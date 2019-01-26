@@ -5,6 +5,7 @@ import numpy as np
 import datetime, time, pytz, tzlocal
 import os
 import requests
+from threading import Thread
 
 is_not_headless = sys.argv.count('--headless') == 0
 
@@ -13,6 +14,8 @@ local = tzlocal.get_localzone()
 threshold_pixel_diff = 30
 threshold_diff_percent = .9
 sunset_url = 'https://api.sunrise-sunset.org/json?lat=32.7353&lng=-117.1490'
+
+prev_thread = None
 
 pipe = None
 def captureImage():
@@ -33,7 +36,13 @@ def captureImage():
     return image
 
 def uploadFile(file):
-    uploadFileSync(file)
+    global prev_thread
+
+    # We don't want to back up too many uploads
+    if prev_thread is not None:
+        prev_thread.join()
+    prev_thread = Thread(target = uploadFileSync)
+    prev_thread.start()
 
 def uploadFileSync(file):
     sp.call(['rclone', 'copy', file, 'aerial-baboons:SD_Zoo_Videos'], shell=False)
@@ -169,6 +178,9 @@ def main():
         if out is not None:
             # When everything done, release the capture
             out.release()
+            # We want to wait in case there are any uploads going.
+            if prev_thread is not None:
+                prev_thread.join()
             uploadFileSync(file_name)
 
 if __name__ == '__main__':
