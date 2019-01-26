@@ -32,6 +32,12 @@ def captureImage():
 
     return image
 
+def uploadFile(file):
+    uploadFileSync(file)
+
+def uploadFileSync(file):
+    sp.call(['rclone', 'copy', file, 'aerial-baboons:SD_Zoo_Videos'], shell=False)
+
 def getGrayEqualized(gray):
     hist,bins = np.histogram(gray.flatten(),256,[0,256])
          
@@ -99,12 +105,14 @@ def main():
 
                 # Get the next sunrise, for tomorrow
                 sunrise = getSunrise(now + datetime.timedelta(days=1))
-            elif not night and now >= sunset:
+            if not night and now >= sunset:
                 night = True
 
-                # Save the video to disk.
-                out.release()
-                out = None
+                if out is not None:
+                    # Save the video to disk.
+                    out.release()
+                    out = None
+                    uploadFile(file_name)
 
                 # Get the next sunset, for tomorrow
                 sunset = getSunset(now + datetime.timedelta(days=1))
@@ -144,6 +152,7 @@ def main():
             if diff_percent >= threshold_diff_percent:
                 out.release()
                 out = None
+                uploadFile(file_name)
 
             # write the flipped frame
             out.write(image)
@@ -155,10 +164,12 @@ def main():
     except KeyboardInterrupt:
         pass
     finally:
-        # When everything done, release the capture
-        out.release()
         if is_not_headless:
             cv2.destroyAllWindows()
+        if out is not None:
+            # When everything done, release the capture
+            out.release()
+            uploadFileSync(file_name)
 
 if __name__ == '__main__':
     main()
