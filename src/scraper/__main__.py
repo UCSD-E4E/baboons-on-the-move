@@ -49,6 +49,8 @@ def uploadFile(file):
 def uploadFileSync(file):
     sp.call(['rclone', 'copy', file, 'aerial-baboons:SD_Zoo_Videos'], shell=False)
 
+    os.remove(file)
+
 def getSunrise(date):
     return getSunInfo(date, 'civil_twilight_begin')
 
