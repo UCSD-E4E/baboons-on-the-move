@@ -9,7 +9,8 @@ from threading import Thread
 
 is_not_headless = sys.argv.count('--headless') == 0
 
-local = tzlocal.get_localzone()
+# local = tzlocal.get_localzone()
+local = pytz.timezone('America/Los_Angeles')
 
 threshold_pixel_diff = 30
 threshold_diff_percent = .9
