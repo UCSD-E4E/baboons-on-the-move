@@ -13,6 +13,7 @@ local = tzlocal.get_localzone()
 
 threshold_pixel_diff = 30
 threshold_diff_percent = .9
+video_length = 10 * 60
 sunset_url = 'https://api.sunrise-sunset.org/json?lat=32.7353&lng=-117.1490'
 
 prev_thread = None
@@ -41,36 +42,11 @@ def uploadFile(file):
     # We don't want to back up too many uploads
     if prev_thread is not None:
         prev_thread.join()
-    prev_thread = Thread(target = uploadFileSync)
+    prev_thread = Thread(target = uploadFileSync, args = (file,))
     prev_thread.start()
 
 def uploadFileSync(file):
     sp.call(['rclone', 'copy', file, 'aerial-baboons:SD_Zoo_Videos'], shell=False)
-
-def getGrayEqualized(gray):
-    hist,bins = np.histogram(gray.flatten(),256,[0,256])
-         
-    cdf = hist.cumsum()
-    cdf_normalized = cdf * hist.max()/ cdf.max()
-
-    cdf_m = np.ma.masked_equal(cdf,0)
-    cdf_m = (cdf_m - cdf_m.min())*255/(cdf_m.max()-cdf_m.min())
-    cdf = np.ma.filled(cdf_m,0).astype('uint8')
-
-    gray_equal = cdf[gray]
-    gray_equal = gray_equal[:,:] / 120
-
-    kernel = np.ones((5,5),np.float32)/100
-    gray_equal = cv2.filter2D(gray_equal,-1,kernel)
-
-    return gray_equal
-
-def getDiffImage(gray_equal, prev_gray_equal):
-    diff = np.abs(prev_gray_equal - gray_equal)
-    idx = diff[:, :] > threshold_pixel_diff
-    diff[idx] = 255
-
-    return diff
 
 def getSunrise(date):
     return getSunInfo(date, 'civil_twilight_begin')
@@ -104,7 +80,6 @@ def main():
         sunrise = getSunrise(now)
         sunset = getSunset(now)
 
-        prev_gray_equal = None
         night = True
         while(True):
             now = local.localize(datetime.datetime.now())
@@ -139,37 +114,25 @@ def main():
             if out is None:
                 file_name = 'output' + str(now.month) + '-' + str(now.day) + '-' + str(now.year) + 'T' + str(now.hour) + '-' + str(now.minute) + '.avi'
                 out = cv2.VideoWriter(file_name,fourcc, 20.0, (800,480))
+                start_time = time.time()
 
             image =  captureImage()
-
-            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-            gray_equal = getGrayEqualized(gray)
-
-            if prev_gray_equal is None:
-                prev_gray_equal = gray_equal
-
-            diff = getDiffImage(gray_equal, prev_gray_equal)
             
             if is_not_headless:
                 # Display the resulting frame
-                cv2.imshow('Color', image)
-                cv2.imshow('Gray', gray)
-                cv2.imshow('Gray Equal', gray_equal)
-                cv2.imshow('Diff', diff)
-
-            diff_percent = (np.sum(diff) / 255) / (800 * 480)
-            if diff_percent >= threshold_diff_percent:
+                cv2.imshow('image', image)
+            
+            if time.time() - start_time > video_length:
                 out.release()
                 out = None
                 uploadFile(file_name)
 
-            # write the flipped frame
-            out.write(image)
+            if out is not None:
+                # write the flipped frame
+                out.write(image)
 
             if cv2.waitKey(5) == 27:
                 break
-
-            prev_gray_equal = gray_equal
     except KeyboardInterrupt:
         pass
     finally:
