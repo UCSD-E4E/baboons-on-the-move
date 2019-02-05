@@ -1,38 +1,49 @@
 # source backgroundsubtraction/cv/bin/activate
 # TODO: Make const file
+# TODO: Add velocity arrows
+# TODO: Brighten dark areas
 import numpy as np
 import cv2 as cv
 import math
 import sys
+
+blur_radius = 15
+params = cv.SimpleBlobDetector_Params()
+params.minDistBetweenBlobs = 5 
+params.minArea = 20
+params.maxArea = 100000000
+params.minCircularity = 0
+params.minConvexity = 0
+distthresh = 100
+momentum_ratio = .5
+min_age = 15
+history = 16
+circle_radius = 80
+bgsub_history = 300
+nmixtures = 10
+background_ratio = .7
+video_fps = 20
+fourcc = cv.VideoWriter_fourcc('D', 'I', 'V', 'X')
 
 # Straight from the opencv tutorial page https://docs.opencv.org/master/db/d5c/tutorial_py_bg_subtraction.html#gsc.tab=0
 def draw_keypoints(vis, keypoints, color = (0, 255, 255)):
     for kp in keypoints:
         if kp.age > min_age:
             x, y = kp.latest().pt
-            cv.circle(vis, (int(x), int(y)), 80, color)
+            dx, dy = kp.velocity
+            cv.circle(vis, (int(x), int(y)), circle_radius, color)
+            cv.circle(vis, (int(x), int(y)), 1, color, 2)
+            cv.line(vis, (int(x), int(y)), (int(x) + int(dx), int(y) + int(dy)), color, 2)
 
 def dkp(vis, keypoints, color = (0, 255, 255)):
     for kp in keypoints:
         x, y = kp.pt
         cv.circle(vis, (int(x), int(y)), 10, color)
 
-params = cv.SimpleBlobDetector_Params()
-params.minDistBetweenBlobs = 50 
-params.minArea = 20
-params.maxArea = 100000000
-params.minCircularity = 0
-params.minConvexity = 0
-distthresh = 120
-momentum_ratio = .5
-min_age = 5
-history = 10
-
 cap = cv.VideoCapture('zoocam.avi')
-fgbg = cv.bgsegm.createBackgroundSubtractorMOG(200, 5, .7)
+fgbg = cv.bgsegm.createBackgroundSubtractorMOG(bgsub_history, nmixtures, background_ratio)
 # fgbg = cv.createBackgroundSubtractorMOG2(500, 16, True)
-fourcc = cv.VideoWriter_fourcc('D', 'I', 'V', 'X')
-out = cv.VideoWriter('output.avi', fourcc, 20, (int(cap.get(3)), int(cap.get(4))), False)
+out = cv.VideoWriter('output.avi', fourcc, video_fps, (int(cap.get(3)), int(cap.get(4))), True)
 blobdetector = cv.SimpleBlobDetector_create(params)
 keypointtrackers = []
 
@@ -97,11 +108,14 @@ def distance(a, b):
 while(1):
     ret, frame = cap.read()
     if ret == True:
-        frame = cv.blur(frame, (3,3))
-        fgmask = fgbg.apply(frame, .1)
+        brightened = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        brightened = cv.equalizeHist(brightened)
+        fgmask = fgbg.apply(brightened, .1)
         # fgmask = fgbg.apply(frame, None, .04)
         inverted_img = cv.bitwise_not(fgmask)
-        inverted_img = cv.blur(inverted_img, (10,10))
+        inverted_img = cv.blur(inverted_img, (blur_radius,blur_radius))
+        # inverted_img = cv.blur(inverted_img, (blur_radius,blur_radius))
+        # reti, inverted_img = cv.threshold(inverted_img, 240, 255, cv.THRESH_BINARY)
         keypoints = blobdetector.detect(inverted_img)
 
         for tracker in keypointtrackers:
@@ -126,7 +140,7 @@ while(1):
                 keypointtrackers.append(newkpt)
 
         draw_keypoints(frame, keypointtrackers, (0,255,255))
-        # dkp(frame, keypoints, (0, 255, 255))
+        dkp(frame, keypoints, (0, 255, 255))
         cv.imshow('frame',frame)
         out.write(frame)
         k = cv.waitKey(30) & 0xff
