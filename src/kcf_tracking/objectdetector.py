@@ -3,6 +3,8 @@ import numpy as np
 from skimage import img_as_ubyte
 from skimage.measure import regionprops, label
 
+from objectregistry import ObjectModel
+
 class ObjectDetector:
     blur_threshold = 100
 
@@ -41,7 +43,7 @@ class ObjectDetector:
     def _is_baboon(self, prop):
         return prop.bbox_area >= 500
 
-    def find_boxes(self, frame):
+    def find_objects(self, frame):
         blur = frame.copy()
         blur = cv2.blur(frame, (5, 5))
 
@@ -51,5 +53,4 @@ class ObjectDetector:
         label_mask = label(mask)
         props = regionprops(label_mask)
 
-        return [(p.bbox[1], p.bbox[0], p.bbox[3], p.bbox[2]) for p in props if self._is_baboon(p)]
-
+        return [ObjectModel(np.array([p.bbox[1], p.bbox[0], p.bbox[3], p.bbox[2]])) for p in props if self._is_baboon(p)]
