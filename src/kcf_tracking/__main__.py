@@ -8,6 +8,8 @@ def main():
     object_tracker = ObjectTracker()
 
     cap = cv2.VideoCapture('video.avi')
+    fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+    out = cv2.VideoWriter('output.avi',fourcc, 20.0, (800,480))
 
     prev_frame = None
     prev_boxes = None
@@ -16,7 +18,6 @@ def main():
 
         if ret == True:
             boxes = object_detector.find_boxes(frame)
-            boxes2 = boxes
 
             if prev_frame is not None and prev_boxes is not None:
                 boxes2 = object_tracker.find_boxes((prev_frame, prev_boxes), (frame, boxes))
@@ -26,8 +27,6 @@ def main():
 
             bounding_boxes = frame.copy()
 
-            print(len(boxes2))
-
             for box in boxes:
                 cv2.rectangle(bounding_boxes, (box[0], box[1]), (box[2], box[3]), (255, 0, 0))
 
@@ -36,6 +35,7 @@ def main():
 
             cv2.imshow('Input',frame)
             cv2.imshow('Bounding Boxes', bounding_boxes)
+            out.write(bounding_boxes)
             k = cv2.waitKey(30) & 0xff
             if k == 27:
                 break
@@ -45,6 +45,7 @@ def main():
         else:
             break
 
+    out.release()
     cap.release()
     cv2.destroyAllWindows()
 
