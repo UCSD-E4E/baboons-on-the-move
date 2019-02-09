@@ -6,7 +6,7 @@ from skimage.measure import regionprops, label
 from objectregistry import ObjectModel
 
 class ObjectDetector:
-    blur_threshold = 100
+    blur_threshold = 75
 
     def __init__(self):
         self.subtractor = cv2.createBackgroundSubtractorKNN()

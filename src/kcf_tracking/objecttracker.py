@@ -1,26 +1,27 @@
 import cv2
 
+from objectregistry import ObjectModel
+
 class ObjectTracker:
-    def __init__(self):
-        self.tracker = cv2.TrackerKCF_create()
+    def __init__(self, object_registry):
+        self._object_registry = object_registry
+        self._tracker_created = set()
 
-    def _filter_duplicates(self, boxes):
-        return boxes
+        self._multitracker = cv2.MultiTracker_create()
 
-    def find_boxes(self, prev_frame, frame):
-        prev_boxes = prev_frame[1]
-        prev_frame = prev_frame[0]
+    def find_objects(self, frame):
+        objects = self._object_registry.get_objects()
 
-        boxes = []# frame[1]
-        frame = frame[0]
+        for obj in objects:
+            if obj.id in self._tracker_created:
+                continue
 
-        for prev_box in prev_boxes:
-            self.tracker = cv2.TrackerKCF_create()
-            self.tracker.init(prev_frame, prev_box)
+            self._multitracker.add(cv2.TrackerKCF_create(), frame, (obj.bbox[0], obj.bbox[1], obj.bbox[2], obj.bbox[3]))
+            self._tracker_created.add(obj.id)
 
-            ret, bbox = self.tracker.update(frame)
-            
-            if ret:
-                boxes.append((int(bbox[0]), int(bbox[1]), int(bbox[2]), int(bbox[3])))
+        success, boxes = self._multitracker.update(frame)
+        self._object_registry.update([ObjectModel(b) for b in boxes])
 
-        return boxes
+        print(success)
+
+        return self._object_registry.get_objects()

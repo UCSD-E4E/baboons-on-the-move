@@ -12,6 +12,9 @@ class ObjectModel:
         # Find center
         return np.array([bbox[0] + (bbox[2] - bbox[0]) / 2, bbox[1] + (bbox[3] - bbox[1]) / 2])
 
+    def tuple_bbox(self):
+        return (self.bbox[0], self.bbox[1]), (self.bbox[2], self.bbox[3])
+
 class ObjectRegistry:
     dist_threshold = 50
 
