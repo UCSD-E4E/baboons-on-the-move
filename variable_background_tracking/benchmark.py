@@ -6,12 +6,20 @@ import skimage
 import time
 import multiprocessing
 
+
 from collections import deque
 from registration import register
 
 from trackingfunctions import *
 
 def main():
+    #local variables of aggregiated run times
+    intersect_time = 0
+    union_time = 0
+    dissimilarity_time = 0
+    weights_time = 0
+    zero_time = 0
+
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
     cap = cv2.VideoCapture('DJI_0769.MP4')
@@ -57,15 +65,32 @@ def main():
             grouped_shifted_history_frames = [(shifted_history_frames[g[0]], shifted_history_frames[g[1]]) for g in frame_group_index]
             grouped_quantized_frames = [(quantized_frames[g[0]], quantized_frames[g[1]]) for g in frame_group_index]
 
+            #including second start time for individual functions
+            start2 = time.clock()
             intersects = [intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
+            curr_time2 = time.clock() - start2
+            intersect_time += curr_time2
+
+            start2 = time.clock()
             union = union_frames(intersects)
+            curr_time2 = time.clock() - start2
+            union_time += curr_time2
 
+            start2 = time.clock()
             history_of_dissimilarity = get_history_of_dissimilarity(shifted_history_frames, quantized_frames)
+            curr_time2 = time.clock() - start2
+            dissimilarity_time += curr_time2
 
+            start2 = time.clock()
             weights = get_weights(quantized_frames)
+            curr_time2 = time.clock() - start2
+            weights_time += curr_time2
 
+            start2 = time.clock()
             frame_new = zero_weights(gray, weights)
             union_new = zero_weights(union, weights)
+            curr_time2 = time.clock() - start2
+            zero_time += curr_time2
 
             foreground = np.absolute(frame_new.astype(np.int32) - union_new.astype(np.int32)).astype(np.uint8)
 
@@ -84,7 +109,6 @@ def main():
             curr_time = time.clock() - start
 
             print('curr_time: ' + str(curr_time))
-
             # Press Q on keyboard to  exit
             if cv2.waitKey(25) & 0xFF == ord('q') or curr_time > 5 * 60 * 60:
                 break
@@ -99,6 +123,20 @@ def main():
 
     # Closes all the frames
     cv2.destroyAllWindows()
+    return intersect_time, union_time, dissimilarity_time, weights_time, zero_time
 
 if __name__ == '__main__':
-    main()
+    #returning runtimes
+    intersect_time, union_time, dissimilarity_time, weights_time, zero_time = main()
+    #Creating txt file
+    f = open( 'times_of_functions.txt', 'w' )
+    f.write( 'intersect: ' + str(intersect_time))
+    f.write('\n')
+    f.write('union: ' + str(union_time))
+    f.write('\n')
+    f.write('dissimilarity: ' + str(dissimilarity_time))
+    f.write('\n')
+    f.write('weights: ' + str(weights_time))
+    f.write('\n')
+    f.write('zero: ' + str(zero_time))
+    f.close()
