@@ -38,13 +38,13 @@ def main():
 
             cv2.imshow('Gray', cv2.resize(gray, (1600, 900)))
 
-            moving_foreground = frame
+            moving_foreground = gray
 
             moving_foreground = define_blobs(moving_foreground)
 
             # Display the resulting frame
             cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (1600, 900)))
-            #out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
+            out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             # Press Q on keyboard to  exit
             if cv2.waitKey(25) & 0xFF == ord('q'):
