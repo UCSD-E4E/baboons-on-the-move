@@ -9,7 +9,7 @@ import multiprocessing
 from collections import deque
 from registration import register
 
-from trackingfunctions import *
+from foreground_extraction import *
 
 def main():
     # Create a VideoCapture object and read from input file

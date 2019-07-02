@@ -10,7 +10,7 @@ import multiprocessing
 from collections import deque
 from registration import register
 
-from trackingfunctions import *
+from foreground_extraction import *
 
 def main():
     #local variables of aggregiated run times
