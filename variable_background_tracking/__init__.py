@@ -6,6 +6,7 @@ import skimage
 import time
 import multiprocessing
 
+
 from collections import deque
 from registration import register
 
@@ -109,13 +110,13 @@ def get_moving_foreground(weights, foreground, dissimilarity):
 
     return moving_foreground * 255
 
-def main():  
+def main():
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
     cap = cv2.VideoCapture('DJI_0769.MP4')
-    
+
     # Check if camera opened successfully
-    if (cap.isOpened()== False): 
+    if (cap.isOpened()== False):
         print("Error opening video stream or file")
 
     frame_width = int(cap.get(3))
@@ -178,7 +179,7 @@ def main():
             out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             push_history_frame(gray)
-        
+
             curr_time = time.clock() - start
 
             print('curr_time: ' + str(curr_time))
@@ -186,17 +187,20 @@ def main():
             # Press Q on keyboard to  exit
             if cv2.waitKey(25) & 0xFF == ord('q') or curr_time > 5 * 60 * 60:
                 break
-            
+
         # Break the loop
-        else: 
+        else:
             break
-    
+
     # When everything done, release the video capture object
     cap.release()
     out.release()
-    
+
     # Closes all the frames
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    main()
+    #main()
+    #Adding Function to Time Each Iteration Of the Loop (intersect, dissimilarity, zero)
+    import timeit
+    print(timeit.timeit("main()", setup="from __main__ import main"))
