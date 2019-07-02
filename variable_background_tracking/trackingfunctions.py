@@ -13,12 +13,19 @@ history_frame_count = 10
 
 history_frames = deque([])
 def push_history_frame(frame):
+    '''
+    Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count,
+    remove the oldest frame
+    '''
     if len(history_frames) == history_frame_count:
         history_frames.popleft()
 
     history_frames.append(frame)
 
 def shift_frame(input):
+    '''
+    Takes in transformation matrix; does homography transformation to register/align two frames
+    '''
     frame = input[0]
     previous_frame = input[1]
 
@@ -27,9 +34,17 @@ def shift_frame(input):
     return (cv2.warpPerspective(previous_frame, M, (previous_frame.shape[1], previous_frame.shape[0])).astype(np.uint8), M)
 
 def quantize(frame):
+    '''
+    Normalize pixel values from 0-255 to values from 0-10
+    Returns quantized frame
+    '''
     return (frame.astype(np.float32) * 10 / 255).astype(np.int8)
 
 def intersect_frames(frames, q_frames):
+    '''
+    Intersect two consecutive frames to find common background between those two frames
+    Returns the single frame produced by intersection
+    '''
     print('intersect')
 
     mask = (np.abs(q_frames[0] - q_frames[1]) <= 1).astype(np.float64)
@@ -38,6 +53,10 @@ def intersect_frames(frames, q_frames):
     return skimage.img_as_ubyte(combined)
 
 def union_frames(frames):
+    '''
+    Union all frame intersections to produce acting background for all frames
+    Returns the single union frame produced by unioning all frames in input
+    '''
     print('union')
 
     union = np.zeros(frames[0].shape).astype(np.uint8)
@@ -48,6 +67,10 @@ def union_frames(frames):
     return union
 
 def get_history_of_dissimilarity(frames, q_frames):
+    '''
+    Calculate history of dissimilarity according to figure 10 of paper
+    Returns frame representing history of dissimilarity
+    '''
     print('dissimilarity')
 
     dissimilarity = np.zeros(frames[0].shape).astype(np.uint32)
@@ -62,6 +85,11 @@ def get_history_of_dissimilarity(frames, q_frames):
     return (dissimilarity / len(frames)).astype(np.uint8)
 
 def get_weights(q_frames):
+    '''
+    Calculate weights based on frequency of commonality between frames according
+    to figure 12 of paper
+    Returns frame representing frequency of commonality
+    '''
     print('weights')
 
     weights = np.zeros(q_frames[0].shape).astype(np.uint8)
@@ -76,6 +104,11 @@ def get_weights(q_frames):
     return weights
 
 def zero_weights(frame, weights):
+    '''
+    Gets foreground of frame by zeroing out all pixels with large weights, i.e. pixels in which frequency of commonality
+    is really high, meaning that it hasn't changed much or at all in the history frames, according to figure 13 of paper
+    Returns frame representing the foreground
+    '''
     print('zero')
 
     f = frame.copy()
@@ -84,6 +117,15 @@ def zero_weights(frame, weights):
     return f
 
 def get_moving_foreground(weights, foreground, dissimilarity):
+    '''
+    Calculates moving foreground according to figure 14 of paper
+    Each of W and D (weights and dissimilarity) is assigned to high, medium, and low
+
+    Medium commonality AND low commonality but low dissimiliarity are considered moving foreground
+    Otherwise, it is either a still or flickering background
+
+    Return frame representing moving foreground
+    '''
     history_frame_count_third = math.floor(float(history_frame_count - 1) / 3)
     third_gray = 255.0 / 3.0
 
