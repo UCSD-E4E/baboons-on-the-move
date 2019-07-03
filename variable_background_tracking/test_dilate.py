@@ -36,15 +36,15 @@ def main():
         if ret == True:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            cv2.imshow('Gray', cv2.resize(gray, (1600, 900)))
-
             moving_foreground = gray
 
-            moving_foreground = define_blobs(moving_foreground)
+            moving_foreground = remove_noise(moving_foreground)
+            frame_with_detected_blobs = detect_blobs(moving_foreground, frame)
 
             # Display the resulting frame
             cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (1600, 900)))
-            out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
+            cv2.imshow('detected_blobs', cv2.resize(frame_with_detected_blobs, (1600, 900)))
+            #out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             # Press Q on keyboard to  exit
             if cv2.waitKey(25) & 0xFF == ord('q'):
