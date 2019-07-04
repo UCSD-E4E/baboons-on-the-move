@@ -12,3 +12,5 @@ Attempt to detect baboons using simple background subtraction methods. Works wel
 Interactive test of various common builtin [opencv tracking methods](https://www.learnopencv.com/object-tracking-using-opencv-cpp-python/). Allows user to draw bounding box around baboon, and attempts to track it for duration of the video. Only able to track, not detect baboons.
 ### variable_background_tracking
 Attempt to isolate moving foreground from a variable background by implementing the algorithm described in [this paper](https://arxiv.org/abs/1706.02672). At the moment, algorithm works well but is incredibly slow, as it has not been optimized for performance.
+### registration_bg_subtraction
+Use registration (stabilization) functions from variable_background_tracking, and apply regular background subtraction on the results
