@@ -9,7 +9,7 @@ import multiprocessing
 from collections import deque
 from registration import register
 
-history_frame_count = 10
+from config import *
 
 history_frames = deque([])
 def push_history_frame(frame):
@@ -17,7 +17,7 @@ def push_history_frame(frame):
     Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count,
     remove the oldest frame
     '''
-    if len(history_frames) == history_frame_count:
+    if len(history_frames) == HISTORY_FRAME_COUNT:
         history_frames.popleft()
 
     history_frames.append(frame)
@@ -112,7 +112,7 @@ def zero_weights(frame, weights):
     print('zero')
 
     f = frame.copy()
-    f[weights >= history_frame_count - 1] = 0
+    f[weights >= HISTORY_FRAME_COUNT - 1] = 0
 
     return f
 
@@ -126,11 +126,11 @@ def get_moving_foreground(weights, foreground, dissimilarity):
 
     Return frame representing moving foreground
     '''
-    history_frame_count_third = math.floor(float(history_frame_count - 1) / 3)
+    history_frame_count_third = math.floor(float(HISTORY_FRAME_COUNT - 1) / 3)
     third_gray = 255.0 / 3.0
 
     weights_low = (weights <= history_frame_count_third).astype(np.uint8)
-    weights_medium = np.logical_and(history_frame_count_third < weights, weights < history_frame_count - 1).astype(np.uint8) * 2
+    weights_medium = np.logical_and(history_frame_count_third < weights, weights < HISTORY_FRAME_COUNT - 1).astype(np.uint8) * 2
 
     weight_levels = weights_low + weights_medium
 

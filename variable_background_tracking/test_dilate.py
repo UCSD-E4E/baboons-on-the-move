@@ -12,10 +12,12 @@ from registration import register
 from foreground_extraction import *
 from blob_detection import *
 
+from config import *
+
 def main():
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
-    cap = cv2.VideoCapture('first_attempt_using_image_registration.mp4')
+    cap = cv2.VideoCapture(INPUT_MASK)
 
     # Check if camera opened successfully
     if (cap.isOpened()== False):
@@ -23,7 +25,7 @@ def main():
 
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
-    out = cv2.VideoWriter('dilation_out.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width,frame_height))
+    out = cv2.VideoWriter(OUTPUT_MASK_BLOB_DETECTION, cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
@@ -42,8 +44,8 @@ def main():
             frame_with_detected_blobs = detect_blobs(moving_foreground, frame)
 
             # Display the resulting frame
-            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (1600, 900)))
-            cv2.imshow('detected_blobs', cv2.resize(frame_with_detected_blobs, (1600, 900)))
+            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+            cv2.imshow('detected_blobs', cv2.resize(frame_with_detected_blobs, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
             #out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             # Press Q on keyboard to  exit

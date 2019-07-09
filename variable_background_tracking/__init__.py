@@ -10,11 +10,12 @@ from collections import deque
 from registration import register
 
 from foreground_extraction import *
+from config import *
 
 def main():
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
-    cap = cv2.VideoCapture('DJI_0769.MP4')
+    cap = cv2.VideoCapture(INPUT_VIDEO)
 
     # Check if camera opened successfully
     if (cap.isOpened()== False):
@@ -22,7 +23,7 @@ def main():
 
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
-    out = cv2.VideoWriter('outpy.mp4', cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width,frame_height))
+    out = cv2.VideoWriter(OUTPUT_MASK, cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width,frame_height))
 
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
@@ -35,10 +36,10 @@ def main():
         if ret == True:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            cv2.imshow('Gray', cv2.resize(gray, (1600, 900)))
+            cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
 
             # We need at least n frames to continue
-            if (len(history_frames) < history_frame_count):
+            if (len(history_frames) < HISTORY_FRAME_COUNT):
                 push_history_frame(gray)
                 continue
 
@@ -76,7 +77,7 @@ def main():
                 moving_foreground = np.multiply(moving_foreground, mask)
 
             # Display the resulting frame
-            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (1600, 900)))
+            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
             out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             push_history_frame(gray)
