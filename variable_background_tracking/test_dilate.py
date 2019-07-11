@@ -5,6 +5,7 @@ import cmath
 import skimage
 import time
 import multiprocessing
+import sys
 
 from collections import deque
 from registration import register
@@ -22,6 +23,7 @@ def main():
     # Check if camera opened successfully
     if (cap.isOpened()== False):
         print("Error opening video stream or file")
+        sys.exit()
 
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
