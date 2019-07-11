@@ -8,6 +8,8 @@ import multiprocessing
 
 from collections import deque
 
+from config import *
+
 def remove_noise(foreground_mask):
     '''
     Uses OpenCV morphological transformations to make blobs more defined
