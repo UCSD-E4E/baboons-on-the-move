@@ -43,11 +43,15 @@ def main():
             moving_foreground = gray
 
             moving_foreground = remove_noise(moving_foreground)
-            frame_with_detected_blobs = detect_blobs(moving_foreground, frame)
+            frame_with_detected_blobs, mask_blobs = detect_blobs(moving_foreground, frame)
 
             # Display the resulting frame
-            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+
+            #cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
             cv2.imshow('detected_blobs', cv2.resize(frame_with_detected_blobs, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+            #display the frame that keypoints are being found from as well as keypoints detected
+            cv2.imshow('detected_blobs_mask', cv2.resize(mask_blobs, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+            
             #out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             # Press Q on keyboard to  exit

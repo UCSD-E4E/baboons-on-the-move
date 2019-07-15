@@ -43,5 +43,8 @@ def detect_blobs(foreground_mask, rgb_frame):
 
     # draw detected blobs
     frame_with_blobs = cv2.drawKeypoints(rgb_frame, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+ #creating another image with the keypoints drawn onto the image that it is finding keypoints on
+    mask_with_blobs = cv2.drawKeypoints(foreground_mask, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    return frame_with_blobs
+
+    return frame_with_blobs, mask_with_blobs

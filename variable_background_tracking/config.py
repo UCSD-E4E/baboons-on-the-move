@@ -34,3 +34,6 @@ BLOB_DET_PARAMS.minThreshold = 10
 BLOB_DET_PARAMS.maxThreshold = 200
 BLOB_DET_PARAMS.filterByArea = True
 BLOB_DET_PARAMS.minArea = 1
+#adding a filter by inertia
+BLOB_DET_PARAMS.filterByInertia = True
+BLOB_DET_PARAMS.minInertiaRatio = 0.001
