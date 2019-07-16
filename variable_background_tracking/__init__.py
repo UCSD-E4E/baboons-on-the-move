@@ -20,6 +20,7 @@ def main():
     # Check if camera opened successfully
     if (cap.isOpened()== False):
         print("Error opening video stream or file")
+        exit()
 
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
