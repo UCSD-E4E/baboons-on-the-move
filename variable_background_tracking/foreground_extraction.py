@@ -52,7 +52,19 @@ def intersect_frames(frames, q_frames):
     combined[mask] = 0
 
     return combined
-    # return skimage.img_as_ubyte(combined)
+
+def intersect_frames_old(frames, q_frames):
+    '''
+    Intersect two consecutive frames to find common background between those two frames
+    Returns the single frame produced by intersection
+    '''
+    print('intersect_old')
+
+    mask = (np.abs(q_frames[0] - q_frames[1]) <= 1).astype(np.float64)
+    combined = (np.multiply(skimage.img_as_float(frames[0]), mask) + np.multiply(skimage.img_as_float(frames[1]), mask)) / 2.0
+
+    return skimage.img_as_ubyte(combined)
+
 
 def union_frames(frames):
     '''

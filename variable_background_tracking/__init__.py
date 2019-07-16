@@ -58,6 +58,10 @@ def main():
             grouped_shifted_history_frames = [(shifted_history_frames[g[0]], shifted_history_frames[g[1]]) for g in frame_group_index]
             grouped_quantized_frames = [(quantized_frames[g[0]], quantized_frames[g[1]]) for g in frame_group_index]
 
+            # choose to use new or old intersects function
+            if(ACTIVE_INTERSECT == 1):
+                intersect_frames = intersect_frames_old
+
             intersects = [intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
             union = union_frames(intersects)
 
