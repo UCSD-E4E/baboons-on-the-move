@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 from config import *
 
@@ -36,12 +37,13 @@ def main():
             cv2.imshow("Gray1", cv2.resize(gray1, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
             cv2.imshow("Gray2", cv2.resize(gray2, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
 
-            # calculate frame intersect
+            # calculate frame diff
+            union = cv2.bitwise_or(gray1, gray2)
+            intersect = cv2.bitwise_and(gray1, gray2)
+            diff = cv2.bitwise_and(union, cv2.bitwise_not(intersect))
 
-            #PLACEHOLDER just display frame1
-            intersect = gray1
-            cv2.imshow("Intersect", cv2.resize(intersect, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
-            out.write(cv2.cvtColor(intersect, cv2.COLOR_GRAY2BGR))
+            cv2.imshow("Diff", cv2.resize(diff, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+            out.write(cv2.cvtColor(diff, cv2.COLOR_GRAY2BGR))
 
             if cv2.waitKey(25) & 0xFF == ord('q'):
                 break
