@@ -3,14 +3,15 @@ import cv2
 cwd = os.getcwd()
 
 DATA_PATH = '../data'
-OUTPUT_PATH = '../out'
+OUTPUT_PATH = './'
 
 # OPENCV DISPLAY DIMENSIONS
-DISPLAY_WIDTH = 800
-DISPLAY_HEIGHT = 600
+DISPLAY_WIDTH = 1600
+DISPLAY_HEIGHT = 900
 
 ### FOR __init__.py ###
-INPUT_VIDEO = os.path.join(DATA_PATH, 'DJI_0769.MP4')
+#INPUT_VIDEO = os.path.join(DATA_PATH, 'DJI_0769.MP4')
+INPUT_VIDEO = os.path.join(DATA_PATH, 'input.mp4')
 OUTPUT_MASK = os.path.join(OUTPUT_PATH, 'output_mask.mp4')
 
 HISTORY_FRAME_COUNT = 10

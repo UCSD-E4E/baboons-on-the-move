@@ -20,6 +20,8 @@ def main():
     # If the input is the camera, pass 0 instead of the video file name
     cap = cv2.VideoCapture(INPUT_MASK)
 
+    cap_orig = cv2.VideoCapture(INPUT_VIDEO)
+
     # Check if camera opened successfully
     if (cap.isOpened()== False):
         print("Error opening video stream or file")
@@ -29,6 +31,11 @@ def main():
     frame_height = int(cap.get(4))
     out = cv2.VideoWriter(OUTPUT_MASK_BLOB_DETECTION, cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
+    # Process original video if provided
+    if (cap_orig.isOpened() and int(cap_orig.get(3) == frame_width and cap_orig.get(4) == frame_height)):
+        using_orig = True
+
+
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
 
@@ -37,13 +44,14 @@ def main():
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
+        orig_ret, orig_frame = cap_orig.read()
         if ret == True:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
             moving_foreground = gray
 
             moving_foreground = remove_noise(moving_foreground)
-            frame_with_detected_blobs, mask_blobs = detect_blobs(moving_foreground, frame)
+            frame_with_detected_blobs, mask_blobs, orig_frame_with_blobs = detect_blobs(moving_foreground, frame, orig_frame)
 
             # Display the resulting frame
 
@@ -51,8 +59,15 @@ def main():
             cv2.imshow('detected_blobs', cv2.resize(frame_with_detected_blobs, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
             #display the frame that keypoints are being found from as well as keypoints detected
             cv2.imshow('detected_blobs_mask', cv2.resize(mask_blobs, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
-            
-            #out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
+
+            # display original frame with overlayed detected blobs
+            if(using_orig and orig_frame_with_blobs is not None):
+                cv2.imshow('detected_blobs_on_orig', cv2.resize(orig_frame_with_blobs, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+
+            #if not using_orig:
+            #    out.write(cv2.cvtColor(frame_with_detected_blobs, cv2.COLOR_GRAY2BGR))
+            #else:
+            #    out.write(cv2.cvtColor(orig_frame_with_blobs, cv2.COLOR_GRAY2BGR))
 
             # Press Q on keyboard to  exit
             if cv2.waitKey(25) & 0xFF == ord('q'):
