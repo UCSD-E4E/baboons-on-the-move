@@ -1,12 +1,15 @@
 import cv2
 import numpy as np
+import sys
 
 from config import *
 
 def main():
 
-    cap1 = cv2.VideoCapture("../data/outpy_blur4x4.mp4")
-    cap2 = cv2.VideoCapture("../data/outpy_nonblur.mp4")
+    cap1 = cv2.VideoCapture(DIFF_VIDEO_1)
+    cap2 = cv2.VideoCapture(DIFF_VIDEO_2)
+
+    print(DIFF_VIDEO_1)
 
     # check if camera opened successfully
     if(cap1.isOpened() == False):
@@ -24,7 +27,7 @@ def main():
     frame_width = int(cap1.get(3))
     frame_height = int(cap1.get(4))
 
-    out = cv2.VideoWriter("./diff_output.mp4", cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width, frame_height))
+    out = cv2.VideoWriter(DIFF_OUTPUT, cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width, frame_height))
 
     while(cap1.isOpened() and cap2.isOpened()):
         ret1, frame1 = cap1.read()

@@ -6,8 +6,8 @@ DATA_PATH = '../data'
 OUTPUT_PATH = '../out'
 
 # OPENCV DISPLAY DIMENSIONS
-DISPLAY_WIDTH = 1600
-DISPLAY_HEIGHT = 900
+DISPLAY_WIDTH = 800
+DISPLAY_HEIGHT = 600
 
 ### FOR __init__.py ###
 INPUT_VIDEO = os.path.join(DATA_PATH, 'DJI_0769.MP4')
@@ -40,3 +40,10 @@ BLOB_DET_PARAMS.minArea = 1
 #adding a filter by inertia
 BLOB_DET_PARAMS.filterByInertia = True
 BLOB_DET_PARAMS.minInertiaRatio = 0.001
+
+
+### DIFF VIDEOS
+DIFF_VIDEO_1 = os.path.join(DATA_PATH, 'outpy_blur2x2.mp4')
+DIFF_VIDEO_2 = os.path.join(DATA_PATH, 'output_mask_blur_2x2_new_intersect.mp4')
+DIFF_OUTPUT = os.path.join(DATA_PATH, 'diff_output.mp4')
+
