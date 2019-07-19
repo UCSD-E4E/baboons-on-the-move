@@ -94,7 +94,7 @@ def get_history_of_dissimilarity(frames, q_frames):
             continue
 
         mask = (np.abs(q_frames[i] - q_frames[i - 1]) > 1).astype(np.uint32)
-        dissimilarity = dissimilarity + np.multiply(np.abs(frames[i].astype(np.uint32) - frames[i - 1].astype(np.uint32)), mask)
+        dissimilarity = dissimilarity + np.multiply(np.abs(frames[i].astype(np.int32) - frames[i - 1].astype(np.int32)), mask)
 
     return (dissimilarity / len(frames)).astype(np.uint8)
 
