@@ -93,10 +93,10 @@ def get_history_of_dissimilarity(frames, q_frames):
         if i == 0:
             continue
 
-        mask = (np.abs(q_frames[i] - q_frames[i - 1]) > 1).astype(np.uint32)
-        dissimilarity = dissimilarity + np.multiply(np.abs(frames[i].astype(np.int32) - frames[i - 1].astype(np.int32)), mask)
+        mask = (np.abs(q_frames[i] - q_frames[i - 1]) > 1)
+        dissimilarity = dissimilarity + np.multiply(np.abs(frames[i] - frames[i - 1]), mask)
 
-    return (dissimilarity / len(frames)).astype(np.uint8)
+    return (dissimilarity / len(frames))
 
 def get_weights(q_frames):
     '''
