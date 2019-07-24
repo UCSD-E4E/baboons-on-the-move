@@ -33,10 +33,10 @@ def main():
 
     # Initialize baboon detector object
     configs = {
-        registration_strategy = 'orb'
+        'registration_strategy': 'orb'
     }
 
-    baboon_detector = BaboonDetector(configs)
+    tracker = BaboonTracker(configs)
 
     start = time.clock()
     # Read until video is completed
@@ -48,10 +48,15 @@ def main():
 
             cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
 
-            baboon_detector.process_gray_frame(gray)
+            # We need at least n frames to continue
+            if (len(history_frames) < HISTORY_FRAME_COUNT):
+                tracker.push_history_frame(gray)
+                continue
 
-            shifted_history_frames = baboon_detector.shift_history_frames()
+            # returns list of tuples of (shifted frames, transformation matrix)
+            shifted_history_frames = tracker.shift_history_frames()
 
+            # splits tuple list into two lists
             Ms = [f[1] for f in shifted_history_frames]
             shifted_history_frames = [f[0] for f in shifted_history_frames]
 

@@ -12,31 +12,32 @@ class Registration_Strategy():
         self.cpus = multiprocessing.cpu_count()
         self.pool = multiprocessing.Pool(processes=self.cpus)
 
-    def shift_frame(frame, previous_frame):
+    def shift_frame(self, frame, previous_frame):
         '''
         Takes in transformation matrix; does homography transformation to register/align two frames
         '''
         M = self.register(previous_frame, frame)
         return (cv2.warpPerspective(previous_frame, M, (previous_frame.shape[1], previous_frame.shape[0])).astype(np.uint8), M)
 
-    def shift_all_frames(target_frame, frames):
+    def shift_all_frames(self, target_frame, frames):
         '''
         Shifts all frames to target frame, returns list of shifted frames
         '''
         return [self.shift_frame(target_frame, f) for f in frames]
 
-    def shift_all_frames_multiprocessing(frames, pool):
+    def shift_all_frames_multiprocessing(self, target_frame, frames, pool):
         '''
         Shifts all frames to target frame, returns list of shifted frames
         '''
-        return pool.map(self.shift_frame, [(gray, f) for f in history_frames])
+        return pool.map(self.shift_frame, [(target_frame, f) for f in history_frames])
 
 
 class ORB_Registration_Strategy(Registration_Strategy):
-    def register(frame1, frame2):
+    def register(self, frame1, frame2):
         '''
         Registration function to find homography transformation between two frames using ORB
-        Returns transformation matrix to convert frame1 to frame2
+        Returns list of tuples containing (warped_frame, transformation matrix)
+        (Not including most recent frame)
         '''
         orb = cv2.ORB_create(MAX_FEATURES)
 
@@ -68,29 +69,29 @@ class ORB_Registration_Strategy(Registration_Strategy):
         return h
 
 class FFT_Registration_Strategy(Registration_Strategy):
-    def _delta_x(x_bar, M):
+    def _delta_x(self, x_bar, M):
         if x_bar > M / 2:
             return x_bar - M
         else:
             return x_bar
 
-    def _delta_y(y_bar, N):
+    def _delta_y(self, y_bar, N):
         if y_bar > N / 2:
             return y_bar - N
         else:
             return y_bar
 
-    def _compute_ratio(frame, previous_frame):
+    def _compute_ratio(self, frame, previous_frame):
         frame_star = np.conj(frame)
 
         num = np.multiply(previous_frame, frame_star)
 
         return np.fft.ifft2(num)
 
-    def _exp(m, n, M, N, delta):
+    def _exp(self, m, n, M, N, delta):
         return cmath.exp(-1j * 2 * math.pi * ((m * delta[1]) / M + (n * delta[0]) / N))
 
-    def register(frame1, frame2):
+    def register(self, frame1, frame2):
         '''
         Uses Fast Fourier Transform to find transformation matrix betwen two frames
         '''
