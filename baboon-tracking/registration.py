@@ -8,7 +8,7 @@ MAX_FEATURES = 500
 GOOD_MATCH_PERCENT = 0.15
 
 class Registration_Strategy():
-    def __init__():
+    def __init__(self):
         self.cpus = multiprocessing.cpu_count()
         self.pool = multiprocessing.Pool(processes=self.cpus)
 
@@ -19,18 +19,14 @@ class Registration_Strategy():
         M = self.register(previous_frame, frame)
         return (cv2.warpPerspective(previous_frame, M, (previous_frame.shape[1], previous_frame.shape[0])).astype(np.uint8), M)
 
-    def shift_all_frames(self, target_frame, frames):
+    def shift_all_frames(self, target_frame, frames, pool=None):
         '''
         Shifts all frames to target frame, returns list of shifted frames
         '''
-        return [self.shift_frame(target_frame, f) for f in frames]
-
-    def shift_all_frames_multiprocessing(self, target_frame, frames, pool):
-        '''
-        Shifts all frames to target frame, returns list of shifted frames
-        '''
-        return pool.map(self.shift_frame, [(target_frame, f) for f in history_frames])
-
+        if(pool is not None):
+            return pool.map(self.shift_frame, [(target_frame, f) for f in frames])
+        else:
+            return [self.shift_frame(target_frame, f) for f in frames]    
 
 class ORB_Registration_Strategy(Registration_Strategy):
     def register(self, frame1, frame2):

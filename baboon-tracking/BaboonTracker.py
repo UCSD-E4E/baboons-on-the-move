@@ -11,7 +11,7 @@ class BaboonTracker():
         self.history_frames = deque([])
         self.pool = pool
 
-    def push_history_frame(frame):
+    def push_history_frame(self, frame):
         '''
         Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count,
         remove the oldest frame
@@ -21,7 +21,7 @@ class BaboonTracker():
 
         self.history_frames.append(frame)
 
-    def shift_history_frames():
+    def shift_history_frames(self):
         '''
         Shift all history frames to the latest frame
         Return all shifted history frames 
@@ -29,14 +29,10 @@ class BaboonTracker():
         target_frame = self.history_frames[-1]
         frames = self.history_frames[:-1]
 
-        if(pool is not None):
-            print("shifting history frames (non-multiprocessing)")
-           return self.registration_strategy.shift_all_frames_multiprocessing(target_frame, frames, pool)
-        else:
-            print("shifting history frames (multiprocessing)")
-            return self.registration_strategy.shift_all_frames(target_frame, frames)
-
-    def generate_motion_mask():
+        return self.registration_strategy.shift_all_frames(target_frame, frames, pool)
+        
+    def generate_motion_mask(self, shifted_history_frames, Ms, pool):
         '''
         Generate the mask of movement for the current frame
         '''
+        return self.image_diff_strategy.generate_mask(shifted_history_frames, Ms, pool)
