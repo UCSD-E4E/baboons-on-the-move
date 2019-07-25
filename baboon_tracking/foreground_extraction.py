@@ -21,8 +21,8 @@ class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStr
         Returns quantized frame
         '''
         return (frame.astype(np.float32) * 10 / 255).astype(np.int8)
-    
-    def _intersect_frames(self, shifted_history_frames, q_frames):
+
+    def _intersect_frames(self, frames, q_frames):
         '''
         Intersect two consecutive frames to find common background between those two frames
         Returns the single frame produced by intersection
@@ -30,7 +30,7 @@ class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStr
         print('intersect')
 
         mask = np.abs(q_frames[0] - q_frames[1]) <= 1
-        combined = q_frames[0]
+        combined = q_frames[0].copy()
         combined[mask] = 0
 
         return combined
@@ -139,7 +139,7 @@ class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStr
         '''
         Takes in list of registered grayscale history frames
         Quantizes them, then generates mask using weights and history of dissimilarity
-        
+
         gray - current frame
         shifted_history_frames - list of registered history frames
         Ms - transformation matrices aligning each registered history frame
@@ -149,7 +149,7 @@ class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStr
             quantized_frames = pool.map(self._quantize_frame, [f for f in shifted_history_frames])
         else:
             quantized_frames = [self._quantize_frame(f) for f in shifted_history_frames]
-        
+
         masks = [cv2.warpPerspective(np.ones(gray.shape), M, (gray.shape[1], gray.shape[0])).astype(np.uint8) for M in Ms]
 
         frame_group_index = range(len(shifted_history_frames))
