@@ -1,14 +1,14 @@
 from collections import deque
 
 from .registration import registration_strategies
-from .image_diff import image_diff_strategies
+from .foreground_extraction import foreground_extraction_strategies
 from .object_tracking import object_tracking_strategies
 
 class BaboonTracker():
 
     def __init__(self, config, pool=None):
         self.registration_strategy = registration_strategies[config['registration_strategy']](config)
-        self.image_diff_strategy = image_diff_strategies[config['image_diff_strategy']](config)
+        self.foreground_extraction_strategy = foreground_extraction_strategies[config['foreground_extraction_strategy']](config)
         self.blob_tracking_strategy = None
 
         self.config = config
@@ -36,4 +36,4 @@ class BaboonTracker():
         '''
         Generate the mask of movement for the current frame
         '''
-        return self.image_diff_strategy.generate_mask(gray, shifted_history_frames, Ms, pool=self.pool)
+        return self.foreground_extraction_strategy.generate_mask(gray, shifted_history_frames, Ms, pool=self.pool)

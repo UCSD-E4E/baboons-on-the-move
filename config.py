@@ -50,7 +50,7 @@ DIFF_OUTPUT = os.path.join(DATA_PATH, 'diff_output.mp4')
 
 configs = {
     'registration_strategy': 'orb',
-    'image_diff_strategy': 'vbs',
+    'foreground_extraction_strategy': 'vbs',
     'object_tracking_strategy': 'kalman',
 
     'history_frame_count':HISTORY_FRAME_COUNT,

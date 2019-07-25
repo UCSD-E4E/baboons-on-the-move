@@ -2,14 +2,14 @@ import cv2
 import numpy as np
 import math
 
-class ImageDiffStrategy():
+class ForegroundExtractionStrategy():
     def __init__(self, config):
         self.config = config
 
     def generate_mask(self):
         pass
 
-class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
+class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrategy):
     '''
     This is the strategy that we've been implementing, using hist of dissimilarity,
     freq of commonality, weights, etc
@@ -22,7 +22,7 @@ class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
         '''
         return (frame.astype(np.float32) * 10 / 255).astype(np.int8)
     
-    def _intersect_frames(self, q_frames):
+    def _intersect_frames(self, shifted_history_frames, q_frames):
         '''
         Intersect two consecutive frames to find common background between those two frames
         Returns the single frame produced by intersection
@@ -109,11 +109,12 @@ class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
 
         Return frame representing moving foreground
         '''
-        history_frame_count_third = math.floor(float(HISTORY_FRAME_COUNT - 1) / 3)
+
+        history_frame_count_third = math.floor(float(self.config['history_frame_count'] - 1) / 3)
         third_gray = 255.0 / 3.0
 
         weights_low = (weights <= history_frame_count_third).astype(np.uint8)
-        weights_medium = np.logical_and(history_frame_count_third < weights, weights < HISTORY_FRAME_COUNT - 1).astype(np.uint8) * 2
+        weights_medium = np.logical_and(history_frame_count_third < weights, weights < self.config['history_frame_count'] - 1).astype(np.uint8) * 2
 
         weight_levels = weights_low + weights_medium
 
@@ -159,14 +160,14 @@ class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
         grouped_quantized_frames = [(quantized_frames[g[0]], quantized_frames[g[1]]) for g in frame_group_index]
 
         intersects = [self._intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
-        union = self._union_frames(self, intersects)
+        union = self._union_frames(intersects)
 
-        history_of_dissimilarity = self._get_history_of_dissimilarity(self, shifted_history_frames, quantized_frames)
+        history_of_dissimilarity = self._get_history_of_dissimilarity(shifted_history_frames, quantized_frames)
 
-        weights = self._get_weights(self, quantized_frames)
+        weights = self._get_weights(quantized_frames)
 
-        frame_new = self._zero_weights(self, gray, weights)
-        union_new = self._zero_weights(self, union, weights)
+        frame_new = self._zero_weights(gray, weights)
+        union_new = self._zero_weights(union, weights)
 
         foreground = np.absolute(frame_new.astype(np.int32) - union_new.astype(np.int32)).astype(np.uint8)
 
@@ -178,7 +179,7 @@ class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
 
         return moving_foreground
 
-class SimpleBackroundSub_ImageDiffStrategy(ImageDiffStrategy):
+class SimpleBackroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrategy):
     '''
     Using simple python background subtraction
     '''
@@ -186,7 +187,7 @@ class SimpleBackroundSub_ImageDiffStrategy(ImageDiffStrategy):
     def generate_mask(self):
         pass
 
-image_diff_strategies = {
-    'vbs': VariableBackgroundSub_ImageDiffStrategy,
-    'simple': SimpleBackroundSub_ImageDiffStrategy
+foreground_extraction_strategies = {
+    'vbs': VariableBackgroundSub_ForegroundExtractionStrategy,
+    'simple': SimpleBackroundSub_ForegroundExtractionStrategy
 }
