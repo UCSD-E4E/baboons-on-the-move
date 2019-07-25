@@ -1,24 +1,17 @@
 import cv2
 import numpy as np
-import math
-import cmath
-import skimage
 import time
 import multiprocessing
 
-from collections import deque
-from registration import register
-
-from foreground_extraction import *
+from baboon_tracking.BaboonTracker import BaboonTracker
 from config import *
-
-from BaboonDetector import BaboonDetector
 
 def main():
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
     cap = cv2.VideoCapture(INPUT_VIDEO)
 
+    print(INPUT_VIDEO)
     # Check if camera opened successfully
     if (cap.isOpened()== False):
         print("Error opening video stream or file")
@@ -31,12 +24,7 @@ def main():
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
 
-    # Initialize baboon detector object
-    configs = {
-        'registration_strategy': 'orb'
-    }
-
-    tracker = BaboonTracker(configs)
+    tracker = BaboonTracker(configs, pool=pool)
 
     start = time.clock()
     # Read until video is completed
@@ -49,19 +37,19 @@ def main():
             cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
 
             # We need at least n frames to continue
-            if (len(history_frames) < HISTORY_FRAME_COUNT):
+            if (len(tracker.history_frames) < HISTORY_FRAME_COUNT):
                 tracker.push_history_frame(gray)
                 continue
 
             # returns list of tuples of (shifted frames, transformation matrix)
-            shifted_history_frames = tracker.shift_history_frames()
+            shifted_history_frames = tracker.shift_history_frames(gray)
 
             # splits tuple list into two lists
             Ms = [f[1] for f in shifted_history_frames]
             shifted_history_frames = [f[0] for f in shifted_history_frames]
 
             # generates moving foreground mask
-            moving_foreground = tracker.generate_motion_mask(shifted_history_frames, Ms)
+            moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms)
 
             # Display the resulting frame
             cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))

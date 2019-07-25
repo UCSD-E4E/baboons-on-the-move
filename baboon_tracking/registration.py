@@ -8,14 +8,16 @@ MAX_FEATURES = 500
 GOOD_MATCH_PERCENT = 0.15
 
 class Registration_Strategy():
-    def __init__(self):
-        self.cpus = multiprocessing.cpu_count()
-        self.pool = multiprocessing.Pool(processes=self.cpus)
-
-    def shift_frame(self, frame, previous_frame):
+    def __init__(self, config):
+        self.config = config
+        
+    def _shift_frame(self, frames):#, frame, previous_frame):
         '''
         Takes in transformation matrix; does homography transformation to register/align two frames
         '''
+        frame = frames[0]
+        previous_frame = frames[1]
+
         M = self.register(previous_frame, frame)
         return (cv2.warpPerspective(previous_frame, M, (previous_frame.shape[1], previous_frame.shape[0])).astype(np.uint8), M)
 
@@ -24,9 +26,9 @@ class Registration_Strategy():
         Shifts all frames to target frame, returns list of shifted frames
         '''
         if(pool is not None):
-            return pool.map(self.shift_frame, [(target_frame, f) for f in frames])
+            return pool.map(self._shift_frame, [((target_frame, f)) for f in frames])
         else:
-            return [self.shift_frame(target_frame, f) for f in frames]    
+            return [self._shift_frame(target_frame, f) for f in frames]    
 
 class ORB_Registration_Strategy(Registration_Strategy):
     def register(self, frame1, frame2):

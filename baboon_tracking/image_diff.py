@@ -1,9 +1,10 @@
+import cv2
 import numpy as np
 import math
 
 class ImageDiffStrategy():
-    def __init__(self, ):
-        pass
+    def __init__(self, config):
+        self.config = config
 
     def generate_mask(self):
         pass
@@ -94,7 +95,7 @@ class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
         print('zero')
 
         f = frame.copy()
-        f[weights >= HISTORY_FRAME_COUNT - 1] = 0
+        f[weights >= self.config['history_frame_count'] - 1] = 0
 
         return f
 
@@ -133,11 +134,12 @@ class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
 
         return moving_foreground * 255
 
-    def generate_mask(self, shifted_history_frames, Ms, pool=None):
+    def generate_mask(self, gray, shifted_history_frames, Ms, pool=None):
         '''
         Takes in list of registered grayscale history frames
         Quantizes them, then generates mask using weights and history of dissimilarity
         
+        gray - current frame
         shifted_history_frames - list of registered history frames
         Ms - transformation matrices aligning each registered history frame
         '''
@@ -157,14 +159,14 @@ class VariableBackgroundSub_ImageDiffStrategy(ImageDiffStrategy):
         grouped_quantized_frames = [(quantized_frames[g[0]], quantized_frames[g[1]]) for g in frame_group_index]
 
         intersects = [self._intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
-        union = self._union_frames(intersects)
+        union = self._union_frames(self, intersects)
 
-        history_of_dissimilarity = self._get_history_of_dissimilarity(shifted_history_frames, quantized_frames)
+        history_of_dissimilarity = self._get_history_of_dissimilarity(self, shifted_history_frames, quantized_frames)
 
-        weights = self._get_weights(quantized_frames)
+        weights = self._get_weights(self, quantized_frames)
 
-        frame_new = self._zero_weights(gray, weights)
-        union_new = self._zero_weights(union, weights)
+        frame_new = self._zero_weights(self, gray, weights)
+        union_new = self._zero_weights(self, union, weights)
 
         foreground = np.absolute(frame_new.astype(np.int32) - union_new.astype(np.int32)).astype(np.uint8)
 
@@ -184,4 +186,7 @@ class SimpleBackroundSub_ImageDiffStrategy(ImageDiffStrategy):
     def generate_mask(self):
         pass
 
-
+image_diff_strategies = {
+    'vbs': VariableBackgroundSub_ImageDiffStrategy,
+    'simple': SimpleBackroundSub_ImageDiffStrategy
+}
