@@ -30,15 +30,15 @@ class BaboonTracker():
     def shift_history_frames(self, target_frame):
         '''
         Shift all history frames to the input frame
-        Return all shifted history frames 
+        Return all shifted history frames
         '''
         return self.registration_strategy.shift_all_frames(target_frame, self.history_frames, pool=self.pool)
-        
-    def generate_motion_mask(self, gray, shifted_history_frames, Ms):
+
+    def generate_motion_mask(self, gray, shifted_history_frames, Ms, framecount=0):
         '''
         Generate the mask of movement for the current frame
         '''
-        return self.foreground_extraction_strategy.generate_mask(gray, shifted_history_frames, Ms, pool=self.pool)
+        return self.foreground_extraction_strategy.generate_mask(gray, shifted_history_frames, Ms, pool=self.pool, framecount=framecount)
 
     def detect_blobs(self, foreground_mask):
         '''

@@ -27,6 +27,7 @@ def main():
     tracker = BaboonTracker(configs, pool=pool)
 
     start = time.clock()
+    framecount = 1
     # Read until video is completed
     while(cap.isOpened()):
         # Capture frame-by-frame
@@ -49,7 +50,7 @@ def main():
             shifted_history_frames = [f[0] for f in shifted_history_frames]
 
             # generates moving foreground mask
-            moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms)
+            moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, framecount)
 
             # Display the resulting frame
             cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
@@ -60,6 +61,7 @@ def main():
             curr_time = time.clock() - start
 
             print('curr_time: ' + str(curr_time))
+            framecount = framecount + 1
 
             # Press Q on keyboard to  exit
             if cv2.waitKey(25) & 0xFF == ord('q') or curr_time > 5 * 60 * 60:
