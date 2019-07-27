@@ -50,7 +50,7 @@ DIFF_OUTPUT = os.path.join(DATA_PATH, 'diff_output.mp4')
 
 configs = {
     'registration_strategy': 'orb',
-    'foreground_extraction_strategy': 'vbs',
+    'foreground_extraction_strategy': 'evenodd',
     'blob_detection_strategy': 'opencv',
     'object_tracking_strategy': 'kalman',
 
@@ -59,7 +59,8 @@ configs = {
     'erosion_iterations':EROSION_ITERATIONS,
     'dilation_kernel':DILATION_KERNEL,
     'dilation_iterations':DILATION_ITERATIONS,
-    'blob_det_params':BLOB_DET_PARAMS,
+    # when generating mask, keep this commented b/c config can't be pickled
+    # 'blob_det_params':BLOB_DET_PARAMS,
     'blur_kernel':BLUR_KERNEL,
     '':'',
     '':'',

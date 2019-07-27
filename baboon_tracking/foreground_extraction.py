@@ -135,7 +135,7 @@ class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStr
 
         return moving_foreground * 255
 
-    def _intersect_all_frames(self, grouped_shifted_history_frames, group_quantized_frames, framecount=0):
+    def _intersect_all_frames(self, grouped_shifted_history_frames, grouped_quantized_frames, framecount=0):
         '''
         Takes in two lists of frames, performs intersect on each pair and returns array of intersects
         '''
@@ -166,7 +166,7 @@ class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStr
         grouped_shifted_history_frames = [(shifted_history_frames[g[0]], shifted_history_frames[g[1]]) for g in frame_group_index]
         grouped_quantized_frames = [(quantized_frames[g[0]], quantized_frames[g[1]]) for g in frame_group_index]
 
-        intersects = _intersect_all_frames(group_shifted_history_frames, group_quantized_frames)
+        intersects = self._intersect_all_frames(grouped_shifted_history_frames, grouped_quantized_frames, framecount=framecount)
         union = self._union_frames(intersects)
 
         history_of_dissimilarity = self._get_history_of_dissimilarity(shifted_history_frames, quantized_frames)
@@ -192,29 +192,44 @@ class EvenOdd_VariableBackgroundSub_ForegroundExtractionStrategy(VariableBackgro
     rather than recomputing every frame
     '''
     def __init__(self, config):
-        super(config)
+        super().__init__(config)
         self.even = []
         self.odd = []
 
-    def _intersect_all_frames(self, grouped_shifted_history_frames, group_quantized_frames, framecount=0):
-        if count == 1:
-            odd = [intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
-            union = union_frames(odd)
-        elif count == 2:
-            even = [intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
-            union = union_frames(even)
-        elif (count % 2 == 1):
-            for i in range(4):
-                intersects.append(odd[i + 1])
-            intersects.append(intersect_frames(grouped_shifted_history_frames[4], grouped_quantized_frames[4]))
-            odd = intersects
-        elif (count % 2 == 0):
-            for i in range(4):
-                intersects.append(even[i + 1])
-            intersects.append(intersect_frames(grouped_shifted_history_frames[4], grouped_quantized_frames[4]))
-            even = intersects
+    def _intersect_all_frames(self, grouped_shifted_history_frames, grouped_quantized_frames, framecount=0):
+        '''
+        Finds intersects of each two frames
+        Saves even and odd frames for later use
+        '''
+        intersects_length = len(grouped_shifted_history_frames) // 2
+
+        print(framecount)
+        print(len(self.even))
+        print(len(self.odd))
+
+        if framecount == 1:
+            self.odd = [self._intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
+            return self.odd
+        elif framecount == 2:
+            self.even = [self._intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
+            return self.even
+
+        elif (framecount % 2 == 1):
+            intersects = []
+            for i in range(intersects_length):
+                intersects.append(self.odd[i])
+            intersects.append(self._intersect_frames(grouped_shifted_history_frames[intersects_length], grouped_quantized_frames[intersects_length]))
+            self.odd = intersects
+        elif (framecount % 2 == 0):
+            intersects = []
+            for i in range(intersects_length):
+                intersects.append(self.even[i])
+            intersects.append(self._intersect_frames(grouped_shifted_history_frames[intersects_length], grouped_quantized_frames[intersects_length]))
+            self.even = intersects
         else:
             print("Invalid framecount")
+
+        return intersects
 
 class SimpleBackroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrategy):
     '''
@@ -226,5 +241,6 @@ class SimpleBackroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrate
 
 foreground_extraction_strategies = {
     'vbs': VariableBackgroundSub_ForegroundExtractionStrategy,
-    'simple': SimpleBackroundSub_ForegroundExtractionStrategy
+    'simple': SimpleBackroundSub_ForegroundExtractionStrategy,
+    'evenodd': EvenOdd_VariableBackgroundSub_ForegroundExtractionStrategy
 }
