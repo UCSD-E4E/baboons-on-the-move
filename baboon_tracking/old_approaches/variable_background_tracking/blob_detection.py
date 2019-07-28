@@ -23,7 +23,7 @@ def remove_noise(foreground_mask):
 
     return foreground_mask
 
-def detect_blobs(foreground_mask, rgb_frame):
+def detect_blobs(foreground_mask, rgb_frame, orig_frame=None):
 
     # Create a detector with the parameters
     detector = cv2.SimpleBlobDetector_create(BLOB_DET_PARAMS)
@@ -46,5 +46,8 @@ def detect_blobs(foreground_mask, rgb_frame):
  #creating another image with the keypoints drawn onto the image that it is finding keypoints on
     mask_with_blobs = cv2.drawKeypoints(foreground_mask, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
+    orig_with_blobs = None
+    if(orig_frame is not None):
+        orig_with_blobs = cv2.drawKeypoints(orig_frame, keypoints, np.array([]), (0, 0, 255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-    return frame_with_blobs, mask_with_blobs
+    return frame_with_blobs, mask_with_blobs, orig_with_blobs

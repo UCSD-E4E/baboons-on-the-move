@@ -1,0 +1,14 @@
+version: "3.7"
+services:
+        rabbit:
+                name: rabbit
+                image: 3.8.0-beta.5
+                ports:
+                        - "5672:5672"
+                        - "15672:15672"
+        jupyter:
+                name: juypter
+                build:
+                        dockerfile: Dockerfile-juypter
+                        context: ./
+                ports:   
