@@ -19,6 +19,7 @@ def main():
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
     cap = cv2.VideoCapture(INPUT_MASK)
+    fps = cap.get(cv2.CAP_PROP_FPS)
 
     # Check if camera opened successfully
     if (cap.isOpened()== False):
@@ -27,7 +28,7 @@ def main():
 
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
-    out = cv2.VideoWriter(OUTPUT_MASK_BLOB_DETECTION, cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
+    out = cv2.VideoWriter(OUTPUT_MASK_BLOB_DETECTION, cv2.VideoWriter_fourcc(*'mp4v'), fps, (DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
