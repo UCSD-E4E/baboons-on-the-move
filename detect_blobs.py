@@ -9,6 +9,7 @@ import sys
 
 from baboon_tracking.BaboonTracker import BaboonTracker
 from config import *
+configs['blob_det_params'] = BLOB_DET_PARAMS
 
 def main():
     # Create a VideoCapture object and read from input file
