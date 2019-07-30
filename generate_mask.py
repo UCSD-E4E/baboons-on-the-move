@@ -3,7 +3,7 @@ import numpy as np
 import time
 import multiprocessing
 
-from baboon_tracking.BaboonTracker import BaboonTracker
+import baboon_tracking as bt
 from config import *
 
 def main():
@@ -14,7 +14,7 @@ def main():
     print(INPUT_VIDEO)
     # Check if camera opened successfully
     if (cap.isOpened()== False):
-        print("Error opening video stream or file")
+        print("Error opening video stream or file: ", INPUT_VIDEO)
         exit()
 
     frame_width = int(cap.get(3))
@@ -24,7 +24,11 @@ def main():
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
 
-    tracker = BaboonTracker(configs, pool=pool)
+    # set up tracker
+    registration = bt.registration.ORB_RANSAC_Registration_Strategy(configs)
+    fg_extraction = bt.foreground_extraction.VariableBackgroundSub_ForegroundExtractionStrategy(configs)
+
+    tracker = bt.BaboonTracker(configs, registration=registration, foreground_extraction=fg_extraction, pool=pool)
 
     start = time.clock()
     framecount = 1

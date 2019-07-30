@@ -1,1 +1,5 @@
 from .BaboonTracker import BaboonTracker
+import baboon_tracking.registration
+import baboon_tracking.foreground_extraction
+import baboon_tracking.blob_detection
+import baboon_tracking.object_tracking

@@ -7,7 +7,7 @@ import time
 import multiprocessing
 import sys
 
-from baboon_tracking.BaboonTracker import BaboonTracker
+import baboon_tracking as bt
 from config import *
 configs['blob_det_params'] = BLOB_DET_PARAMS
 
@@ -34,7 +34,9 @@ def main():
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
 
-    tracker = BaboonTracker(configs, pool=pool)
+    # create tracker
+    blob_detector = bt.blob_detection.OpenCV_Simple_BlobDetectionStrategy(configs)
+    tracker = BaboonTracker(configs, blob_detection=blob_detector, pool=pool)
 
     start = time.clock()
     # Read until video is completed

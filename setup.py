@@ -5,7 +5,7 @@ with open('README.md', 'r') as fh:
 
 setuptools.setup(
         name='BaboonTracking',
-        version='0.1',
+        version='0.2dev',
         packages=['baboon_tracking'],
         author='Anh Ngo',
         author_email='adn057@ucsd.edu',

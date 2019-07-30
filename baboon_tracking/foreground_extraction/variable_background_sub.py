@@ -2,12 +2,7 @@ import cv2
 import numpy as np
 import math
 
-class ForegroundExtractionStrategy():
-    def __init__(self, config):
-        self.config = config
-
-    def generate_mask(self):
-        pass
+from .interface import ForegroundExtractionStrategy
 
 class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrategy):
     '''
@@ -230,17 +225,3 @@ class EvenOdd_VariableBackgroundSub_ForegroundExtractionStrategy(VariableBackgro
             print("Invalid framecount")
 
         return intersects
-
-class SimpleBackroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrategy):
-    '''
-    Using simple python background subtraction
-    '''
-
-    def generate_mask(self):
-        pass
-
-foreground_extraction_strategies = {
-    'vbs': VariableBackgroundSub_ForegroundExtractionStrategy,
-    'simple': SimpleBackroundSub_ForegroundExtractionStrategy,
-    'evenodd': EvenOdd_VariableBackgroundSub_ForegroundExtractionStrategy
-}

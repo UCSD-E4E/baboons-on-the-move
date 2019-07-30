@@ -1,19 +1,17 @@
 from collections import deque
 
-from .registration import registration_strategies
-from .foreground_extraction import foreground_extraction_strategies
-from .blob_detection import blob_detection_strategies
-from .object_tracking import object_tracking_strategies
-
 class BaboonTracker():
-
-    def __init__(self, config, pool=None):
-        self.registration_strategy = registration_strategies[config['registration_strategy']](config)
-        self.foreground_extraction_strategy = foreground_extraction_strategies[config['foreground_extraction_strategy']](config)
-        self.blob_detection_strategy = blob_detection_strategies[config['blob_detection_strategy']](config)
-        self.object_tracking_strategy = object_tracking_strategies[config['object_tracking_strategy']](config)
+    # TODO: USE KWARGS!
+    def __init__(self, config, registration=None, foreground_extraction=None, blob_detection=None, object_tracking=None, pool=None):
 
         self.config = config
+
+        # set strategies
+        self.registration_strategy = registration if (registration is not None) else None
+        self.foreground_extraction_strategy = foreground_extraction if (foreground_extraction is not None) else None
+        self.blob_detection_strategy = blob_detection if (blob_detection is not None) else None
+        self.object_tracking_strategy = object_tracking if (object_tracking is not None) else None
+
         self.history_frames = deque([])
         self.pool = pool
 
