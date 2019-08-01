@@ -1,6 +1,23 @@
 # baboon-tracking
 This repo holds all of the [Baboon Team](http://e4e.ucsd.edu/baboons-on-the-move)'s attempted algorithms and implementations to track baboons from aerial drone footage, as well as any other code written for the project.
 
+# Setup Instructions
+1. Install baboon_tracking package
+```
+$ sudo python3 setup.py install
+```
+2. Test if package is installed through the python3 interpreter
+```
+$ python3
+```
+```
+>>> import baboon_tracking
+```
+3. Run the provided sample files
+```
+$ python3 generate_mask.py
+$ python3 detect_blobs.py
+```
 # Included Projects
 ### scraper
 Webscraper to download streamed videos from the San Diego Zoo's [Baboon Live Cams](https://zoo.sandiegozoo.org/cams/baboon-cam). These videos habe been determined to not be useful at the current time in the project, as drone footage has very different properties.
