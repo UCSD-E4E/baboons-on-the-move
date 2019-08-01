@@ -8,6 +8,8 @@ channel = connection.channel
 channel.queue_declare(queue='imshow')
 
 def imshow(img):
+    global channel
+
     compressed_img = io.BytesIO()
     np.savez_compressed(compressed_img, img)
     compressed_img.seek(0)

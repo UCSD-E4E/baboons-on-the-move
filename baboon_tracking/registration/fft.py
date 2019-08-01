@@ -38,6 +38,6 @@ class FFT_Registration_Strategy(Registration_Strategy):
 
         delta = (self._delta_x(arg_max[1], frame1.shape[1]), self._delta_y(arg_max[0], frame1.shape[0]))
 
-        M = np.float32([[1, 0, -delta[0]], [0, 1, -delta[1]]])
+        M = np.float32([[1, 0, -delta[0]], [0, 1, -delta[1]], [0, 0, 1]])
 
         return M
