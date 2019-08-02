@@ -12,4 +12,4 @@ RUN python3 setup.py install
 # expose port that jupyter operates on
 EXPOSE 8888
 
-CMD jupyter notebook
+CMD jupyter notebook --allow-root

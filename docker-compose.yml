@@ -6,11 +6,18 @@ services:
         ports:
             - "5672:5672"
             - "15672:15672"
+        networks:
+            - imshow_net
     jupyter:
         container_name: juypter
         image: anhdngo/baboon_tracking
         build:
-            dockerfile: Dockerfile-juypter
+            dockerfile: Dockerfile
             context: ./
         ports:   
             - "8888:8888"
+        networks:
+            - imshow_net
+
+networks:
+    imshow_net:

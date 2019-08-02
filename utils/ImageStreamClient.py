@@ -4,7 +4,7 @@ import numpy as np;
 import pika
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
-channel = connection.channel
+channel = connection.channel()
 
 channel.queue_declare(queue='imshow')
 
@@ -18,7 +18,7 @@ def callback(ch, method, properties, body):
 
 channel.basic_consume(
     queue='imshow',
-    om_message_callback=callback,
+    on_message_callback=callback,
     auto_ack=True
 )
 
