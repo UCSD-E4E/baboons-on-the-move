@@ -1,10 +1,12 @@
+from abc import ABC, abstractmethod
 import numpy as np
 import cv2
 
-class BlobDetectionStrategy():
+class BlobDetectionStrategy(ABC):
     def __init__(self, config):
         self.config = config
 
+    @abstractmethod
     def detect_blobs(self):
         pass
 
@@ -21,7 +23,7 @@ class OpenCV_Simple_BlobDetectionStrategy(BlobDetectionStrategy):
         foreground_mask = cv2.dilate(foreground_mask, dilation_kernel, iterations = self.config['dilation_iterations'])
 
         return foreground_mask
-    
+
     def detect_blobs(self, foreground_mask):
         '''
         Detect and returns locations of blobs from foreground mask

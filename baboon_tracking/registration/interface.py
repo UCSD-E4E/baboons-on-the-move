@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import cv2
 import numpy as np
 import math
@@ -7,7 +8,7 @@ import multiprocessing
 MAX_FEATURES = 500
 GOOD_MATCH_PERCENT = 0.15
 
-class Registration_Strategy():
+class Registration_Strategy(ABC):
     def __init__(self, config):
         self.MAX_FEATURES = 500
         self.GOOD_MATCH_PERCENT = 0.15
@@ -22,6 +23,10 @@ class Registration_Strategy():
 
         M = self.register(previous_frame, frame)
         return (cv2.warpPerspective(previous_frame, M, (previous_frame.shape[1], previous_frame.shape[0])).astype(np.uint8), M)
+
+    @abstractmethod
+    def register(self, frame1, frame2):
+        pass
 
     def shift_all_frames(self, target_frame, frames, pool=None):
         '''
