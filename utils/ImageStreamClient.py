@@ -2,6 +2,7 @@ import cv2
 import io
 import numpy as np;
 import pika
+import matplotlib.pyplot as plt
 
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
@@ -14,7 +15,11 @@ def callback(ch, method, properties, body):
     compressed_img.seek(0)
     img = np.load(compressed_img)['arr_0']
 
-    cv2.imshow('Remote', img)
+    print(img)
+
+    #cv2.imshow('Remote', img)
+    plt.imshow(img)
+    plt.show()
 
 channel.basic_consume(
     queue='imshow',
