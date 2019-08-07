@@ -15,11 +15,8 @@ def callback(ch, method, properties, body):
     compressed_img.seek(0)
     img = np.load(compressed_img)['arr_0']
 
-    print(img)
-
-    #cv2.imshow('Remote', img)
-    plt.imshow(img)
-    plt.show()
+    cv2.imshow('Remote', img)
+    cv2.waitKey()
 
 channel.basic_consume(
     queue='imshow',

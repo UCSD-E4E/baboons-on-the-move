@@ -27,7 +27,6 @@ def close():
 # TEST RUN
 
 cap = cv2.VideoCapture("../data/input.mp4")
-framenum = 0
 
 while(cap.isOpened()):
     # Capture frame-by-frame
@@ -35,7 +34,6 @@ while(cap.isOpened()):
     if ret == True:
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-        print("pushing frame: ", framenum)
         framenum = framenum + 1
         imshow(gray)
 
