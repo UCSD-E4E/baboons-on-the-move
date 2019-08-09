@@ -6,8 +6,8 @@ import cv2
 
 class ImageStreamServer():
 
-    def __init__(self, ip='localhost'):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(ip))
+    def __init__(self, host, port):
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=port))
         self.channel = self.connection.channel()
         self.channel.queue_declare(queue='imshow')
 

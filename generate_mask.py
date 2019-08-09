@@ -29,7 +29,7 @@ def main():
     fg_extraction = bt.foreground_extraction.VariableBackgroundSub_ForegroundExtractionStrategy(configs)
 
     tracker = bt.BaboonTracker(configs, registration=registration, foreground_extraction=fg_extraction, pool=pool)
-    server = bt.ImageStreamServer()
+    server = bt.ImageStreamServer(host='localhost', port='5672')
 
     start = time.clock()
     framecount = 1
@@ -40,7 +40,7 @@ def main():
         if ret == True:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
-            cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+            #cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
 
             # We need at least n frames to continue
             if (len(tracker.history_frames) < HISTORY_FRAME_COUNT):
@@ -58,7 +58,7 @@ def main():
             moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, framecount)
 
             # Display the resulting frame
-            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+            #cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
             server.imshow(moving_foreground)
             out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 

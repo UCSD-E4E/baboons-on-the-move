@@ -18,6 +18,9 @@ services:
             - "8888:8888"
         networks:
             - imshow_net
+        environment:
+            - RABBIT_IP='rabbit'
+            - RABBIT_PORT='5672'
 
 networks:
     imshow_net:

@@ -1,7 +1,22 @@
 # baboon-tracking
 This repo holds all of the [Baboon Team](http://e4e.ucsd.edu/baboons-on-the-move)'s attempted algorithms and implementations to track baboons from aerial drone footage, as well as any other code written for the project.
 
-# Setup Instructions
+# User Setup Instructions
+1. Install pika (rabbitmq implementation for python)
+```
+sudo pip3 install pika
+```
+2. Run docker-compose to get rabbitmq server and jupyter notebook up
+```
+docker-compose up
+```
+3. Navigate into utils and run ImageStreamClient to receive images from rabbitmq
+```
+cd utils; python3 ImageStreamClient.py
+```
+4. Open localhost:8888 to access jupyter notebook inside docker container
+
+# Dev Setup Instructions
 1. Install baboon_tracking package
 ```
 $ sudo python3 setup.py install
