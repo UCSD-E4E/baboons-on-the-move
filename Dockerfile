@@ -3,14 +3,21 @@ RUN python3 -m pip install opencv-python opencv-contrib-python scikit-image pika
 
 WORKDIR /home/jovyan/baboon_tracking
 
-ADD dist $HOME/baboon_tracking/
+# add whl and utils
+ADD dist $HOME/baboon_tracking
+ADD utils $HOME/baboon_tracking/utils/
 
 # install baboon_tracking python package
 USER root
-#RUN python3 setup.py install
 RUN python3 -m pip install $(ls | grep .whl | head -1)
+
+# delete whl
+RUN rm *.whl
 
 # expose port that jupyter operates on
 EXPOSE 8888
 
-CMD jupyter notebook --allow-root
+# add jupyter notebook files
+ADD *.ipynb $HOME/baboon_tracking/
+
+CMD jupyter notebook --allow-root --NotebookApp.token=e4ebaboons
