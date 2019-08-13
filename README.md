@@ -1,6 +1,12 @@
 # baboon-tracking
 This repo holds all of the [Baboon Team](http://e4e.ucsd.edu/baboons-on-the-move)'s attempted algorithms and implementations to track baboons from aerial drone footage, as well as any other code written for the project.
 
+# Makefile Instructions
+- make: builds python package, builds docker image, runs docker image
+- build: build python package
+- docker-build: builds docker image with tag anhdngo/baboon_tracking
+- docker-run: creates and runs our baboon docker image, as well as rabbitmq docker image
+
 # User Setup Instructions
 1. Install pika (rabbitmq implementation for python)
 ```

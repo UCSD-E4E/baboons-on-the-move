@@ -24,3 +24,7 @@ services:
 
 networks:
     imshow_net:
+
+volumes:
+    data:
+    output:
