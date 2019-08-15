@@ -7,8 +7,15 @@ build:
 
 .PHONY: docker-build
 docker-build:
-	docker build -t anhdngo/baboon_tracking .
+	docker build -t ucsde4e/baboon_tracking .
 
 .PHONY: docker-run
 docker-run:
 	docker-compose up
+
+.PHONY: docker-push
+docker-push:
+	docker image push ucsde4e/baboon_tracking
+
+.PHONY: push
+push: docker-push
