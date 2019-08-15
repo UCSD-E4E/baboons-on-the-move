@@ -1,2 +1,2 @@
-from .interface import BlobDetectionStrategy
-from .default_opencv import OpenCV_Simple_BlobDetectionStrategy
+from .BlobDetection import BlobDetection
+from .default_opencv import OpenCV_Simple_BlobDetection

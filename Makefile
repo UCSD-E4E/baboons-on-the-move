@@ -19,3 +19,7 @@ docker-push:
 
 .PHONY: push
 push: docker-push
+
+.PHONY: install
+install:
+	sudo python3 setup.py install

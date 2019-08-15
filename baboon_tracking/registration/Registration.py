@@ -8,7 +8,7 @@ import multiprocessing
 MAX_FEATURES = 500
 GOOD_MATCH_PERCENT = 0.15
 
-class Registration_Strategy(ABC):
+class Registration(ABC):
     def __init__(self, config):
         self.MAX_FEATURES = 500
         self.GOOD_MATCH_PERCENT = 0.15

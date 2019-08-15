@@ -1,12 +1,11 @@
 from abc import ABC, abstractmethod
-import cv2
 import numpy as np
-import math
+import cv2
 
-class ForegroundExtractionStrategy(ABC):
+class BlobDetection(ABC):
     def __init__(self, config):
         self.config = config
 
     @abstractmethod
-    def generate_mask(self):
+    def detect_blobs(self):
         pass

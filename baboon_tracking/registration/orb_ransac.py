@@ -4,9 +4,9 @@ import math
 import cmath
 import multiprocessing
 
-from .interface import Registration_Strategy
+from .Registration import Registration
 
-class ORB_RANSAC_Registration_Strategy(Registration_Strategy):
+class ORB_RANSAC_Registration(Registration):
     def register(self, frame1, frame2):
         '''
         Registration function to find homography transformation between two frames using ORB

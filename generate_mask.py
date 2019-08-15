@@ -25,8 +25,8 @@ def main():
     pool = multiprocessing.Pool(processes=cpus)
 
     # set up tracker
-    registration = bt.registration.ORB_RANSAC_Registration_Strategy(configs)
-    fg_extraction = bt.foreground_extraction.VariableBackgroundSub_ForegroundExtractionStrategy(configs)
+    registration = bt.registration.ORB_RANSAC_Registration(configs)
+    fg_extraction = bt.foreground_extraction.VariableBackgroundSub_ForegroundExtraction(configs)
 
     tracker = bt.BaboonTracker(configs, registration=registration, foreground_extraction=fg_extraction, pool=pool)
     server = bt.ImageStreamServer(host='localhost', port='5672')

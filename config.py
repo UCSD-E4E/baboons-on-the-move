@@ -20,7 +20,7 @@ HISTORY_FRAME_COUNT = 10
 ACTIVE_INTERSECT = 0
 
 ### FOR test_dilate.py ###
-INPUT_MASK = os.path.join(DATA_PATH, 'outpy_blur2x2.mp4')
+INPUT_MASK = os.path.join(DATA_PATH, 'output_mask.mp4')
 OUTPUT_MASK_BLOB_DETECTION = os.path.join(OUTPUT_PATH, 'output_blobs.mp4')
 
 BLUR_KERNEL = (5, 5)

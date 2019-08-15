@@ -1,2 +1,2 @@
-from .interface import TrackingStrategy
-from .kalman import Kalman_TrackingStrategy
+from .Tracking import Tracking
+from .kalman import Kalman_Tracking

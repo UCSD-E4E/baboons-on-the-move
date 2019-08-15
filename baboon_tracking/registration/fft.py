@@ -4,9 +4,9 @@ import math
 import cmath
 import multiprocessing
 
-from .interface import Registration_Strategy
+from .Registration import Registration
 
-class FFT_Registration_Strategy(Registration_Strategy):
+class FFT_Registration(Registration):
     def _delta_x(self, x_bar, M):
         if x_bar > M / 2:
             return x_bar - M

@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 import math
 
-from .interface import ForegroundExtractionStrategy
+from .ForegroundExtraction import ForegroundExtraction
 
-class SimpleBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrategy):
+class SimpleBackgroundSub_ForegroundExtraction(ForegroundExtraction):
     '''
     Using simple python background subtraction
     '''

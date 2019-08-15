@@ -1,9 +1,9 @@
 import numpy as np
 import cv2
 
-from .interface import BlobDetectionStrategy
+from .BlobDetection import BlobDetection
 
-class OpenCV_Simple_BlobDetectionStrategy(BlobDetectionStrategy):
+class OpenCV_Simple_BlobDetection(BlobDetection):
     def _remove_noise(self, foreground_mask):
         '''
         Uses OpenCV morphological transformations to make blobs more defined

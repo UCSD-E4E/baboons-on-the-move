@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 import math
 
-from .interface import ForegroundExtractionStrategy
+from .ForegroundExtraction import ForegroundExtraction
 
-class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStrategy):
+class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
     '''
     This is the strategy that we've been implementing, using hist of dissimilarity,
     freq of commonality, weights, etc
@@ -181,7 +181,7 @@ class VariableBackgroundSub_ForegroundExtractionStrategy(ForegroundExtractionStr
 
         return moving_foreground
 
-class EvenOdd_VariableBackgroundSub_ForegroundExtractionStrategy(VariableBackgroundSub_ForegroundExtractionStrategy):
+class EvenOdd_VariableBackgroundSub_ForegroundExtraction(VariableBackgroundSub_ForegroundExtraction):
     '''
     Same as VariableBackgroundSub but uses dynamic programming to save results of intersects
     rather than recomputing every frame
