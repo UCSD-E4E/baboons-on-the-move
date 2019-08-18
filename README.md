@@ -19,18 +19,27 @@ cd utils; python3 ImageStreamClient.py
 ```
 
 # Dev Setup Instructions
-1. Install baboon_tracking package
+1. Set up pip environment
+```
+$ pipenv install
+$ pipenv shell
+```
+2. Install baboon_tracking package
 ```
 $ sudo python3 setup.py install
 ```
-2. Test if package is installed through the python3 interpreter
+3. Test if package is installed through the python3 interpreter
 ```
 $ python3
 ```
 ```
 >>> import baboon_tracking
 ```
-3. Run the provided sample files
+4. Run the rabbitmq docker container
+```
+$ docker container run -p 5672:5672 -p 15672:15672 rabbitmq:3.8.0-beta.5
+```
+5. Run the provided sample files
 ```
 $ python3 generate_mask.py
 $ python3 detect_blobs.py
