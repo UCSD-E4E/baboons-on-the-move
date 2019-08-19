@@ -1,5 +1,5 @@
-from .BaboonTracker import BaboonTracker
-from .ImageStreamServer import ImageStreamServer
+from baboon_tracking.BaboonTracker import BaboonTracker
+from baboon_tracking.ImageStreamServer import ImageStreamServer
 import baboon_tracking.registration
 import baboon_tracking.foreground_extraction
 import baboon_tracking.blob_detection
