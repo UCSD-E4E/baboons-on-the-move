@@ -37,12 +37,16 @@ $ python3
 ```
 4. Run the rabbitmq docker container
 ```
-$ docker container run -p 5672:5672 -p 15672:15672 rabbitmq:3.8.0-beta.5
+$ docker container run -p 5672:5672 -p 15672:15672 --rm rabbitmq:3.8.0-beta.5
 ```
 5. Run the provided sample files
 ```
 $ python3 generate_mask.py
 $ python3 detect_blobs.py
+```
+# Test Instructions
+```
+python3 -m unittest discover
 ```
 # Included Projects
 ### scraper
