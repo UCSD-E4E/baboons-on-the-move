@@ -3,7 +3,7 @@ import cv2
 cwd = os.getcwd()
 
 DATA_PATH = './data'
-OUTPUT_PATH = './'
+OUTPUT_PATH = './output'
 
 # OPENCV DISPLAY DIMENSIONS
 DISPLAY_WIDTH = 1600
@@ -15,9 +15,6 @@ INPUT_VIDEO = os.path.join(DATA_PATH, 'input.mp4')
 OUTPUT_MASK = os.path.join(OUTPUT_PATH, 'output_mask.mp4')
 
 HISTORY_FRAME_COUNT = 10
-
-# 0 for new intersect, 1 for old (inefficient) intersect
-ACTIVE_INTERSECT = 0
 
 ### FOR test_dilate.py ###
 INPUT_MASK = os.path.join(DATA_PATH, 'output_mask.mp4')
