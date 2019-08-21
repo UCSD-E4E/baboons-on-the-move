@@ -10,6 +10,7 @@ pika = "*"
 opencv-python = "*"
 opencv-contrib-python = "*"
 scikit-image = "*"
+docker = "*"
 
 [requires]
 python_version = "3.6"

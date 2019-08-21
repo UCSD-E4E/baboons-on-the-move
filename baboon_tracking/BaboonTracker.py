@@ -12,7 +12,7 @@ class BaboonTracker():
 
     """
 
-    def __init__(self, config, **kwargs):
+    def __init__(self, **kwargs):
         """Constructor, initializes all strategies if set by kwargs
 
         Args:
@@ -20,7 +20,7 @@ class BaboonTracker():
             kwargs: dictionary containing any additional keyword arguments
         """
 
-        self.config = config
+        self.config = kwargs.get('config')
 
         # set strategies, returns None if kwargs not set
         self.registration = kwargs.get('registration')
