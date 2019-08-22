@@ -10,7 +10,7 @@ services:
             - imshow_net
     jupyter:
         container_name: juypter
-        image: anhdngo/baboon_tracking
+        image: ucsde4e/baboon_tracking
         build:
             dockerfile: Dockerfile
             context: ./
