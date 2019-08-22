@@ -17,8 +17,14 @@ script:
 - python -m unittest discover
 - docker build -t ucsde4e/baboon_tracking .
 deploy:
-- docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-- docker image push ucsde4e/baboon_tracking
+  provider: script
+  script:
+    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+    - docker image push ucsde4e/baboon_tracking
+  on:
+    branch: master
+
+# STORES CREDENTIALS TO DOCKERHUB, DO NOT REMOVE
 env:
   matrix:
   - secure: FtqZtRw6bswtM4tA1LjA8mze41nLOt2l8pouxSXRusYwraEsPqTF2bHrgujABb/V6RyGSV2M+DzmqYAy7RufPNDhg8Rc9wmVvyUIUurr+xsUhyuMgfEOllSYPqGOqNBIzEqm1X84ZrXBOhNm2stgH4q0XPqKgiogo6FsWvFYWp3wCk/A++GLC2T35+xiItPwT7qjM8k3qJ/ybtdmyc9ZwtvR65j1bJ5N2s2YzPjSbyvQ/FxX39ICIpezAq4QKHxy3bZiiCBP275/bm8FcA5azbOrFEtrMwo3yMrs3UONOhli03VEKT5OpVwE67dsajpqhtj6U/8DIpaGCJRy+bik/++YbTJJt8hf+jlp5QKROSvhJglkhMLyzFH/T8uGoBh4KCDwOIhpvuJ+JtSKZhtS9AvZE/+YjXvmdgCWIrf986fajIoxmoAx0b/haSf1+MDvb8UkVgfMMBpyKah/D/6O111JS5/9sbPHjsBOaL95VZqd/PUyHqXVkFe36jHY35VrlVH+gbBzbAS0OkyivTfSzZmOn3JecFQ6NLbCxXUoU5XGjNMlzY/x130ko9Ax1ZhU5iKscCW29mG3Jv7Pr76ZYDu1bUvyuLYqFwA3VQ8uonE+ADgiCeBPKEw9vGDmgfJJwu2DkS3+bRLoQJTat55fZemvnZuU00T1J3fDHAdbQ0M=
