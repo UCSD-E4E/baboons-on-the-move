@@ -20,9 +20,9 @@ class BaboonTracker():
             kwargs: dictionary containing any additional keyword arguments
         """
 
-        self.config = kwargs.get('config')
+        self.config = kwargs.get('config') or {}
 
-        # set strategies, returns None if kwargs not set
+        # set strategies, kwargs.get() returns None if kwargs not set
         self.registration = kwargs.get('registration')
         self.foreground_extraction = kwargs.get('foreground_extraction')
         self.blob_detection = kwargs.get('blob_detection')
@@ -37,7 +37,7 @@ class BaboonTracker():
         Args:
             frame: grayscale opencv image frame
         '''
-        if len(self.history_frames) == self.config['history_frame_count']:
+        if len(self.history_frames) == self.config['history_frames']:
             self.history_frames.popleft()
 
         self.history_frames.append(frame)

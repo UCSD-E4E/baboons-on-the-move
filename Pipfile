@@ -11,6 +11,7 @@ opencv-python = "*"
 opencv-contrib-python = "*"
 scikit-image = "*"
 docker = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.6"

@@ -2,34 +2,42 @@ import cv2
 import numpy as np
 import time
 import multiprocessing
+import sys
+import yaml
 
 import baboon_tracking as bt
-from config import *
 
 def main():
+    with open('config.yml', 'r') as stream:
+        try:
+            config = yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+            sys.exit()
+
     # Create a VideoCapture object and read from input file
     # If the input is the camera, pass 0 instead of the video file name
-    cap = cv2.VideoCapture(INPUT_VIDEO)
+    cap = cv2.VideoCapture(config['input'])
 
-    print(INPUT_VIDEO)
+    print(config['input'])
     # Check if camera opened successfully
     if (cap.isOpened()== False):
-        print("Error opening video stream or file: ", INPUT_VIDEO)
+        print("Error opening video stream or file: ", config['input'])
         exit()
 
     frame_width = int(cap.get(3))
     frame_height = int(cap.get(4))
-    out = cv2.VideoWriter(OUTPUT_MASK, cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width,frame_height))
+    out = cv2.VideoWriter(config['output'], cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width,frame_height))
 
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
 
     # set up tracker
-    registration = bt.registration.ORB_RANSAC_Registration(configs)
-    fg_extraction = bt.foreground_extraction.VariableBackgroundSub_ForegroundExtraction(configs)
+    registration = bt.registration.ORB_RANSAC_Registration(config)
+    fg_extraction = bt.foreground_extraction.VariableBackgroundSub_ForegroundExtraction(config)
 
-    tracker = bt.BaboonTracker(configs, registration=registration, foreground_extraction=fg_extraction, pool=pool)
-    server = bt.ImageStreamServer(host='localhost', port='5672')
+    tracker = bt.BaboonTracker(config=config, registration=registration, foreground_extraction=fg_extraction, pool=pool)
+    #server = bt.ImageStreamServer(host='localhost', port='5672')
 
     start = time.clock()
     framecount = 1
@@ -43,7 +51,7 @@ def main():
             #cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
 
             # We need at least n frames to continue
-            if (len(tracker.history_frames) < HISTORY_FRAME_COUNT):
+            if (len(tracker.history_frames) < config['history_frames']):
                 tracker.push_history_frame(gray)
                 continue
 
@@ -58,8 +66,8 @@ def main():
             moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, framecount)
 
             # Display the resulting frame
-            #cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
-            server.imshow(moving_foreground)
+            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (config['display']['width'], config['display']['height'])))
+            #server.imshow(moving_foreground)
             out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             tracker.push_history_frame(gray)
