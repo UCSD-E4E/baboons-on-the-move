@@ -18,9 +18,7 @@ script:
 - docker build -t ucsde4e/baboon_tracking .
 deploy:
   provider: script
-  script:
-    - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
-    - docker image push ucsde4e/baboon_tracking
+  script: bash docker_push
   on:
     branch: master
 
