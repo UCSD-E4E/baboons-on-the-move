@@ -6,7 +6,7 @@ root = etree.parse(input_file).getroot()
 
 #set other path variable
 #folder to send output txt files to:
-outputfolder = "groundtruth_txt"
+outputfolder = "groundtruth_txt/"
 
 #iterate through all the frames you want to get ground truth measurements for
 #set which frames by changing range values
