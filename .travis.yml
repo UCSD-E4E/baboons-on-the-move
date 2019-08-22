@@ -16,8 +16,8 @@ install:
 script:
 - python -m unittest discover
 - docker build -t ucsde4e/baboon_tracking .
-deploy:
-  provider: script
-  script: bash docker_push
-  on:
-    branch: master
+#deploy:
+#  provider: script
+#  script: bash docker_push
+#  on:
+#    branch: master
