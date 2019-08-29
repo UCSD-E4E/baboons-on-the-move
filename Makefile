@@ -1,12 +1,12 @@
 .PHONY: all
-all: build docker-build docker-run
+all: docker-build docker-run
 
 .PHONY: build
 build:
 	sudo python3 setup.py bdist_wheel	
 
 .PHONY: docker-build
-docker-build:
+docker-build: build
 	docker build -t ucsde4e/baboon_tracking .
 
 .PHONY: docker-run

@@ -9,7 +9,7 @@ services:
         networks:
             - imshow_net
     jupyter:
-        container_name: juypter
+        container_name: jupyter
         image: ucsde4e/baboon_tracking
         build:
             dockerfile: Dockerfile
