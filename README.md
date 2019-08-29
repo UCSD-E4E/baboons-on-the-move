@@ -13,7 +13,7 @@ This repo holds all of the [Baboon Team](http://e4e.ucsd.edu/baboons-on-the-move
 ```
 make
 ```
-2. Open localhost:8888 to access jupyter notebook inside docker container, the password is e4ebaboons
+2. Open localhost:8888 to access jupyter notebook inside docker container, the password is ucsde4e
 3. Navigate into utils and run ImageStreamClient to receive images from rabbitmq
 ```
 cd utils; python3 ImageStreamClient.py

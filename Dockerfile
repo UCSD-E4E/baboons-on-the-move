@@ -21,4 +21,4 @@ EXPOSE 8888
 # add jupyter notebook files
 ADD *.ipynb $HOME/baboon_tracking/
 
-CMD jupyter notebook --allow-root --NotebookApp.token=e4ebaboons
+CMD jupyter notebook --allow-root --NotebookApp.token=ucsde4e

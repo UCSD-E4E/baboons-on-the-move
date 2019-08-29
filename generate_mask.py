@@ -6,6 +6,8 @@ import sys
 import yaml
 
 import baboon_tracking as bt
+import baboon_tracking.registration
+import baboon_tracking.foreground_extraction
 
 def main():
     with open('config.yml', 'r') as stream:
