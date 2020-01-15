@@ -34,6 +34,8 @@ def main():
 
     fps = cap.get(cv2.CAP_PROP_FPS)
 
+    frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+
     out = cv2.VideoWriter(config['output'], cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width,frame_height))
 
     cpus = multiprocessing.cpu_count()
@@ -47,7 +49,7 @@ def main():
     #server = bt.ImageStreamServer(host='localhost', port='5672')
 
     start = time.clock()
-    framecount = 1
+    curr_frame = 1
     # Read until video is completed
     while(cap.isOpened()):
         # Capture frame-by-frame
@@ -70,7 +72,7 @@ def main():
             shifted_history_frames = [f[0] for f in shifted_history_frames]
 
             # generates moving foreground mask
-            moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, framecount)
+            moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, curr_frame)
 
             # Display the resulting frame
             cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (config['display']['width'], config['display']['height'])))
@@ -81,8 +83,15 @@ def main():
 
             curr_time = time.clock() - start
 
+            percentage = curr_frame / frame_count
+
+            estimate_total_time = curr_time / percentage
+
             print('curr_time: ' + str(curr_time))
-            framecount = framecount + 1
+            print('estimate_total_time: ' + str(estimate_total_time))
+            print('percentage: ' + str(percentage))
+
+            curr_frame = curr_frame + 1
 
             # Press Q on keyboard to  exit
             if cv2.waitKey(25) & 0xFF == ord('q') or curr_time > 5 * 60 * 60:
