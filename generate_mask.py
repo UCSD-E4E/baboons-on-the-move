@@ -9,6 +9,8 @@ import baboon_tracking as bt
 import baboon_tracking.registration
 import baboon_tracking.foreground_extraction
 
+multiprocessing.set_start_method('spawn', True)
+
 def main():
     with open('config.yml', 'r') as stream:
         try:
@@ -27,9 +29,12 @@ def main():
         print("Error opening video stream or file: ", config['input'])
         exit()
 
-    frame_width = int(cap.get(3))
-    frame_height = int(cap.get(4))
-    out = cv2.VideoWriter(config['output'], cv2.VideoWriter_fourcc(*'mp4v'), 20.0, (frame_width,frame_height))
+    frame_width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    frame_height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    fps = cap.get(cv2.CAP_PROP_FPS)
+
+    out = cv2.VideoWriter(config['output'], cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width,frame_height))
 
     cpus = multiprocessing.cpu_count()
     pool = multiprocessing.Pool(processes=cpus)
