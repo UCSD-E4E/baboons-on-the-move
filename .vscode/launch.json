@@ -10,6 +10,13 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Python: Generate Mask",
+            "type": "python",
+            "request": "launch",
+            "program": "generate_mask.py",
+            "console": "integratedTerminal"
         }
     ]
 }

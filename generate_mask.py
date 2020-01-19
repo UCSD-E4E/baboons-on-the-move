@@ -9,9 +9,9 @@ import baboon_tracking as bt
 import baboon_tracking.registration
 import baboon_tracking.foreground_extraction
 
-multiprocessing.set_start_method('spawn', True)
-
 def main():
+    multiprocessing.set_start_method('spawn', True)
+
     with open('config.yml', 'r') as stream:
         try:
             config = yaml.safe_load(stream)
@@ -35,6 +35,7 @@ def main():
     fps = cap.get(cv2.CAP_PROP_FPS)
 
     frame_count = cap.get(cv2.CAP_PROP_FRAME_COUNT)
+    video_length = frame_count / fps
 
     out = cv2.VideoWriter(config['output'], cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width,frame_height))
 
@@ -48,7 +49,7 @@ def main():
     tracker = bt.BaboonTracker(config=config, registration=registration, foreground_extraction=fg_extraction, pool=pool)
     #server = bt.ImageStreamServer(host='localhost', port='5672')
 
-    start = time.clock()
+    start = time.perf_counter()
     curr_frame = 1
     # Read until video is completed
     while(cap.isOpened()):
@@ -56,6 +57,9 @@ def main():
         ret, frame = cap.read()
         if ret == True:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            #gray = cv2.blur(gray,(4,4))
+
+            print('image gathered')
 
             #cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
 
@@ -64,32 +68,53 @@ def main():
                 tracker.push_history_frame(gray)
                 continue
 
+            print('registering frames')
+
             # returns list of tuples of (shifted frames, transformation matrix)
             shifted_history_frames = tracker.shift_history_frames(gray)
+
+            print('frames registered')
 
             # splits tuple list into two lists
             Ms = [f[1] for f in shifted_history_frames]
             shifted_history_frames = [f[0] for f in shifted_history_frames]
 
+            print('starting moving foreground')
+
             # generates moving foreground mask
             moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, curr_frame)
 
+            print('moving foreground generated')
+
+            element = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
+            dialated = cv2.dilate(moving_foreground, element)
+            eroded = cv2.erode(dialated, element)
+
+
+
             # Display the resulting frame
             cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (config['display']['width'], config['display']['height'])))
+            #cv2.imshow('eroded', cv2.resize(eroded, (config['display']['width'], config['display']['height'])))
             #server.imshow(moving_foreground)
             out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
 
             tracker.push_history_frame(gray)
 
-            curr_time = time.clock() - start
-
+            curr_time = time.perf_counter() - start
             percentage = curr_frame / frame_count
-
             estimate_total_time = curr_time / percentage
+            time_per_frame = curr_time / curr_frame
+            estimate_time_remaining = estimate_total_time - curr_time
+            coefficient_of_performance = estimate_total_time / video_length
 
-            print('curr_time: ' + str(curr_time))
-            print('estimate_total_time: ' + str(estimate_total_time))
-            print('percentage: ' + str(percentage))
+            print('curr_time: {}h, {}m, {}s'.format(round(curr_time / 60 / 60, 2), round(curr_time / 60, 2), round(curr_time, 2)))
+            print('estimate_total_time: {}h, {}m, {}s'.format(round(estimate_total_time / 60 / 60, 2), round(estimate_total_time / 60, 2), round(estimate_total_time, 2)))
+            print('estimate_time_remaining: {}h, {}m, {}s'.format(round(estimate_time_remaining / 60 / 60, 2), round(estimate_time_remaining / 60, 2), round(estimate_time_remaining, 2)))
+            print('time_per_frame: {}s'.format(round(time_per_frame, 2)))
+            print('video_time_complete: {}s'.format(round(curr_frame / fps)))
+            print('percentage: {}%'.format(round(percentage * 100, 2)))
+            print('coefficient_of_performance: {}%'.format(round(coefficient_of_performance * 100, 2)))
+            print('')
 
             curr_frame = curr_frame + 1
 

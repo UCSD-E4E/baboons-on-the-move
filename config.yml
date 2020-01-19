@@ -5,7 +5,7 @@ display:
     width: 1600
     height: 900
 
-history_frames: 10
+history_frames: 20
 
 registration:
     max_features: 500

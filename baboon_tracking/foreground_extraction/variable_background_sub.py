@@ -15,7 +15,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Normalize pixel values from 0-255 to values from 0-10
         Returns quantized frame
         '''
-        return (frame.astype(np.float32) * 10 / 255).astype(np.int8)
+        return (frame.astype(np.float32) * 10 / 255).astype(np.uint8)
 
     def _intersect_frames(self, frames, q_frames):
         '''
@@ -25,7 +25,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         print('intersect')
 
         mask = np.abs(q_frames[0] - q_frames[1]) <= 1
-        combined = q_frames[0].copy()
+        combined = frames[0].copy()
         combined[mask] = 0
 
         return combined
@@ -39,7 +39,10 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
 
         union = np.zeros(frames[0].shape).astype(np.uint8)
 
-        for f in frames:
+        f_copy = frames.copy()
+        f_copy.reverse()
+
+        for f in f_copy:
             union[union == 0] = f[union == 0]
 
         return union
@@ -146,16 +149,27 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         shifted_history_frames - list of registered history frames
         Ms - transformation matrices aligning each registered history frame
         '''
+
+        print('quantize frames')
+
         # do multiprocessing if pool argument is given
         if(pool is not None):
             quantized_frames = pool.map(self._quantize_frame, [f for f in shifted_history_frames])
         else:
             quantized_frames = [self._quantize_frame(f) for f in shifted_history_frames]
 
+        print('quantized frames finished')
+
+        print('warp perspective')
+
         masks = [cv2.warpPerspective(np.ones(gray.shape), M, (gray.shape[1], gray.shape[0])).astype(np.uint8) for M in Ms]
 
-        frame_group_index = range(len(shifted_history_frames))
-        frame_group_index = [(r, r + 1) for r in frame_group_index[::2]]
+        print('finished warp perspective')
+
+        frame_group_index = range(len(shifted_history_frames) - 1)
+        frame_group_index = [(r, r + 1) for r in frame_group_index]
+
+        print(frame_group_index)
 
         # pairs each two frames to do intersection
         grouped_shifted_history_frames = [(shifted_history_frames[g[0]], shifted_history_frames[g[1]]) for g in frame_group_index]
