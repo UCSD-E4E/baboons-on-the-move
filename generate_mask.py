@@ -57,7 +57,9 @@ def main():
         ret, frame = cap.read()
         if ret == True:
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            #gray = cv2.blur(gray,(4,4))
+            #gray = cv2.blur(gray, (6, 6))
+            #gray = cv2.medianBlur(gray, 15)
+            gray = cv2.GaussianBlur(gray,(5,5),0)
 
             print('image gathered')
 
@@ -84,19 +86,48 @@ def main():
             # generates moving foreground mask
             moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, curr_frame)
 
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+            opened_mask = cv2.morphologyEx(moving_foreground, cv2.MORPH_OPEN, kernel)
+            element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (30, 30))
+            dilated = cv2.dilate(opened_mask, element)
+
+            combined_mask = np.zeros(opened_mask.shape).astype(np.uint8)
+            combined_mask[dilated == moving_foreground] = 255
+            combined_mask[moving_foreground == 0] = 0
+
+            # (height, width) = moving_foreground.shape
+
+            # for y in range(1, height - 1):
+            #     for x in range(1, width - 1):
+            #         if moving_foreground[y, x] == 0:
+            #             continue
+
+            #         if moving_foreground[y - 1, x] != 0 or \
+            #             moving_foreground[y, x - 1] != 0 or \
+            #             moving_foreground[y + 1, x] != 0 or \
+            #             moving_foreground[y, x + 1] != 0:
+            #             continue
+
+            #         moving_foreground[y, x] = 0
+
+
+
             print('moving foreground generated')
 
-            element = cv2.getStructuringElement(cv2.MORPH_RECT, (12, 12))
-            dialated = cv2.dilate(moving_foreground, element)
+            element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (12, 12))
+            dialated = cv2.dilate(combined_mask, element)
             eroded = cv2.erode(dialated, element)
 
 
+            blend = cv2.addWeighted( frame, 0.75, cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR), 0.5, 0.0)          
+
 
             # Display the resulting frame
-            cv2.imshow('moving_foreground', cv2.resize(moving_foreground, (config['display']['width'], config['display']['height'])))
-            #cv2.imshow('eroded', cv2.resize(eroded, (config['display']['width'], config['display']['height'])))
+            #cv2.imshow('combined_mask', cv2.resize(combined_mask, (config['display']['width'], config['display']['height'])))
+            cv2.imshow('blend', cv2.resize(blend, (config['display']['width'], config['display']['height'])))
             #server.imshow(moving_foreground)
-            out.write(cv2.cvtColor(moving_foreground, cv2.COLOR_GRAY2BGR))
+            #out.write(cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR))
+            out.write(blend)
 
             tracker.push_history_frame(gray)
 

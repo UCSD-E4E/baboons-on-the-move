@@ -9,11 +9,11 @@ pylint = "*"
 [packages]
 pika = "*"
 opencv-python = "*"
-opencv-contrib-python = "*"
 scikit-image = "*"
 docker = "*"
 pyyaml = "*"
 pylint = "*"
+opencv-contrib-python = "*"
 
 [requires]
 python_version = "3.8"

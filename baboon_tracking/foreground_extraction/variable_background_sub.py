@@ -15,7 +15,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Normalize pixel values from 0-255 to values from 0-10
         Returns quantized frame
         '''
-        return (frame.astype(np.float32) * 10 / 255).astype(np.uint8)
+        return np.floor(frame.astype(np.float32) * 20.0 / 255.0).astype(np.uint8).astype(np.int32)
 
     def _intersect_frames(self, frames, q_frames):
         '''
@@ -75,7 +75,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
 
         weights = np.zeros(q_frames[0].shape).astype(np.uint8)
 
-        for i, q in enumerate(q_frames):
+        for i, _ in enumerate(q_frames):
             if i == 0:
                 continue
 
@@ -185,7 +185,10 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         frame_new = self._zero_weights(gray, weights)
         union_new = self._zero_weights(union, weights)
 
-        foreground = np.absolute(frame_new.astype(np.int32) - union_new.astype(np.int32)).astype(np.uint8)
+        #foreground = np.absolute(frame_new.astype(np.int32) - union_new.astype(np.int32)).astype(np.uint8)
+        foreground =  cv2.absdiff(frame_new, union_new)
+
+        #cv2.imshow('foreground', cv2.resize(foreground * 25, (1600, 900)))
 
         moving_foreground = self._get_moving_foreground(weights, foreground, history_of_dissimilarity)
 
@@ -194,48 +197,3 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
             moving_foreground = np.multiply(moving_foreground, mask)
 
         return moving_foreground
-
-class EvenOdd_VariableBackgroundSub_ForegroundExtraction(VariableBackgroundSub_ForegroundExtraction):
-    '''
-    Same as VariableBackgroundSub but uses dynamic programming to save results of intersects
-    rather than recomputing every frame
-    '''
-    def __init__(self, config):
-        super().__init__(config)
-        self.even = []
-        self.odd = []
-
-    def _intersect_all_frames(self, grouped_shifted_history_frames, grouped_quantized_frames, framecount=0):
-        '''
-        Finds intersects of each two frames
-        Saves even and odd frames for later use
-        '''
-        intersects_length = len(grouped_shifted_history_frames) // 2
-
-        print(framecount)
-        print(len(self.even))
-        print(len(self.odd))
-
-        if framecount == 1:
-            self.odd = [self._intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
-            return self.odd
-        elif framecount == 2:
-            self.even = [self._intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
-            return self.even
-
-        elif (framecount % 2 == 1):
-            intersects = []
-            for i in range(intersects_length):
-                intersects.append(self.odd[i])
-            intersects.append(self._intersect_frames(grouped_shifted_history_frames[intersects_length], grouped_quantized_frames[intersects_length]))
-            self.odd = intersects
-        elif (framecount % 2 == 0):
-            intersects = []
-            for i in range(intersects_length):
-                intersects.append(self.even[i])
-            intersects.append(self._intersect_frames(grouped_shifted_history_frames[intersects_length], grouped_quantized_frames[intersects_length]))
-            self.even = intersects
-        else:
-            print("Invalid framecount")
-
-        return intersects

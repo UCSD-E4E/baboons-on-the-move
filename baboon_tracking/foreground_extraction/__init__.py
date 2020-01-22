@@ -1,4 +1,3 @@
 from .ForegroundExtraction import ForegroundExtraction
 from .variable_background_sub import VariableBackgroundSub_ForegroundExtraction
-from .variable_background_sub import EvenOdd_VariableBackgroundSub_ForegroundExtraction
 from .simple_background_sub import SimpleBackgroundSub_ForegroundExtraction

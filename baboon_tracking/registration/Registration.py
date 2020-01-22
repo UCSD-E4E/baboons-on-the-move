@@ -19,6 +19,7 @@ class Registration(ABC):
         previous_frame = frames[1]
 
         M = self.register(previous_frame, frame)
+        #return (previous_frame, M)
         return (cv2.warpPerspective(previous_frame, M, (previous_frame.shape[1], previous_frame.shape[0])).astype(np.uint8), M)
 
     @abstractmethod
