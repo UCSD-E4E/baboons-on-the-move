@@ -51,19 +51,25 @@ def main():
 
     start = time.perf_counter()
     curr_frame = 1
+
+    prev_mask = None
+
     # Read until video is completed
     while(cap.isOpened()):
         # Capture frame-by-frame
         ret, frame = cap.read()
         if ret == True:
+            #hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+            #gray = hsv[:,:,2]
+
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            #gray = cv2.blur(gray, (6, 6))
+            # gray = cv2.blur(gray, (2, 2))
             #gray = cv2.medianBlur(gray, 15)
             gray = cv2.GaussianBlur(gray,(5,5),0)
 
             print('image gathered')
 
-            #cv2.imshow('Gray', cv2.resize(gray, (DISPLAY_WIDTH, DISPLAY_HEIGHT)))
+            # cv2.imshow('Gray', cv2.resize(gray, (config['display']['width'], config['display']['height'])))
 
             # We need at least n frames to continue
             if (len(tracker.history_frames) < config['history_frames']):
@@ -86,14 +92,14 @@ def main():
             # generates moving foreground mask
             moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, curr_frame)
 
-            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+            kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
             opened_mask = cv2.morphologyEx(moving_foreground, cv2.MORPH_OPEN, kernel)
             element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (30, 30))
             dilated = cv2.dilate(opened_mask, element)
 
-            combined_mask = np.zeros(opened_mask.shape).astype(np.uint8)
-            combined_mask[dilated == moving_foreground] = 255
-            combined_mask[moving_foreground == 0] = 0
+            # combined_mask = np.zeros(opened_mask.shape).astype(np.uint8)
+            # combined_mask[dilated == moving_foreground] = 255
+            # combined_mask[moving_foreground == 0] = 0
 
             # (height, width) = moving_foreground.shape
 
@@ -114,12 +120,20 @@ def main():
 
             print('moving foreground generated')
 
+            if prev_mask is None:
+                prev_mask = moving_foreground
+
+            filtered_mask = moving_foreground.copy()
+            filtered_mask[prev_mask != 255] = 0
+
             element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (12, 12))
-            dialated = cv2.dilate(combined_mask, element)
+            dialated = cv2.dilate(filtered_mask, element)
             eroded = cv2.erode(dialated, element)
 
 
             blend = cv2.addWeighted( frame, 0.75, cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR), 0.5, 0.0)          
+
+            prev_mask = moving_foreground
 
 
             # Display the resulting frame
