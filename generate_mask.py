@@ -52,8 +52,6 @@ def main():
     start = time.perf_counter()
     curr_frame = 1
 
-    prev_mask = None
-
     # Read until video is completed
     while(cap.isOpened()):
         # Capture frame-by-frame
@@ -97,9 +95,9 @@ def main():
             element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (30, 30))
             dilated = cv2.dilate(opened_mask, element)
 
-            # combined_mask = np.zeros(opened_mask.shape).astype(np.uint8)
-            # combined_mask[dilated == moving_foreground] = 255
-            # combined_mask[moving_foreground == 0] = 0
+            combined_mask = np.zeros(opened_mask.shape).astype(np.uint8)
+            combined_mask[dilated == moving_foreground] = 255
+            combined_mask[moving_foreground == 0] = 0
 
             # (height, width) = moving_foreground.shape
 
@@ -120,14 +118,8 @@ def main():
 
             print('moving foreground generated')
 
-            if prev_mask is None:
-                prev_mask = moving_foreground
-
-            filtered_mask = moving_foreground.copy()
-            filtered_mask[prev_mask != 255] = 0
-
             element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (12, 12))
-            dialated = cv2.dilate(filtered_mask, element)
+            dialated = cv2.dilate(combined_mask, element)
             eroded = cv2.erode(dialated, element)
 
 
