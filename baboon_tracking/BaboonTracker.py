@@ -27,8 +27,8 @@ class BaboonTracker():
         self.blob_detection = kwargs.get('blob_detection')
         self.object_tracking = kwargs.get('object_tracking')
 
-    def history_frames_full(self):
-        return self.registration.history_frames_full()
+    def is_history_frames_full(self):
+        return self.registration.is_history_frames_full()
 
     def push_history_frame(self, frame: Frame):
         self.registration.push_history_frame(frame)

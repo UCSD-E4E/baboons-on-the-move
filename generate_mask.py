@@ -66,8 +66,10 @@ def main():
             # cv2.imshow('Gray', cv2.resize(gray, (config['display']['width'], config['display']['height'])))
 
             # We need at least n frames to continue
-            if (not tracker.history_frames_full()):
+            if (not tracker.is_history_frames_full()):
                 tracker.push_history_frame(frame_obj)
+
+                curr_frame = curr_frame + 1
                 continue
 
             print('registering frames')

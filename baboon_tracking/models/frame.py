@@ -8,3 +8,6 @@ class Frame:
 
     def get_frame_number(self):
         return self._frame_number
+
+    def __hash__(self):
+        return self.get_frame_number()

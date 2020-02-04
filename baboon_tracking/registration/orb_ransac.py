@@ -10,7 +10,28 @@ class ORB_RANSAC_Registration(Registration):
     def __init__(self, config):
         super().__init__(config)
 
+        self._orb = cv2.ORB_create(self.MAX_FEATURES)
         self._feature_hash = dict()
+
+    def _detectAndCompute(self, frame: Frame):
+        if frame not in self._feature_hash:
+            keypoints, descriptors = self._orb.detectAndCompute(frame.get_frame(), None)
+            self._feature_hash[frame] = (keypoints, descriptors)
+
+        return self._feature_hash[frame]
+
+    def push_history_frame(self, frame: Frame):
+        '''Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count, remove the oldest frame
+
+        Args:
+            frame: grayscale opencv image frame
+        '''
+        popped_frame = super().push_history_frame(frame)
+
+        if popped_frame is not None:
+            del self._feature_hash[popped_frame]
+
+        return popped_frame
 
     def register(self, frame1: Frame, frame2: Frame):
         '''
@@ -18,10 +39,8 @@ class ORB_RANSAC_Registration(Registration):
         Returns list of tuples containing (warped_frame, transformation matrix)
         (Not including most recent frame)
         '''
-        orb = cv2.ORB_create(self.MAX_FEATURES)
-
-        keypoints1, descriptors1 = orb.detectAndCompute(frame1.get_frame(), None)
-        keypoints2, descriptors2 = orb.detectAndCompute(frame2.get_frame(), None)
+        keypoints1, descriptors1 = self._detectAndCompute(frame1)
+        keypoints2, descriptors2 = self._detectAndCompute(frame2)
 
         # Match features.
         matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)

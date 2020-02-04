@@ -29,15 +29,7 @@ class Registration(ABC):
     def register(self, frame1: Frame, frame2: Frame):
         pass
 
-    def shift_all_frames(self, target_frame: Frame):
-        '''
-        Shifts all frames to target frame, returns list of shifted frames
-        '''
-        frames = self.history_frames
-
-        return [self._shift_frame((target_frame, f)) for f in frames]
-
-    def history_frames_full(self):
+    def is_history_frames_full(self):
         return len(self.history_frames) >= self.config['history_frames']
 
     def push_history_frame(self, frame: Frame):
@@ -46,7 +38,18 @@ class Registration(ABC):
         Args:
             frame: grayscale opencv image frame
         '''
-        if self.history_frames_full():
-            self.history_frames.popleft()
+        popped_frame = None
+        if self.is_history_frames_full():
+            popped_frame  = self.history_frames.popleft()
 
         self.history_frames.append(frame)
+
+        return popped_frame
+
+    def shift_all_frames(self, target_frame: Frame):
+        '''
+        Shifts all frames to target frame, returns list of shifted frames
+        '''
+        frames = self.history_frames
+
+        return [self._shift_frame((target_frame, f)) for f in frames]
