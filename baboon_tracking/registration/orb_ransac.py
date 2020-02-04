@@ -2,12 +2,12 @@ import cv2
 import numpy as np
 import math
 import cmath
-import multiprocessing
 
 from .Registration import Registration
+from ..models import Frame
 
 class ORB_RANSAC_Registration(Registration):
-    def register(self, frame1, frame2):
+    def register(self, frame1: Frame, frame2: Frame):
         '''
         Registration function to find homography transformation between two frames using ORB
         Returns list of tuples containing (warped_frame, transformation matrix)
@@ -15,8 +15,8 @@ class ORB_RANSAC_Registration(Registration):
         '''
         orb = cv2.ORB_create(self.MAX_FEATURES)
 
-        keypoints1, descriptors1 = orb.detectAndCompute(frame1, None)
-        keypoints2, descriptors2 = orb.detectAndCompute(frame2, None)
+        keypoints1, descriptors1 = orb.detectAndCompute(frame1.get_frame(), None)
+        keypoints2, descriptors2 = orb.detectAndCompute(frame2.get_frame(), None)
 
         # Match features.
         matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)

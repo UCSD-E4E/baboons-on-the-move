@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import time
-import multiprocessing
 import sys
 import yaml
 
@@ -10,8 +9,6 @@ import baboon_tracking.registration
 import baboon_tracking.foreground_extraction
 
 def main():
-    multiprocessing.set_start_method('spawn', True)
-
     with open('config.yml', 'r') as stream:
         try:
             config = yaml.safe_load(stream)
@@ -39,14 +36,11 @@ def main():
 
     out = cv2.VideoWriter(config['output'], cv2.VideoWriter_fourcc(*'mp4v'), fps, (frame_width,frame_height))
 
-    cpus = multiprocessing.cpu_count()
-    pool = multiprocessing.Pool(processes=cpus)
-
     # set up tracker
     registration = bt.registration.ORB_RANSAC_Registration(config)
     fg_extraction = bt.foreground_extraction.VariableBackgroundSub_ForegroundExtraction(config)
 
-    tracker = bt.BaboonTracker(config=config, registration=registration, foreground_extraction=fg_extraction, pool=pool)
+    tracker = bt.BaboonTracker(config=config, registration=registration, foreground_extraction=fg_extraction)
     #server = bt.ImageStreamServer(host='localhost', port='5672')
 
     start = time.perf_counter()
@@ -65,19 +59,21 @@ def main():
             #gray = cv2.medianBlur(gray, 15)
             gray = cv2.GaussianBlur(gray,(5,5),0)
 
+            frame_obj = bt.Frame(gray, curr_frame)
+
             print('image gathered')
 
             # cv2.imshow('Gray', cv2.resize(gray, (config['display']['width'], config['display']['height'])))
 
             # We need at least n frames to continue
             if (len(tracker.history_frames) < config['history_frames']):
-                tracker.push_history_frame(gray)
+                tracker.push_history_frame(frame_obj)
                 continue
 
             print('registering frames')
 
             # returns list of tuples of (shifted frames, transformation matrix)
-            shifted_history_frames = tracker.shift_history_frames(gray)
+            shifted_history_frames = tracker.shift_history_frames(frame_obj)
 
             print('frames registered')
 
@@ -88,7 +84,7 @@ def main():
             print('starting moving foreground')
 
             # generates moving foreground mask
-            moving_foreground = tracker.generate_motion_mask(gray, shifted_history_frames, Ms, curr_frame)
+            moving_foreground = tracker.generate_motion_mask(frame_obj, shifted_history_frames, Ms)
 
             kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
             opened_mask = cv2.morphologyEx(moving_foreground, cv2.MORPH_OPEN, kernel)
@@ -123,10 +119,7 @@ def main():
             eroded = cv2.erode(dialated, element)
 
 
-            blend = cv2.addWeighted( frame, 0.75, cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR), 0.5, 0.0)          
-
-            prev_mask = moving_foreground
-
+            blend = cv2.addWeighted(frame, 0.75, cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR), 0.5, 0.0)          
 
             # Display the resulting frame
             #cv2.imshow('combined_mask', cv2.resize(combined_mask, (config['display']['width'], config['display']['height'])))
@@ -135,7 +128,7 @@ def main():
             #out.write(cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR))
             out.write(blend)
 
-            tracker.push_history_frame(gray)
+            tracker.push_history_frame(frame_obj)
 
             curr_time = time.perf_counter() - start
             percentage = curr_frame / frame_count

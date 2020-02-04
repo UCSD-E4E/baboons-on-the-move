@@ -3,7 +3,8 @@ import cv2
 import numpy as np
 import math
 import cmath
-import multiprocessing
+
+from ..models import Frame
 
 class Registration(ABC):
     def __init__(self, config):
@@ -15,22 +16,19 @@ class Registration(ABC):
         '''
         Takes in transformation matrix; does homography transformation to register/align two frames
         '''
-        frame = frames[0]
-        previous_frame = frames[1]
+        frame: Frame = frames[0]
+        previous_frame: Frame = frames[1]
 
         M = self.register(previous_frame, frame)
         #return (previous_frame, M)
-        return (cv2.warpPerspective(previous_frame, M, (previous_frame.shape[1], previous_frame.shape[0])).astype(np.uint8), M)
+        return (Frame(cv2.warpPerspective(previous_frame.get_frame(), M, (previous_frame.get_frame().shape[1], previous_frame.get_frame().shape[0])).astype(np.uint8), previous_frame.get_frame_number()), M)
 
     @abstractmethod
-    def register(self, frame1, frame2):
+    def register(self, frame1: Frame, frame2: Frame):
         pass
 
-    def shift_all_frames(self, target_frame, frames, pool=None):
+    def shift_all_frames(self, target_frame, frames):
         '''
         Shifts all frames to target frame, returns list of shifted frames
         '''
-        if(pool is not None):
-            return pool.map(self._shift_frame, [((target_frame, f)) for f in frames])
-        else:
-            return [self._shift_frame(target_frame, f) for f in frames]
+        return [self._shift_frame((target_frame, f)) for f in frames]
