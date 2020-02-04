@@ -1,5 +1,3 @@
-from collections import deque
-
 from .models import Frame
 
 class BaboonTracker():
@@ -29,18 +27,11 @@ class BaboonTracker():
         self.blob_detection = kwargs.get('blob_detection')
         self.object_tracking = kwargs.get('object_tracking')
 
-        self.history_frames = deque([])
+    def history_frames_full(self):
+        return self.registration.history_frames_full()
 
     def push_history_frame(self, frame: Frame):
-        '''Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count, remove the oldest frame
-
-        Args:
-            frame: grayscale opencv image frame
-        '''
-        if len(self.history_frames) == self.config['history_frames']:
-            self.history_frames.popleft()
-
-        self.history_frames.append(frame)
+        self.registration.push_history_frame(frame)
 
     def shift_history_frames(self, target_frame: Frame):
         '''Shift all history frames to the input frame
@@ -51,7 +42,7 @@ class BaboonTracker():
         Returns:
             Return all shifted history frames
         '''
-        return self.registration.shift_all_frames(target_frame, self.history_frames)
+        return self.registration.shift_all_frames(target_frame)
 
     def generate_motion_mask(self, gray: Frame, shifted_history_frames, Ms):
         '''Generate the mask of movement for the current frame

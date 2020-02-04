@@ -7,6 +7,11 @@ from .Registration import Registration
 from ..models import Frame
 
 class ORB_RANSAC_Registration(Registration):
+    def __init__(self, config):
+        super().__init__(config)
+
+        self._feature_hash = dict()
+
     def register(self, frame1: Frame, frame2: Frame):
         '''
         Registration function to find homography transformation between two frames using ORB
