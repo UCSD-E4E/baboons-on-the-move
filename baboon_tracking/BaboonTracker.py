@@ -19,8 +19,6 @@ class BaboonTracker():
             kwargs: dictionary containing any additional keyword arguments
         """
 
-        self.config = kwargs.get('config') or {}
-
         # set strategies, kwargs.get() returns None if kwargs not set
         self.registration = kwargs.get('registration')
         self.foreground_extraction = kwargs.get('foreground_extraction')

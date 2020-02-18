@@ -93,7 +93,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         print('zero')
 
         f = frame.copy()
-        f[weights >= self.config['history_frames'] - 1] = 0
+        f[weights >= self.history_frames - 1] = 0
 
         return f
 
@@ -108,11 +108,11 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Return frame representing moving foreground
         '''
 
-        history_frame_count_third = math.floor(float(self.config['history_frames'] - 1) / 3)
+        history_frame_count_third = math.floor(float(self.history_frames - 1) / 3)
         third_gray = 255.0 / 3.0
 
         weights_low = (weights <= history_frame_count_third).astype(np.uint8)
-        weights_medium = np.logical_and(history_frame_count_third < weights, weights < self.config['history_frames'] - 1).astype(np.uint8) * 2
+        weights_medium = np.logical_and(history_frame_count_third < weights, weights < self.history_frames - 1).astype(np.uint8) * 2
 
         weight_levels = weights_low + weights_medium
 

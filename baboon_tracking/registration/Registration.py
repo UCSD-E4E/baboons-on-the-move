@@ -8,10 +8,10 @@ from collections import deque
 from ..models import Frame
 
 class Registration(ABC):
-    def __init__(self, config):
-        self.MAX_FEATURES = config['registration']['max_features']
-        self.GOOD_MATCH_PERCENT = config['registration']['good_match_percent']
-        self.config = config
+    def __init__(self, history_frame_count, max_features, good_match_percent):
+        self.MAX_FEATURES           = max_features
+        self.GOOD_MATCH_PERCENT     = good_match_percent
+        self.history_frame_count    = history_frame_count
         self.history_frames = deque([])
 
     def _shift_frame(self, frames):#, frame, previous_frame):
@@ -30,7 +30,7 @@ class Registration(ABC):
         pass
 
     def is_history_frames_full(self):
-        return len(self.history_frames) >= self.config['history_frames']
+        return len(self.history_frames) >= self.history_frame_count
 
     def push_history_frame(self, frame: Frame):
         '''Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count, remove the oldest frame

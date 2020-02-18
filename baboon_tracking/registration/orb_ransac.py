@@ -7,8 +7,10 @@ from .Registration import Registration
 from ..models import Frame
 
 class ORB_RANSAC_Registration(Registration):
-    def __init__(self, config):
-        super().__init__(config)
+    def __init__(self, history_frame_count, max_features, good_match_percent):
+        super().__init__( history_frame_count, max_features, good_match_percent  )
+
+        print(f"{history_frame_count}, {max_features}, {good_match_percent}")
 
         self._orb = cv2.ORB_create(self.MAX_FEATURES)
         self._feature_hash = dict()
