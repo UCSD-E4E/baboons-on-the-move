@@ -15,7 +15,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Normalize pixel values from 0-255 to values from 0-10
         Returns quantized frame
         '''
-        return np.floor(frame.astype(np.float32) * 40.0 / 255.0).astype(np.uint8).astype(np.int32)
+        return np.floor(frame.get_frame().astype(np.float32) * 40.0 / 255.0).astype(np.uint8).astype(np.int32)
 
     def _intersect_frames(self, frames, q_frames):
         '''
@@ -25,7 +25,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         print('intersect')
 
         mask = np.abs(q_frames[0] - q_frames[1]) <= 1
-        combined = frames[0].copy()
+        combined = frames[0].get_frame().copy()
         combined[mask] = 0
 
         return combined
@@ -54,14 +54,14 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         '''
         print('dissimilarity')
 
-        dissimilarity = np.zeros(frames[0].shape).astype(np.uint32)
+        dissimilarity = np.zeros(frames[0].get_frame().shape).astype(np.uint32)
 
         for i in range(len(frames)):
             if i == 0:
                 continue
 
             mask = (np.abs(q_frames[i] - q_frames[i - 1]) > 1).astype(np.uint32)
-            dissimilarity = dissimilarity + np.multiply(np.abs(frames[i].astype(np.int32) - frames[i - 1].astype(np.int32)), mask)
+            dissimilarity = dissimilarity + np.multiply(np.abs(frames[i].get_frame().astype(np.int32) - frames[i - 1].get_frame().astype(np.int32)), mask)
 
         return (dissimilarity / len(frames)).astype(np.uint8)
 
@@ -93,7 +93,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         print('zero')
 
         f = frame.copy()
-        f[weights >= self.config['history_frames'] - 1] = 0
+        f[weights >= self.history_frames - 1] = 0
 
         return f
 
@@ -108,11 +108,11 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Return frame representing moving foreground
         '''
 
-        history_frame_count_third = math.floor(float(self.config['history_frames'] - 1) / 3)
+        history_frame_count_third = math.floor(float(self.history_frames - 1) / 3)
         third_gray = 255.0 / 3.0
 
         weights_low = (weights <= history_frame_count_third).astype(np.uint8)
-        weights_medium = np.logical_and(history_frame_count_third < weights, weights < self.config['history_frames'] - 1).astype(np.uint8) * 2
+        weights_medium = np.logical_and(history_frame_count_third < weights, weights < self.history_frames - 1).astype(np.uint8) * 2
 
         weight_levels = weights_low + weights_medium
 
@@ -133,36 +133,32 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
 
         return moving_foreground * 255
 
-    def _intersect_all_frames(self, grouped_shifted_history_frames, grouped_quantized_frames, framecount=0):
+    def _intersect_all_frames(self, grouped_shifted_history_frames, grouped_quantized_frames):
         '''
         Takes in two lists of frames, performs intersect on each pair and returns array of intersects
         '''
         return [self._intersect_frames(z[0], z[1]) for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)]
 
 
-    def generate_mask(self, gray, shifted_history_frames, Ms, pool=None, framecount=0):
+    def generate_mask(self, frame, shifted_history_frames, Ms):
         '''
         Takes in list of registered grayscale history frames
         Quantizes them, then generates mask using weights and history of dissimilarity
 
-        gray - current frame
+        frame - current frame
         shifted_history_frames - list of registered history frames
         Ms - transformation matrices aligning each registered history frame
         '''
 
         print('quantize frames')
 
-        # do multiprocessing if pool argument is given
-        if(pool is not None):
-            quantized_frames = pool.map(self._quantize_frame, [f for f in shifted_history_frames])
-        else:
-            quantized_frames = [self._quantize_frame(f) for f in shifted_history_frames]
+        quantized_frames = [self._quantize_frame(f) for f in shifted_history_frames]
 
         print('quantized frames finished')
 
         print('warp perspective')
 
-        masks = [cv2.warpPerspective(np.ones(gray.shape), M, (gray.shape[1], gray.shape[0])).astype(np.uint8) for M in Ms]
+        masks = [cv2.warpPerspective(np.ones(frame.get_frame().shape), M, (frame.get_frame().shape[1], frame.get_frame().shape[0])).astype(np.uint8) for M in Ms]
 
         print('finished warp perspective')
 
@@ -175,14 +171,14 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         grouped_shifted_history_frames = [(shifted_history_frames[g[0]], shifted_history_frames[g[1]]) for g in frame_group_index]
         grouped_quantized_frames = [(quantized_frames[g[0]], quantized_frames[g[1]]) for g in frame_group_index]
 
-        intersects = self._intersect_all_frames(grouped_shifted_history_frames, grouped_quantized_frames, framecount=framecount)
+        intersects = self._intersect_all_frames(grouped_shifted_history_frames, grouped_quantized_frames)
         union = self._union_frames(intersects)
 
         history_of_dissimilarity = self._get_history_of_dissimilarity(shifted_history_frames, quantized_frames)
 
         weights = self._get_weights(quantized_frames)
 
-        frame_new = self._zero_weights(gray, weights)
+        frame_new = self._zero_weights(frame.get_frame(), weights)
         union_new = self._zero_weights(union, weights)
 
         #foreground = np.absolute(frame_new.astype(np.int32) - union_new.astype(np.int32)).astype(np.uint8)

@@ -1,6 +1,8 @@
 input: './data/input.mp4'
 output: './output/output.mp4'
 
+stop_on_frame: 
+
 display:
     width: 1600
     height: 900
