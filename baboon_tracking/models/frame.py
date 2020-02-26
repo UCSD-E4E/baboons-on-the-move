@@ -6,6 +6,9 @@ class Frame:
     def get_frame(self):
         return self._frame
 
+    def set_frame(self, new_frame):
+        self._frame = new_frame
+
     def get_frame_number(self):
         return self._frame_number
 

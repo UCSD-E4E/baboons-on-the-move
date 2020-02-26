@@ -22,7 +22,6 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Intersect two consecutive frames to find common background between those two frames
         Returns the single frame produced by intersection
         '''
-        print('intersect')
 
         mask = np.abs(q_frames[0] - q_frames[1]) <= 1
         combined = frames[0].get_frame().copy()
@@ -35,7 +34,6 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Union all frame intersections to produce acting background for all frames
         Returns the single union frame produced by unioning all frames in input
         '''
-        print('union')
 
         union = np.zeros(frames[0].shape).astype(np.uint8)
 
