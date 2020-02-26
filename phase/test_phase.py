@@ -37,32 +37,31 @@ class TestPhase( unittest.TestCase ):
         for i in range(0, len(x) ):
             self.assertEqual(x[i] ** 2, y[i])
 
+    # # test the phase object when applying 3 phases each in its own process
+    # def test_phase_mp_1( self ):
 
-    # test the phase object when applying 3 phases each in its own process
-    def test_phase_mp_1( self ):
+    #     # key issue: how can we collect/test the output easily 
+    #     frame_count = 100
 
-        # key issue: how can we collect/test the output easily 
-        frame_count = 100
+    #     smm = Manager( )
+    #     sl = smm.list( )
 
-        smm = Manager( )
-        sl = smm.list( )
+    #     x = Phase( )
+    #     x.add( lambda x: x * 2 )
+    #     y = Phase( )
+    #     y.add( lambda x: x + 1 )
+    #     x.next = y
+    #     z = Phase( sl )
+    #     z.add( lambda x: sl.append(x) ) # this would be incredible if this could work
+    #     y.next = z
 
-        x = Phase( )
-        x.add( lambda x: x * 2 )
-        y = Phase( )
-        y.add( lambda x: x + 1 )
-        x.next = y
-        z = Phase( sl )
-        z.add( lambda x: sl.append(x) ) # this would be incredible if this could work
-        y.next = z
+    #     q = Queue()
+    #     x.start( q, frame_count )
 
-        q = Queue()
-        x.start( q, frame_count )
+    #     for i in range( 0, frame_count ):
+    #         q.put( i )
 
-        for i in range( 0, frame_count ):
-            q.put( i )
-
-        print( sl )
+    #     print( sl )
 
 
 if __name__ == '__main__':

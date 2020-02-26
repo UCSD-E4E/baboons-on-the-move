@@ -26,7 +26,7 @@ def main():
         exit()
 
     # check if videos have same dimensions
-    if(cap1.get(3) != cap2.get(3) or cap1.get(4) != cap2.get(4)):
+    if cap1.get(3) != cap2.get(3) or cap1.get(4) != cap2.get(4):
         print("Video 1 has dimensions (", cap1.get(3), ", ", cap1.get(4), "), but video 2 has dimensions (", cap2.get(3), ",", cap2.get(4), ")")
         exit()
 
