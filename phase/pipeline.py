@@ -11,7 +11,7 @@ class Pipeline():
         self.tail:Phase = None
         self.len    = 0
 
-    def apolooldd_phase( self, phase ):
+    def add_phase( self, phase ):
 
         # TODO make each stage know about the shasred memory 
         # can I do this?
