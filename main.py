@@ -21,7 +21,6 @@ def main():
     #server         = bt.ImageStreamServer(host='localhost', port='5672')
 
     start = time.perf_counter()
-
     while True:
         
         success, frame_obj = input_video.next_frame()

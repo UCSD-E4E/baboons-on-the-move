@@ -1,7 +1,7 @@
 import unittest
+import os
 from phase import Phase
-from multiprocessing import Process, Queue
-from multiprocessing import Manager
+from pipeline import Pipeline
 
 class TestPhase( unittest.TestCase ):
 
@@ -38,31 +38,50 @@ class TestPhase( unittest.TestCase ):
             self.assertEqual(x[i] ** 2, y[i])
 
     # # test the phase object when applying 3 phases each in its own process
-    # def test_phase_mp_1( self ):
+    def test_pipeline_length( self ):
 
-    #     # key issue: how can we collect/test the output easily 
-    #     frame_count = 100
+        frame_count = 100
 
-    #     smm = Manager( )
-    #     sl = smm.list( )
+        # build up the phase seperately from the pipeline
+        x = Phase( )
+        x.add( lambda x: x * 2 )
+        y = Phase( )
+        y.add( lambda x: x + 1 )
+        
+        # open question, where can I collect the input
+        # create a multiprocess pipeline
+        pipeline = Pipeline( ) 
+        pipeline.add_phase( x )
+        pipeline.add_phase( y )
 
-    #     x = Phase( )
-    #     x.add( lambda x: x * 2 )
-    #     y = Phase( )
-    #     y.add( lambda x: x + 1 )
-    #     x.next = y
-    #     z = Phase( sl )
-    #     z.add( lambda x: sl.append(x) ) # this would be incredible if this could work
-    #     y.next = z
+        assert( len( pipeline ) == 2 )
 
-    #     q = Queue()
-    #     x.start( q, frame_count )
+    # test the phase object when applying 3 phases each in its own process
+    def test_pipeline_execute_1( self ):
 
-    #     for i in range( 0, frame_count ):
-    #         q.put( i )
+        frame_count = 10
 
-    #     print( sl )
+        # build up the phase seperately from the pipeline
+        x = Phase( )
+        x.add( lambda x: x * 2 )
+        y = Phase( )
+        y.add( lambda x: x + 1 )
+        z = Phase( )
+        z.add( test )
 
+        # open question, where can I collect the input
+        pipeline = Pipeline( )
+        pipeline.add_phase( x )
+        pipeline.add_phase( y )
+        pipeline.add_phase( z )
+        pipeline.start( frame_count )
+        for i in range(0, frame_count ):
+            pipeline.schedule( i )
+        
+def test( x ):
+    # the most naive way to see the output
+    print( x ) 
+    return x
 
 if __name__ == '__main__':
     unittest.main()

@@ -16,10 +16,48 @@ class Phase:
         self.launched_next = False
         self.next = None
 
-    def start( self, source, time_to_live ):
-        self.p = Process( target=self._new_process, args=(source, time_to_live) )
-        self.p.start()
-        
+    def on_start( self, obj ):
+        if self.collect_time:
+            duration = time.perf_counter()
+
+    def on_complete( self, obj ):
+        # somewhat naive, only keeps time from the last execution
+        if self.collect_time:
+            self.duration = time.perf_counter() - duration
+    
+    def add( self, t ):
+        self.steps.append( t )
+
+    def show( self ):
+        pass
+
+    def mp_apply( self, source, time_to_live ):
+        p = Process( target=self._new_process, args=(source, time_to_live) )
+        p.start()
+
+    def _new_process(self, source, time_to_live):
+
+        if not self.launched_next:
+            q = Queue()
+            
+        i = 0
+        while i < time_to_live:
+            if not source.empty():
+                n_item  = source.get()
+                res     = self.apply( n_item )
+
+                # TODO do I update some kind of shared memory here ?? 
+                # is that too slow to do ?
+
+                if not self.launched_next and self.next is not None:
+                    self.next.mp_apply( q, time_to_live )
+                    self.launched_next = True
+                    q.put( res )
+                elif self.launched_next:
+                    q.put( res )
+                
+                i += 1
+
     def apply( self, obj ):
 
         if not self.on:
@@ -37,39 +75,4 @@ class Phase:
         self.on_complete( obj )
 
         return res
-
-    def on_start( self, obj ):
-        if self.collect_time:
-            duration = time.perf_counter()
-
-    def on_complete( self, obj ):
-        # somewhat naive, only keeps time from the last execution
-        if self.collect_time:
-            self.duration = time.perf_counter() - duration
-    
-    def add( self, t ):
-        self.steps.append( t )
-
-    def show( self ):
-        pass
-
-    def _new_process(self, source, time_to_live):
-
-        if not self.launched_next:
-            q = Queue()
-            
-        i = 0
-        while i < time_to_live:
-            if not source.empty():
-                n_item  = source.get()
-                res     = self.apply( n_item )
-
-                if not self.launched_next and self.next is not None:
-                    self.next.start( q, time_to_live )
-                    self.launched_next = True
-                    q.put( res )
-                elif self.launched_next:
-                    q.put( res )
-                
-                i += 1
 
