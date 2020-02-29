@@ -15,7 +15,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Normalize pixel values from 0-255 to values from 0-10
         Returns quantized frame
         '''
-        return np.floor(frame.get_frame().astype(np.float32) * 40.0 / 255.0).astype(np.uint8).astype(np.int32)
+        return np.floor(frame.get_frame().astype(np.float32) * 50.0 / 255.0).astype(np.uint8).astype(np.int32)
 
     def _intersect_frames(self, frames, q_frames):
         '''

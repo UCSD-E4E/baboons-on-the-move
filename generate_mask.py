@@ -81,13 +81,14 @@ def main():
         # generates moving foreground mask
         moving_foreground = tracker.generate_motion_mask(frame_obj, shifted_history_frames, Ms)
 
-        kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
-        opened_mask = cv2.morphologyEx(moving_foreground, cv2.MORPH_OPEN, kernel)
+        element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (6, 6))
+        eroded = cv2.erode(moving_foreground, element)
+
         element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (30, 30))
-        dilated = cv2.dilate(opened_mask, element)
+        opened_mask = cv2.dilate(eroded, element)
 
         combined_mask = np.zeros(opened_mask.shape).astype(np.uint8)
-        combined_mask[dilated == moving_foreground] = 255
+        combined_mask[opened_mask == moving_foreground] = 255
         combined_mask[moving_foreground == 0] = 0
 
         # (height, width) = moving_foreground.shape
@@ -116,7 +117,7 @@ def main():
 
         # Display the resulting frame
         #cv2.imshow('combined_mask', cv2.resize(combined_mask, (config['display']['width'], config['display']['height'])))
-        # cv2.imshow('blend', cv2.resize(blend, ( config.display_width , config.display_height )))
+        cv2.imshow('blend', cv2.resize(blend, ( config.display_width , config.display_height )))
         #server.imshow(moving_foreground)
         #out.write(cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR))
         out.write(blend)
