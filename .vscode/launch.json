@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Phase Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "phase/test_phase.py",
+            "console": "integratedTerminal"
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

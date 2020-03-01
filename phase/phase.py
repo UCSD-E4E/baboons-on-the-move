@@ -2,9 +2,11 @@ from multiprocessing import Process, Queue
 import random
 import time
 
-# Basic unit of multipipelining 
 class Phase:
-    
+    '''
+    A base unit of multipipelining in Phase, that can compose function pointers and 
+    subphases to be executed be executed in one more or processes.
+    '''
     def __init__( self, sm_output_list = None ):
         super().__init__()
 
@@ -15,6 +17,19 @@ class Phase:
 
         self.launched_next = False
         self.next = None
+
+    def on_proc_start( self ):
+        '''
+        Callback that is called when a new process starts executing this Phase.
+        '''
+        pass 
+
+    def on_proc_complete( self ):
+        '''
+        Callback that is called when the process finished the process running this phase has completed
+        all scheduled work.
+        '''
+        pass
 
     def on_start( self, obj ):
         if self.collect_time:
@@ -27,37 +42,27 @@ class Phase:
     
     def add( self, t ):
         self.steps.append( t )
+       
+    def _apply_new_process(self, input_queue, time_to_live, output_queue):
+        
+        # we will only process time_to_live frames
+        self.on_proc_start() 
 
-    def show( self ):
-        pass
-
-    def mp_apply( self, source, time_to_live ):
-        p = Process( target=self._new_process, args=(source, time_to_live) )
-        p.start()
-
-    def _new_process(self, source, time_to_live):
-
-        if not self.launched_next:
-            q = Queue()
-            
         i = 0
         while i < time_to_live:
-            if not source.empty():
-                n_item  = source.get()
+            # if there is input waiting to be processed
+            if not input_queue.empty():
+                n_item  = input_queue.get()
                 res     = self.apply( n_item )
-
-                # TODO do I update some kind of shared memory here ?? 
-                # is that too slow to do ?
-
-                if not self.launched_next and self.next is not None:
-                    self.next.mp_apply( q, time_to_live )
-                    self.launched_next = True
-                    q.put( res )
-                elif self.launched_next:
-                    q.put( res )
+                output_queue.put( res )
                 
                 i += 1
+            else:
+                # maybe some kind of optional sleep for queue balancing happens here
+                continue
 
+        self.on_proc_complete() 
+        
     def apply( self, obj ):
 
         if not self.on:

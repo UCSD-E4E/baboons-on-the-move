@@ -1,87 +1,94 @@
 import unittest
 import os
+import time
 from phase import Phase
 from pipeline import Pipeline
+from phase_exceptions import NoPhasesException 
 
 class TestPhase( unittest.TestCase ):
 
     # Square every number in an integer sequence using Phase
-    def test_apply_1( self ):
-
+    def test_single_apply( self ):
         x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        y = []
 
         pipeline = Phase()
         pipeline.add( lambda x: x**2 ) 
-
         for i in x:
-            y.append( pipeline.apply(i) )
-        
-        for i in range(0, len(x) ):
-            self.assertEqual(x[i] ** 2, y[i])
+            self.assertEqual(x[i] ** 2, pipeline.apply(i))
 
     # Square every number in an integer sequence using nested Phases
-    def test_nested_phase_apply_1( self ):
-
+    def test_nested_apply( self ):
         x = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-        y = []
 
         pipeline = Phase()
         sub_phase = Phase( )
         sub_phase.add( lambda x: x**2 )
         pipeline.add( sub_phase ) 
-
         for i in x:
-            y.append( pipeline.apply( i ) )
-        
-        for i in range(0, len(x) ):
-            self.assertEqual(x[i] ** 2, y[i])
-
-    # # test the phase object when applying 3 phases each in its own process
-    def test_pipeline_length( self ):
-
-        frame_count = 100
-
-        # build up the phase seperately from the pipeline
-        x = Phase( )
-        x.add( lambda x: x * 2 )
-        y = Phase( )
-        y.add( lambda x: x + 1 )
-        
-        # open question, where can I collect the input
-        # create a multiprocess pipeline
-        pipeline = Pipeline( ) 
-        pipeline.add_phase( x )
-        pipeline.add_phase( y )
-
-        assert( len( pipeline ) == 2 )
+            self.assertEqual(x[i] ** 2, pipeline.apply( i ) )
 
     # test the phase object when applying 3 phases each in its own process
-    def test_pipeline_execute_1( self ):
+    def test_multiprocess_length( self ):
+        frame_count = 100
+        pipeline = Pipeline( ) 
+        pipeline.add_phase( lambda x: x * 2 )
+        pipeline.add_phase( lambda x: x + 1 )
+        assert( len( pipeline ) == 2 )
 
-        frame_count = 10
+    def test_no_phases( self ):
+        frame_count = 100
+        pipeline = Pipeline( ) 
+        assert( len( pipeline ) == 0 )
+        with self.assertRaises(NoPhasesException): 
+            pipeline.start( frame_count )
 
-        # build up the phase seperately from the pipeline
-        x = Phase( )
-        x.add( lambda x: x * 2 )
-        y = Phase( )
-        y.add( lambda x: x + 1 )
-        z = Phase( )
-        z.add( test )
+    # test the phase object when applying 3 phases each in its own process
+    def test_single_phase( self ):
 
-        # open question, where can I collect the input
+        frames = 450
+
+        # create a pipeline and shared memeory manager
         pipeline = Pipeline( )
-        pipeline.add_phase( x )
-        pipeline.add_phase( y )
-        pipeline.add_phase( z )
-        pipeline.start( frame_count )
-        for i in range(0, frame_count ):
-            pipeline.schedule( i )
-        
-def test( x ):
-    # the most naive way to see the output
-    print( x ) 
-    return x
+        pipeline.add_phase( lambda x: 2 * x )
+        assert( len( pipeline ) == 1 )
 
+        # begin multiprocessing
+        pipeline.start( frames )
+        for i in range(0, frames ):
+            pipeline.schedule_input( i )
+
+        # collect the output in the main function
+        i = 0
+        while i < frames:
+            if not pipeline._output_queue.empty():
+                output = pipeline._output_queue.get()
+                assert( 2 * i == output )
+                i += 1
+
+    # test the phase object when applying 3 phases each in its own process
+    def test_multiple_phases( self ):
+
+        frames = 1800
+
+        # create a pipeline and shared memeory manager
+        pipeline = Pipeline( )
+        pipeline.add_phase( lambda x: 2 * x )
+        pipeline.add_phase( lambda x: 1 + x )
+        pipeline.add_phase( lambda x: 1 + x )
+
+        assert( len( pipeline ) == 3 )
+        
+        # start multiprocessing and configure IPC queues   
+        pipeline.start( frames )
+        for i in range(0, frames ):
+            pipeline.schedule_input( i )
+
+        i = 0
+        while i < frames:
+            if pipeline.has_output():
+                output = pipeline.next_output()
+                assert( 2 + 2 * i == output )
+                i += 1
+                
 if __name__ == '__main__':
     unittest.main()
