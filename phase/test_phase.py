@@ -44,12 +44,11 @@ class TestPhase( unittest.TestCase ):
 
     # test the phase object when applying 3 phases each in its own process
     def test_single_phase( self ):
-
         frames = 450
 
         # create a pipeline and shared memeory manager
         pipeline = Pipeline( )
-        pipeline.add_phase( lambda x: 2 * x )
+        pipeline.add_phase( mult_2 )
         assert( len( pipeline ) == 1 )
 
         # begin multiprocessing
@@ -67,14 +66,13 @@ class TestPhase( unittest.TestCase ):
 
     # test the phase object when applying 3 phases each in its own process
     def test_multiple_phases( self ):
-
         frames = 1800
 
         # create a pipeline and shared memeory manager
         pipeline = Pipeline( )
-        pipeline.add_phase( lambda x: 2 * x )
-        pipeline.add_phase( lambda x: 1 + x )
-        pipeline.add_phase( lambda x: 1 + x )
+        pipeline.add_phase( mult_2 )
+        pipeline.add_phase( add_one )
+        pipeline.add_phase( add_one )
 
         assert( len( pipeline ) == 3 )
         
@@ -89,6 +87,12 @@ class TestPhase( unittest.TestCase ):
                 output = pipeline.next_output()
                 assert( 2 + 2 * i == output )
                 i += 1
+
+def mult_2( x ):
+    return x * 2
+
+def add_one( x ):
+    return 1 + x
                 
 if __name__ == '__main__':
     unittest.main()
