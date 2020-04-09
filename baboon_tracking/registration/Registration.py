@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 import math
 import cmath
+import time
+from phase import tbench as bench
 
 from collections import deque
 from ..models import Frame
@@ -21,9 +23,19 @@ class Registration(ABC):
         frame: Frame = frames[0]
         previous_frame: Frame = frames[1]
 
+        start = time.perf_counter_ns( )
         M = self.register(previous_frame, frame)
-        #return (previous_frame, M)
-        return (Frame(cv2.warpPerspective(previous_frame.get_frame(), M, (previous_frame.get_frame().shape[1], previous_frame.get_frame().shape[0])).astype(np.uint8), previous_frame.get_frame_number()), M)
+        bench.print_task_time_ms( "register()", start, time.perf_counter_ns(), 1)
+
+        start = time.perf_counter_ns( )
+        warp = cv2.warpPerspective(previous_frame.get_frame(), M, (previous_frame.get_frame().shape[1], previous_frame.get_frame().shape[0]))
+        bench.print_task_time_ms( "_shift_frame warp", start, time.perf_counter_ns(), 1)
+
+        start = time.perf_counter_ns( )
+        r = ( Frame(warp.astype(np.uint8), previous_frame.get_frame_number()), M )
+        bench.print_task_time_ms( "_shift_frame return cast", start, time.perf_counter_ns(), 1)
+
+        return r
 
     @abstractmethod
     def register(self, frame1: Frame, frame2: Frame):

@@ -4,6 +4,7 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Python: Phase Tests",
             "type": "python",
@@ -19,10 +20,10 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Python: Generate Mask",
+            "name": "Python: Main",
             "type": "python",
             "request": "launch",
-            "program": "generate_mask.py",
+            "program": "main.py",
             "console": "integratedTerminal"
         }
     ]

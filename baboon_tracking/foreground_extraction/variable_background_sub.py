@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import math
+import time
+from phase import tbench as bench
 
 from .ForegroundExtraction import ForegroundExtraction
 
@@ -15,7 +17,12 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Normalize pixel values from 0-255 to values from 0-10
         Returns quantized frame
         '''
-        return np.floor(frame.get_frame().astype(np.float32) * 40.0 / 255.0).astype(np.uint8).astype(np.int32)
+
+        start = time.perf_counter_ns()
+        res = np.floor(frame.get_frame().astype(np.float32) * 40.0 / 255.0).astype(np.uint8).astype(np.int32) # int16 sufficient, astype(np.uint8) not needed
+        bench.print_task_time_ms("_quantize_frame", start, time.perf_counter_ns(), 3)
+
+        return res
 
     def _intersect_frames(self, frames, q_frames):
         '''
@@ -50,16 +57,23 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Calculate history of dissimilarity according to figure 10 of paper
         Returns frame representing history of dissimilarity
         '''
-        print('dissimilarity')
-
+        mini_start = time.perf_counter_ns() 
         dissimilarity = np.zeros(frames[0].get_frame().shape).astype(np.uint32)
+        bench.print_task_time_ms(f"new empty dis", mini_start, time.perf_counter_ns(), 3)
 
+        
         for i in range(len(frames)):
             if i == 0:
                 continue
 
-            mask = (np.abs(q_frames[i] - q_frames[i - 1]) > 1).astype(np.uint32)
+            mini_start = time.perf_counter_ns() 
+            mask = (np.abs( q_frames[i] - q_frames[i - 1]) > 1 ).astype( np.uint32 ) 
+            bench.print_task_time_ms(f"mask {i}", mini_start, time.perf_counter_ns(), 3)
+
+            mini_start =time.perf_counter_ns() 
             dissimilarity = dissimilarity + np.multiply(np.abs(frames[i].get_frame().astype(np.int32) - frames[i - 1].get_frame().astype(np.int32)), mask)
+            bench.print_task_time_ms(f"dissimilarity {i}", mini_start, time.perf_counter_ns(), 3)
+
 
         return (dissimilarity / len(frames)).astype(np.uint8)
 
@@ -69,16 +83,26 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         to figure 12 of paper
         Returns frame representing frequency of commonality
         '''
-        print('weights')
-
-        weights = np.zeros(q_frames[0].shape).astype(np.uint8)
+        start = time.perf_counter_ns()
+        weights = np.zeros(q_frames[0].shape).astype(np.uint8) # potential to remove this if you pass in frames
+        # np.zeros_like( M )
+        bench.print_task_time_ms( "_get_weights/zeros", start, time.perf_counter_ns(), 3 )
 
         for i, _ in enumerate(q_frames):
             if i == 0:
                 continue
 
+            start = time.perf_counter_ns()
             mask = (np.abs(q_frames[i] - q_frames[i - 1]) <= 1).astype(np.uint8)
+            bench.print_task_time_ms( "_get_weights/mask", start, time.perf_counter_ns(), 3 )
+
+            start = time.perf_counter_ns( )
             weights = weights + mask
+            bench.print_task_time_ms( "_get_weights/weights", start, time.perf_counter_ns(), 3 )
+
+            # finish by testing their equality
+            mask = np.abs(q_frames[i] - q_frames[i - 1]) <= 1
+            weights[mask] = weights[mask] + 1
 
         return weights
 
@@ -88,7 +112,7 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         is really high, meaning that it hasn't changed much or at all in the history frames, according to figure 13 of paper
         Returns frame representing the foreground
         '''
-        print('zero')
+        # print('zero')
 
         f = frame.copy()
         f[weights >= self.history_frames - 1] = 0
@@ -148,22 +172,24 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         Ms - transformation matrices aligning each registered history frame
         '''
 
-        print('quantize frames')
-
+        mini_start = time.perf_counter_ns() 
         quantized_frames = [self._quantize_frame(f) for f in shifted_history_frames]
+        bench.print_task_time_ms("Quantize Frames", mini_start, time.perf_counter_ns(),  1)
+        
+        # astype(np.unit8) not necesary ?
+        # mini_start =time.perf_counter_ns() 
+        # masks = [cv2.warpPerspective(np.ones(frame.get_frame().shape), M, (frame.get_frame().shape[1], frame.get_frame().shape[0])).astype(np.uint8) for M in Ms]
+        # bench.print_task_time_ms("Warp Perspective", mini_start, time.perf_counter_ns(),  1)
 
-        print('quantized frames finished')
-
-        print('warp perspective')
-
-        masks = [cv2.warpPerspective(np.ones(frame.get_frame().shape), M, (frame.get_frame().shape[1], frame.get_frame().shape[0])).astype(np.uint8) for M in Ms]
-
-        print('finished warp perspective')
+        # TODO: test
+        mini_start = time.perf_counter_ns() 
+        masks = [f.get_frame() != 0 for f in shifted_history_frames]
+        bench.print_task_time_ms("Warp Perspective", mini_start, time.perf_counter_ns(), 1)
 
         frame_group_index = range(len(shifted_history_frames) - 1)
         frame_group_index = [(r, r + 1) for r in frame_group_index]
 
-        print(frame_group_index)
+        mini_start =time.perf_counter_ns() 
 
         # pairs each two frames to do intersection
         grouped_shifted_history_frames = [(shifted_history_frames[g[0]], shifted_history_frames[g[1]]) for g in frame_group_index]
@@ -172,19 +198,32 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         intersects = self._intersect_all_frames(grouped_shifted_history_frames, grouped_quantized_frames)
         union = self._union_frames(intersects)
 
+        bench.print_task_time_ms("Intersection and Union", mini_start, time.perf_counter_ns(),  1)
+
+        mini_start =time.perf_counter_ns() 
         history_of_dissimilarity = self._get_history_of_dissimilarity(shifted_history_frames, quantized_frames)
 
+        bench.print_task_time_ms("History of Dissimilarity", mini_start, time.perf_counter_ns(),  1)
+
+        mini_start = time.perf_counter_ns() 
         weights = self._get_weights(quantized_frames)
+
+        bench.print_task_time_ms("_get_weights", mini_start, time.perf_counter_ns(),  1)
+        mini_start = time.perf_counter_ns() 
 
         frame_new = self._zero_weights(frame.get_frame(), weights)
         union_new = self._zero_weights(union, weights)
 
+        bench.print_task_time_ms("_zero_weights", mini_start, time.perf_counter_ns(),  1)
+
         #foreground = np.absolute(frame_new.astype(np.int32) - union_new.astype(np.int32)).astype(np.uint8)
+        mini_start = time.perf_counter_ns() 
         foreground =  cv2.absdiff(frame_new, union_new)
+        bench.print_task_time_ms("cv2.absdiff", mini_start, time.perf_counter_ns(),  1)
 
-        #cv2.imshow('foreground', cv2.resize(foreground * 25, (1600, 900)))
-
+        mini_start =time.perf_counter_ns() 
         moving_foreground = self._get_moving_foreground(weights, foreground, history_of_dissimilarity)
+        bench.print_task_time_ms("_get_moving_foreground", mini_start, time.perf_counter_ns(),  1)
 
         # This cleans up the edges after performing image registration.
         for mask in masks:
