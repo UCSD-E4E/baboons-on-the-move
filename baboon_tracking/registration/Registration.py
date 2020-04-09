@@ -4,7 +4,7 @@ import numpy as np
 import math
 import cmath
 import time
-from phase import tbench as bench
+from baboon_bench import pretty_times as bench
 
 from collections import deque
 from ..models import Frame

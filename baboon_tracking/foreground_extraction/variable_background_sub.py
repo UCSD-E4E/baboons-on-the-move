@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import math
 import time
-from phase import tbench as bench
+from baboon_bench import pretty_times as bench
 
 from .ForegroundExtraction import ForegroundExtraction
 
@@ -85,7 +85,6 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         '''
         start = time.perf_counter_ns()
         weights = np.zeros(q_frames[0].shape).astype(np.uint8) # potential to remove this if you pass in frames
-        # np.zeros_like( M )
         bench.print_task_time_ms( "_get_weights/zeros", start, time.perf_counter_ns(), 3 )
 
         for i, _ in enumerate(q_frames):
@@ -100,9 +99,9 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
             weights = weights + mask
             bench.print_task_time_ms( "_get_weights/weights", start, time.perf_counter_ns(), 3 )
 
-            # finish by testing their equality
-            mask = np.abs(q_frames[i] - q_frames[i - 1]) <= 1
-            weights[mask] = weights[mask] + 1
+            # TODO
+            # mask = np.abs(q_frames[i] - q_frames[i - 1]) <= 1
+            # weights[mask] = weights[mask] + 1
 
         return weights
 
@@ -177,14 +176,14 @@ class VariableBackgroundSub_ForegroundExtraction(ForegroundExtraction):
         bench.print_task_time_ms("Quantize Frames", mini_start, time.perf_counter_ns(),  1)
         
         # astype(np.unit8) not necesary ?
-        # mini_start =time.perf_counter_ns() 
-        # masks = [cv2.warpPerspective(np.ones(frame.get_frame().shape), M, (frame.get_frame().shape[1], frame.get_frame().shape[0])).astype(np.uint8) for M in Ms]
-        # bench.print_task_time_ms("Warp Perspective", mini_start, time.perf_counter_ns(),  1)
+        mini_start =time.perf_counter_ns() 
+        masks = [cv2.warpPerspective(np.ones(frame.get_frame().shape), M, (frame.get_frame().shape[1], frame.get_frame().shape[0])).astype(np.uint8) for M in Ms]
+        bench.print_task_time_ms("Warp Perspective", mini_start, time.perf_counter_ns(),  1)
 
-        # TODO: test
-        mini_start = time.perf_counter_ns() 
-        masks = [f.get_frame() != 0 for f in shifted_history_frames]
-        bench.print_task_time_ms("Warp Perspective", mini_start, time.perf_counter_ns(), 1)
+        # TODO: can this fit into this
+        # mini_start = time.perf_counter_ns() 
+        # masks = [f.get_frame() != 0 for f in shifted_history_frames]
+        # bench.print_task_time_ms("Warp Perspective", mini_start, time.perf_counter_ns(), 1)
 
         frame_group_index = range(len(shifted_history_frames) - 1)
         frame_group_index = [(r, r + 1) for r in frame_group_index]

@@ -7,7 +7,7 @@ import baboon_tracking.registration
 import baboon_tracking.foreground_extraction
 from baboon_tracking.models.config import Config
 from baboon_tracking.models import video
-from phase import tbench as bench
+from baboon_bench import pretty_times as bench
 
 def main():
     config          = Config( 'config.yml' )
