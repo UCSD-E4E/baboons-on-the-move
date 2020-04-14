@@ -35,7 +35,7 @@ $ pip install -f requirements.txt
 2. Add "baboon_tracking" to be importable
 cd into the directory at which the baboon-tracking on your local directory  
 pwd (to get the full path of where the directory lives)  
-add the following line (but your path found in the previous step) to your ~/.bashrc (or ~/.zshrc if you're a ninja) 
+add the following line (but your path found in the previous step) to your ~/.bashrc (or ~/.zshrc if you're a ninja)  
 restart your terminal session (or use the command "source ~/.zshrc", if you're a ninja of course)  
 ```
 export PYTHONPATH="/Users/joshuakang/git/baboon-tracking:$PYTHONPATH"
