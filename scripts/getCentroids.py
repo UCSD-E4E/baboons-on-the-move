@@ -21,12 +21,33 @@ w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 fps = cap.get(cv2.CAP_PROP_FPS)
 out = cv2.VideoWriter(args.output, fourcc, fps, (w, h))
 
+# kernels
 erosion_kernel = np.ones((5, 5), np.uint8)
 dilation_kernel = np.ones((5, 5), np.uint8)
+
+# blob detection  ================================
+# Setup SimpleBlobDetector parameters.
+params = cv2.SimpleBlobDetector_Params()
+# Change thresholds
+params.minDistBetweenBlobs = 0
+params.filterByColor = True
+params.blobColor = 255
+params.filterByArea = True
+params.minArea = 10
+params.maxArea = 300000
+params.filterByCircularity = False
+params.filterByConvexity = False
+params.filterByInertia = True
+params.minInertiaRatio = 0.01
+params.maxInertiaRatio = 1
+detector = cv2.SimpleBlobDetector_create(params)
+# ================================================
 
 while(cap.isOpened()):
     ret, frame = cap.read()
 
+    if(frame is None):
+        break
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (5, 5), 0)
 
@@ -35,10 +56,15 @@ while(cap.isOpened()):
     gray = cv2.dilate(gray, dilation_kernel, iterations=1)
     # ===================================================
 
+    # contour detection
     ret, thresh = cv2.threshold(gray, 127, 255, 0)
     contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    # blob detection
+    keypoints = detector.detect(gray)
     
     frame = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
+    frame = cv2.drawKeypoints(frame, keypoints, np.array([]), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
     for c in contours:
         # compute the center of the contour
