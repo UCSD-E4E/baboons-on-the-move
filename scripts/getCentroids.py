@@ -84,11 +84,15 @@ while(cap.isOpened()):
         else:
             cX, cY = 0, 0
         # draw the contour and center of the shape on the image
-        coordinates.append([cX, cY])
         cv2.drawContours(frame, [c], -1, (0, 255, 0), 2)
         cv2.circle(frame, (cX, cY), 2, (0, 0, 255), -1)
+        # add the centroid coordinates in array
+        coordinates.append([cX, cY])
 
-    df = pd.DataFrame.from_records(locations)
+    # set up panda dataset using the (x,y) coordinates
+    # in the array "coordinates" and label columns
+    # as 'x' and 'y'
+    df = pd.DataFrame.from_records(coordinates)
     df.columns = ['x', 'y']
 
     cv2.imshow('frame', frame)
