@@ -4,8 +4,8 @@ import cv2
 import csv
 #Edit these as necessary.
 VIDEO_FILEPATH = "./../data/input.mp4"
-XML_FILEPATH = "./../xml&velocities/DJI_0870_mp4.xml"
-OUTPUT_FILEPATH = "./../xml&velocities/DJI_0870_velocity.csv"
+XML_FILEPATH = "./../research_data/DJI_0870_mp4.xml"
+OUTPUT_FILEPATH = "./../research_data/DJI_0870_velocity.csv"
 
 #Get fps of video
 cap=cv2.VideoCapture(VIDEO_FILEPATH)
