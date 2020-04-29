@@ -53,13 +53,18 @@ csvContents = [['baboon id', 'frame', 'centroid_x', 'centroid_y', 'velocity']]
 for baboon in XML.iter('track'):
     #prev centroid used to displace velocity
     last_centroid = None
+    first = True 
     #iter through each frame the baboon appears in - labeled "box" in XML
     for box in baboon.iter('box'):
         #get centroid from bounding box - returns set with x-dim at 0 & y-dim at 1
         centroid = getCentroid(box)
         velocity = computeVelocity(last_centroid, centroid)
-        csvContents.append([baboon.get('id'), box.get('frame'), centroid[0], centroid[1], velocity])
-        last_centroid = centroid
+
+        if not first:
+            csvContents.append([baboon.get('id'), box.get('frame'), centroid[0], centroid[1], velocity])
+            last_centroid = centroid
+
+        first = False
 print("Velocity computed, outputting to ", OUTPUT_FILEPATH)
 outputToFile(csvContents)
 print("Completed.")
