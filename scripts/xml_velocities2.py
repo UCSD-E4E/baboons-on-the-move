@@ -7,6 +7,9 @@ VIDEO_FILEPATH = "./../data/input.mp4"
 XML_FILEPATH = "./../xml&velocities/DJI_0870_mp4.xml"
 OUTPUT_FILEPATH = "./../xml&velocities/DJI_0870_velocity.csv"
 
+# Velocity threshold to filter
+velocityThreshold = 1
+
 # Get fps of video
 cap = cv2.VideoCapture(VIDEO_FILEPATH)
 FPS = cap.get(cv2.CAP_PROP_FPS)
@@ -70,6 +73,15 @@ for baboon in XML.iter('track'):
             'frame'), centroid[0], centroid[1], velocity])
         last_centroid = centroid
 
-print("Velocity computed, outputting to ", OUTPUT_FILEPATH)
+# copy of csvContents to filter velocity
+csvFilteredContents = csvContents
+for dataPoint in csvFilteredContents:
+    if dataPoint[4] < velocityThreshold:
+        csvFilteredContents.remove(dataPoint)
+
+
+print("Velocities computed, outputting to ", OUTPUT_FILEPATH)
 outputToFile(csvContents)
+print("Velocities filtered, outputting to ", OUTPUT_FILEPATH)
+outputToFile(csvFIlteredContents)
 print("Completed.")
