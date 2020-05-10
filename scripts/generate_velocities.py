@@ -2,10 +2,11 @@ from xml.etree import ElementTree as ET
 import math
 import cv2
 import csv
+import numpy as np
 #Edit these as necessary.
 VIDEO_FILEPATH = "./../data/input.mp4"
 XML_FILEPATH = "./../research_data/DJI_0870_mp4.xml"
-OUTPUT_FILEPATH = "./../research_data/DJI_0870_velocity.csv"
+OUTPUT_FILEPATH = "./../output/DJI_0870_velocity.csv"
 
 #Get fps of video
 cap=cv2.VideoCapture(VIDEO_FILEPATH)
@@ -34,6 +35,7 @@ def computeVelocity(centroid1, centroid2, FPS=FPS):
     #Velocity = Distance / Time
     #Distance Formula = sqrt((x2-x1)^2 + (y2-y1)^2 )
     distance = math.sqrt( math.pow(centroid2[0]-centroid1[0],2) + math.pow(centroid2[1]-centroid1[1],2) )
+
     return distance/(1/FPS)
 
 
@@ -63,7 +65,6 @@ for baboon in XML.iter('track'):
         if not first:
             csvContents.append([baboon.get('id'), box.get('frame'), centroid[0], centroid[1], velocity])
             last_centroid = centroid
-
         first = False
 print("Velocity computed, outputting to ", OUTPUT_FILEPATH)
 outputToFile(csvContents)
