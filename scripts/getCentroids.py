@@ -19,7 +19,7 @@ fourcc = cv2.VideoWriter_fourcc(*'MP4V')
 h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 fps = cap.get(cv2.CAP_PROP_FPS)
-out = cv2.VideoWriter('video_' + args.input + '.mp4', fourcc, fps, (w, h))
+out = cv2.VideoWriter(args.input + '_video' + '.mp4', fourcc, fps, (w, h))
 
 # kernels
 erosion_kernel = np.ones((5, 5), np.uint8)
@@ -99,11 +99,11 @@ while(cap.isOpened()):
 
 blobdetector_centroids_df = pd.DataFrame.from_records(blobdetector_centroids)
 blobdetector_centroids_df.columns = ['frame', 'x', 'y']
-blobdetector_centroids_df.to_csv('blobdetector_' + args.input + '.csv')
+blobdetector_centroids_df.to_csv(args.input + '_blobdetector' + '.csv')
 
 contour_centroids_df = pd.DataFrame.from_records(contour_centroids)
 contour_centroids_df.columns = ['frame', 'x', 'y']
-contour_centroids_df.to_csv('contour_' + args.input + '.csv')
+contour_centroids_df.to_csv(args.input + '_contour' + '.csv')
 
 cap.release()
 out.release()
