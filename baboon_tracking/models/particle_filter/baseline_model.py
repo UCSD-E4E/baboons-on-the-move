@@ -39,10 +39,6 @@ class Nnet(nn.Module):
         self.input_layer = nn.Linear(input_dim, 500)
         
         self.main = nn.Sequential(
-            nn.Linear(input_dim, 500),
-            nn.ReLU( inplace=True),
-            nn.Dropout(),
-            
             nn.Linear(4096, 25088),
             nn.ReLU(inplace=True),
             nn.Dropout(),
