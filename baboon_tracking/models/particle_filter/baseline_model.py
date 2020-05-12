@@ -18,7 +18,7 @@ Not really needed at the moment but will be nice to have in the future
 Parameters:
     Data : should be a (n x d) np array 
 """
-class loader(Dataset):
+class Loader(Dataset):
     def __init__(self, data):
         if not isinstance(data,(np.ndarray)):
             raise ValueError('Data should be a numpy array')
