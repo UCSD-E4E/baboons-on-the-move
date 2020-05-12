@@ -30,7 +30,7 @@ $ pipenv shell
 
 venv (just don't, but if you really wanted to...):
 ```
-$ pip install -f requirements.txt
+$ pip install -r requirements.txt
 ```
 2. Add "baboon_tracking" to be importable
 cd into the directory at which the baboon-tracking on your local directory  
