@@ -1,11 +1,13 @@
+import code
 from xml.etree import ElementTree as ET
 import math
 import cv2
 import csv
+import numpy as np
 #Edit these as necessary.
 VIDEO_FILEPATH = "./../data/input.mp4"
 XML_FILEPATH = "./../research_data/DJI_0870_mp4.xml"
-OUTPUT_FILEPATH = "./../research_data/DJI_0870_velocity.csv"
+OUTPUT_FILEPATH = "./../output/DJI_0870_velocity.csv"
 
 #Get fps of video
 cap=cv2.VideoCapture(VIDEO_FILEPATH)
@@ -34,7 +36,16 @@ def computeVelocity(centroid1, centroid2, FPS=FPS):
     #Velocity = Distance / Time
     #Distance Formula = sqrt((x2-x1)^2 + (y2-y1)^2 )
     distance = math.sqrt( math.pow(centroid2[0]-centroid1[0],2) + math.pow(centroid2[1]-centroid1[1],2) )
-    return distance/(1/FPS)
+
+    return distance/(1/FPS) 
+
+
+#Computes direction in radians
+def computeDirection(centroid1, centroid2, FPS=FPS):
+    if centroid1 is None or centroid2 is None:
+        return None
+
+    return  math.atan2(centroid2[1]-centroid1[1], centroid2[0]-centroid1[0]) #in radians
 
 
 #Outputs a CSV file containing headers "baboon id", "frame", "centroid_x", "centroid_y", "velocity"
@@ -47,7 +58,7 @@ print("Loading XML into Python")
 XML = loadXML(XML_FILEPATH)
 print("Loaded file ", XML_FILEPATH)
 
-csvContents = [['baboon id', 'frame', 'centroid_x', 'centroid_y', 'velocity']]
+csvContents = [['baboon id', 'frame', 'centroid_x', 'centroid_y', 'velocity', 'direction']]
 
 #iter through each baboon in file - labeled "track" in XML 
 for baboon in XML.iter('track'):
@@ -58,8 +69,13 @@ for baboon in XML.iter('track'):
         #get centroid from bounding box - returns set with x-dim at 0 & y-dim at 1
         centroid = getCentroid(box)
         velocity = computeVelocity(last_centroid, centroid)
-        csvContents.append([baboon.get('id'), box.get('frame'), centroid[0], centroid[1], velocity])
+        direction = computeDirection(last_centroid, centroid)
+
+        if last_centroid is not None:
+            csvContents.append([baboon.get('id'), box.get('frame'), centroid[0], centroid[1], velocity, direction])
+        
         last_centroid = centroid
+
 print("Velocity computed, outputting to ", OUTPUT_FILEPATH)
 outputToFile(csvContents)
 print("Completed.")
