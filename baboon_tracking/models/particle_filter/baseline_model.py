@@ -18,19 +18,19 @@ Not really needed at the moment but will be nice to have in the future
 Parameters:
     Data : should be a (n x d) np array 
 """
-class Loader(Dataset):
+class loader(Dataset):
     def __init__(self, data):
         if not isinstance(data,(np.ndarray)):
             raise ValueError('Data should be a numpy array')
         self.data = data
 
     def __len__(self):
-        return data.shape[0]
+        return self.data.shape[0]
     
 
     #allow us to use the index for an instance of loader
     def __getitem__(self, idx):
-        return data[idx]
+        return self.data[idx]
     
 class Nnet(nn.Module):
     def __init__(self, input_dim):
