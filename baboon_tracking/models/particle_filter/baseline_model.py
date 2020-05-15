@@ -23,6 +23,7 @@ class loader(Dataset):
         if not isinstance(data,(np.ndarray)):
             raise ValueError('Data should be a numpy array')
         self.data = data
+        self.labels = labels
 
     def __len__(self):
         return self.data.shape[0]
@@ -30,10 +31,10 @@ class loader(Dataset):
 
     #allow us to use the index for an instance of loader
     def __getitem__(self, idx):
-        return self.data[idx]
+        return self.data[idx], self.labels[idx]
     
 class Nnet(nn.Module):
-    def __init__(self, input_dim):
+    def __init__(self, input_dim, output_dim):
         super(Nnet, self).__init__()
         #TODO: Add dropout! When we do we MUST use model.eval() for val or testing and model.train() for training
         self.input_layer = nn.Linear(input_dim, 500)
@@ -56,7 +57,7 @@ class Nnet(nn.Module):
             nn.Dropout(),
         )
         
-        self.output = nn.Linear(500, 3)
+        self.output = nn.Linear(500, output_dim)
 
 
     def forward(self, input):
