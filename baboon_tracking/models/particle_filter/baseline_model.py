@@ -19,7 +19,7 @@ Parameters:
     Data : should be a (n x d) np array 
 """
 class loader(Dataset):
-    def __init__(self, data):
+    def __init__(self, data, labels):
         if not isinstance(data,(np.ndarray)):
             raise ValueError('Data should be a numpy array')
         self.data = data
@@ -37,7 +37,10 @@ class Nnet(nn.Module):
     def __init__(self, input_dim, output_dim):
         super(Nnet, self).__init__()
         #TODO: Add dropout! When we do we MUST use model.eval() for val or testing and model.train() for training
-        self.input_layer = nn.Linear(input_dim, 500)
+        self.input_layer = nn.Sequential(
+            nn.Linear(input_dim, 500), 
+            nn.ReLU(inplace=True)
+        )
         
         self.main = nn.Sequential(
             nn.Linear(500, 4096),
