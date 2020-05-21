@@ -146,6 +146,8 @@ kmeans = pickle.load(open(config['kmeans_model_path'], 'rb'))
 kmeans_centers_sorted = np.sort(np.array(kmeans.cluster_centers_).squeeze())
 config['output_dimension'] = kmeans_centers_sorted.size + 1
 
+
+print('labeling data')
 # test_predict = np.array([10])
 # print(kmeans.predict(test_predict.reshape(-1,1)))
 #TODO : add the sitting still !!!
