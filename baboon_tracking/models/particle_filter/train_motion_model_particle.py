@@ -21,8 +21,8 @@ config['shuffle_dataset'] = True #shuffle data before start (TODO: change this i
 config['epochs'] = 100  # Number of epochs to train the model
 config['early_stop'] = True  # Implement early stopping or not
 config['early_stop_epoch'] = 3 # Number of epochs for which validation loss increases to be counted as overfitting
-config['input_training_data'] = root / 'output/DJI_0870_velocity.csv'
-config['kmeans_model_path'] = root / 'output' / 'velocity_model.pkl'
+config['input_training_data'] = root / 'ml_data' / 'DJI_0870_velocity.csv'
+config['kmeans_model_path'] = root / 'ml_data' / 'velocity_model.pkl'
 
 
 #DO NOT CHANGE THE FOLLOWING 
