@@ -1,3 +1,17 @@
+from baseline_model import *
+from pathlib import Path 
+import numpy as np
+import pandas as pd
+import os
+import math
+import pickle
+import matplotlib.pyplot as plt
+from tensorboardX import SummaryWriter
+from datetime import date
+
+
+root = Path('../../..')
+
 config = {}
 config['k_nearest_baboons'] = 4 #getting the four nearest baboons per frame to consider(MUST BE EVEN)
 config['k_historic_velocities'] = 4 #getting the four past velocities to consider

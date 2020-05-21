@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 import os
 import math
+import code
 import pickle
 import matplotlib.pyplot as plt
 from tensorboardX import SummaryWriter
@@ -215,9 +216,14 @@ writer = SummaryWriter(f'motion_model_tensorboard_{d1}', flush_secs=1)
 
 # X = np.array(X)
 # labels = np.array(labels)
+kmeans = pickle.load(open(config['kmeans_model_path'], 'rb'))
+kmeans_centers_sorted = np.sort(np.array(kmeans.cluster_centers_).squeeze())
+config['output_dimension'] = kmeans_centers_sorted.size + 1
+
 
 X = np.load(config['data_output_path'])
 labels = np.load(config['labels_output_path'])
+
 
 #TODO : add weighted classes to save from an unbalanced dataset
 # Check if your system supports CUDA
