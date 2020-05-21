@@ -1,6 +1,3 @@
-%load_ext autoreload
-%autoreload 2
-
 from baseline_model import *
 from pathlib import Path 
 import numpy as np
@@ -96,9 +93,6 @@ def get_k_nearest_baboons_velocities(frame, baboon_id):
         
     return output
             
-frames_to_velocities[1]
-
-get_k_nearest_baboons_velocities(1, 10)
 
 #TODO : Must check for 'extended' periods of discountinuous frames for future potentially sparese labeled data
 #TODO : Assuming data is ordered by frame (increasing timesteps/frames)
@@ -142,10 +136,7 @@ def get_k_past_velocities(current_frame, baboon_id):
     
     else:
         return [item[0] for item in velocities[frame_index-config['k_historic_velocities'] : frame_index]]
-    
-baboons_to_velocities[0]
 
-get_k_past_velocities(22, 0)
 
 #TODO : way too hard coded here. Make better
 
@@ -165,7 +156,6 @@ label_table[kmeans_centers_sorted[1]] = [0,0,1,0,0,0]
 label_table[kmeans_centers_sorted[2]] = [0,0,0,1,0,0]
 label_table[kmeans_centers_sorted[3]] = [0,0,0,0,1,0]
 label_table[kmeans_centers_sorted[4]] = [0,0,0,0,0,1]
-
 
 
 
@@ -210,12 +200,10 @@ for idx, row in training_data.iterrows():
     labels.append(current_one_hot)
 
 
-X[0]
 
 X = np.array(X)
 labels = np.array(labels)
 
-X.shape, labels.shape
 
 #TODO : add weighted classes to save from an unbalanced dataset
 # Check if your system supports CUDA
@@ -238,7 +226,6 @@ if not config['checkpoint_training']:
 optimizer = optim.Adam(net.parameters(),lr = config['learning_rate'])
 criterion = nn.CrossEntropyLoss()
 
-net
 
 dataset = loader(X, labels)
 
@@ -377,9 +364,6 @@ for epoch in range(config['epochs']):
     training_losses.append(average_epoch_loss)
     validation_losses.append(N_minibatch_val_loss)
 
-
-
-training_losses, validation_losses
 
 min_entries = min(len(training_losses), len(validation_losses))
 epochs_plots = []
