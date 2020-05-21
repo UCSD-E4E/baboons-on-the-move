@@ -335,8 +335,8 @@ for epoch in range(config['epochs']):
 
         for minibatch_count, (datapoints, labels) in enumerate(validation_loader, 0):
             val_data_size += 1
-            datapoints, labels = images.to(computing_device), labels.to(computing_device)
-            outputs = net(datapoints)
+            datapoints, labels = datapoints.to(computing_device), labels.to(computing_device)
+            outputs = net(datapoints.float())
             val_loss = criterion(outputs, labels).item()
             N_minibatch_val_loss += val_loss
 

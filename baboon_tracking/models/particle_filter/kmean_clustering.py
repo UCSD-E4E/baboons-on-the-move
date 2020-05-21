@@ -79,7 +79,7 @@ kmeans_model.cluster_centers_ #should be the average of the cluster since it's a
 # In[11]:
 
 
-pickle.dump(kmeans_model, open(root / 'output' / 'velocity_model.pkl', "wb"))
+pickle.dump(kmeans_model, open(root / 'ml_data' / 'velocity_model.pkl', "wb"))
 
 
 # In[ ]:
