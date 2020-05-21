@@ -368,6 +368,9 @@ for epoch in range(config['epochs']):
 
         N_minibatch_val_loss /= val_data_size
         print(f'Epoch {epoch + 1} average validation loss over {val_data_size} datapoints : {N_minibatch_val_loss}' )
+        writer.add_scalar('loss_train/val', N_minibatch_val_loss, epoch)
+        writer.flush()
+
         
         #early stopping
         if config['early_stop']:
