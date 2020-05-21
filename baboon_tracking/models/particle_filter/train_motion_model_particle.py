@@ -326,6 +326,9 @@ for epoch in range(config['epochs']):
         loss.backward()
         total_epoch_loss += loss.item()
 
+        writer.add_scalar('loss_train/loss', loss.item(), minibatch_count)
+        writer.flush()
+
         # Update the weights
         optimizer.step()    
         # Add this iteration's loss to the total_loss
@@ -345,8 +348,6 @@ for epoch in range(config['epochs']):
     average_epoch_loss = total_epoch_loss / num_minibatches
     print(f"Finished {epoch+ 1} epochs of training with average {average_epoch_loss} loss." )
     
-    writer.add_scalar('loss_train/loss', average_epoch_loss, iteration)
-    writer.flush()
     
     N_minibatch_val_loss = 0
     val_data_size = 0
@@ -360,6 +361,8 @@ for epoch in range(config['epochs']):
             val_data_size += 1
             datapoints, labels = datapoints.to(computing_device), labels.to(computing_device)
             outputs = net(datapoints.float())
+            labels = torch.max(labels, 1)[1]
+
             val_loss = criterion(outputs, labels).item()
             N_minibatch_val_loss += val_loss
 
