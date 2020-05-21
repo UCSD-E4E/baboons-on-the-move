@@ -394,19 +394,5 @@ for epoch in range(config['epochs']):
     validation_losses.append(N_minibatch_val_loss)
 
 
-min_entries = min(len(training_losses), len(validation_losses))
-epochs_plots = []
-for i in range(min_entries):
-    epochs_plots.append(i+1)
-    
-val_plots = training_losses[:min_entries]
-train_plots = validation_losses[:min_entries]
-
-plt.figure()
-plt.plot(epochs_plots, val_plots, label='val loss')
-plt.plot(epochs_plots, train_plots, label='train loss')
-plt.legend(loc='upper right')
-plt.xlabel('epochs')
-plt.ylabel('cross entropy error')
-
+torch.save(net.state_dict(), './net.pth'  )
 
