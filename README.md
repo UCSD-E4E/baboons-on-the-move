@@ -2,12 +2,6 @@
 [[![Build Status](https://travis-ci.org/UCSD-E4E/baboon-tracking.svg?branch=master)](https://travis-ci.org/UCSD-E4E/baboon-tracking)](https://travis-ci.org/UCSD-E4E/baboon-tracking)
 This repo holds all of the [Baboon Team](http://e4e.ucsd.edu/baboons-on-the-move)'s attempted algorithms and implementations to track baboons from aerial drone footage, as well as any other code written for the project.
 
-# Makefile Instructions
-- make: builds python package, builds docker image, runs docker image
-- build: build python package
-- docker-build: builds docker image with tag anhdngo/baboon_tracking
-- docker-run: creates and runs our baboon docker image, as well as rabbitmq docker image
-
 # User Setup Instructions
 1. Build everything and start docker container
 ```
@@ -19,27 +13,39 @@ make
 cd utils; python3 ImageStreamClient.py
 ```
 
-# Dev Setup Instructions
-1. Set up pip environment
+# Dev Setup Instructions, python 3.8 needed (conda environment recommended)
+1. Set up python virtual environment
+conda (uses the conda_requirements.txt):
 ```
-$ pipenv install
+(base) $ conda create --name py38 python=3.8  
+(base) $ conda activate py38
+(py38) $ conda install --file conda_requirements.txt 
+```
+
+pipenv (uses the Pipfile):
+```
+$ pipenv install 
 $ pipenv shell
 ```
-2. Install baboon_tracking package
+
+venv (just don't, but if you really wanted to...):
 ```
-$ sudo python3 setup.py install
+$ pip install -f requirements.txt
 ```
-3. Test if package is installed through the python3 interpreter
+2. Add "baboon_tracking" to be importable
+cd into the directory at which the baboon-tracking on your local directory  
+pwd (to get the full path of where the directory lives)  
+add the following line (but your path found in the previous step) to your ~/.bashrc (or ~/.zshrc if you're a ninja)  
+restart your terminal session (or use the command "source ~/.zshrc", if you're a ninja of course)  
+```
+export PYTHONPATH="/Users/joshuakang/git/baboon-tracking:$PYTHONPATH"
+```
+3. Test if package is accessible by the python path 
 ```
 $ python3
-```
-```
 >>> import baboon_tracking
 ```
-4. Run the rabbitmq docker container
-```
-$ docker container run -p 5672:5672 -p 15672:15672 --rm rabbitmq:3.8.0-beta.5
-```
+4. Add a video dataset to the /data directory named "input.mp4"
 5. Run the provided sample files
 ```
 $ python3 generate_mask.py
