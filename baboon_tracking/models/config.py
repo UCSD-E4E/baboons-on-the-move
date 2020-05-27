@@ -16,6 +16,7 @@ class Config:
                 self.display_height  = self.config['display']['height']
                 self.input_location  = self.config['input']
                 self.output_location = self.config['output']
+                self.mask_output_location = self.config['mask_output']
                 self.max_frames      = self.config['stop_on_frame']
                 self.history_frames  = self.config['history_frames']
                 self.max_features    = self.registration['max_features'] 

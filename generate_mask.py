@@ -25,6 +25,7 @@ def main():
 
     # prepare to write to the output video
     out = cv2.VideoWriter( config.output_location, cv2.VideoWriter_fourcc(*'mp4v'), config.fps, (config.frame_width, config.frame_height))
+    mask_out = cv2.VideoWriter( config.mask_output_location, cv2.VideoWriter_fourcc(*'mp4v'), config.fps, (config.frame_width, config.frame_height))
 
     # set up tracker
     registration = bt.registration.ORB_RANSAC_Registration( config.history_frames, config.max_features, config.match_percent )
@@ -121,6 +122,7 @@ def main():
         #server.imshow(moving_foreground)
         #out.write(cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR))
         out.write(blend)
+        mask_out.write(cv2.cvtColor(eroded, cv2.COLOR_GRAY2BGR))
 
         tracker.push_history_frame(frame_obj)
 
@@ -150,6 +152,7 @@ def main():
     # When everything done, release the video capture object
     cap.release()
     out.release()
+    mask_out.release()
 
     # Closes all the frames
     cv2.destroyAllWindows()
