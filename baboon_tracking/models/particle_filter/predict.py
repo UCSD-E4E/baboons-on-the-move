@@ -5,7 +5,7 @@ import ntpath
 from pathlib import Path
 import os
 import torch
-from baboon_tracking.models.particle_filter.baseline_model import * 
+from baseline_model import * 
 
 root_path = Path('./../../..')
 
