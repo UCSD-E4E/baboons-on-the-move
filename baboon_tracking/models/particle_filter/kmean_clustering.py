@@ -21,7 +21,7 @@ num_clusters = 5
 
 #(should change these to the configs in the yaml later on)
 root = Path('../../../')
-input_velocities_csv = root / 'ml_data' / 'DJI_0870_velocity.csv'
+input_velocities_csv = root / 'ml_data' / 'DJI_0769_1st_2250_frames.csv'
 
 
 # # Get the csv into a dataframe

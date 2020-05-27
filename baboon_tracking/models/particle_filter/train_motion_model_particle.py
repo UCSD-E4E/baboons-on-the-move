@@ -25,7 +25,6 @@ config['shuffle_dataset'] = True #shuffle data before start (TODO: change this i
 config['epochs'] = 100  # Number of epochs to train the model
 config['early_stop'] = True  # Implement early stopping or not
 config['early_stop_epoch'] = 3 # Number of epochs for which validation loss increases to be counted as overfitting
-config['input_training_data'] = root / 'ml_data' / 'DJI_0870_velocity.csv'
 config['kmeans_model_path'] = root / 'ml_data' / 'velocity_model.pkl'
 config['data_output_path'] = './data.npy'
 config['labels_output_path'] = './labels.npy'
@@ -40,7 +39,6 @@ config['output_dimension'] = -1 #leave empty
 
 #config checks
 assert( config['k_nearest_baboons'] % 2 == 0 )
-assert( os.path.isfile(config['input_training_data']) == True)
 assert( os.path.isfile(config['kmeans_model_path']) == True)
 
 today = date.today()
