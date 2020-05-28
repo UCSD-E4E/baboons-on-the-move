@@ -27,7 +27,7 @@ else: # Otherwise, train on the CPU
     
 # Initialize network
 net = Nnet(config['input_dim'], config['output_dim']).to(computing_device)
-state_dict = torch.load(config['model'], map_location=computing_device)
+state_dict = torch.load(config['model'])
 net.load_state_dict(state_dict)
 
 ########## COPY THE ABOVE CODE TO THE TOP OF THE FILE WHEN MERGING PARTICLE FILTER CODE ##########
