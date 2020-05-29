@@ -6,6 +6,7 @@ import os
 import torch
 from baseline_model import * 
 from particle import Particle_Filter 
+import pandas as pd
 
 """
 Given a csv of the video containing positional and direction velocity data, predicts locations of baboons 
@@ -19,6 +20,11 @@ config['model'] = root_path / 'baboon_tracking' / 'models' / 'particle_filter' /
 config['input_dim'] = 9
 config['output_dim'] = -1 
 config['kmeans_model_path'] = root_path / 'ml_data' / 'velocity_model.pkl'
+config['input_csv'] = root_path / 'ml_data' / 'DJI_0769_1st_2250_frames.csv'
+
+########## csv Initialization ##########
+data = pd.read_csv(config['input_training_data'])
+
 
 ########## KMEANS Initialization ##########
 kmeans = pickle.load(open(config['kmeans_model_path'], 'rb'))
