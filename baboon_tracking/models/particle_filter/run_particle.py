@@ -5,6 +5,7 @@ from pathlib import Path
 import os
 import torch
 from baseline_model import * 
+from particle import Particle_Filter 
 
 root_path = Path('./../../..')
 
@@ -13,7 +14,7 @@ config['model'] = root_path / 'baboon_tracking' / 'models' / 'particle_filter' /
 config['input_dim'] = 9
 config['output_dim'] = 6
 
-########## COPY THE BELOW CODE TO THE TOP OF THE FILE WHEN MERGING PARTICLE FILTER CODE ##########
+########## MODEL Initialization ##########
 # Setup GPU optimization if CUDA is supported
 use_cuda = torch.cuda.is_available()
 if use_cuda:
@@ -30,13 +31,9 @@ net = Nnet(config['input_dim'], config['output_dim']).to(computing_device)
 state_dict = torch.load(config['model'])
 net.load_state_dict(state_dict)
 
-########## COPY THE ABOVE CODE TO THE TOP OF THE FILE WHEN MERGING PARTICLE FILTER CODE ##########
-
-
-def predict(weights, net):
-    pass
-
-
+########## PARTICLE Initialization ##########
+initial_state = [2,3]
+particle_filter = Particle_Filter(initial_state, net)
 
 
 
