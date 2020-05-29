@@ -1,6 +1,7 @@
 import numpy as np
 from baseline_model import * 
 import torch
+import torch.nn as nn
 
 """
 Class for Particle filter
@@ -13,8 +14,8 @@ Fields :
     num_states : number of possible states 
     cluster_centers : the velocity at the center of each state (cluster centers from kmeans model)
     input_dim : dimension of input into model. Must be sorted
-    states (type : list of floats, length : n) : the states of the n particles 
-    weights (type : list of floats, length : n) : the current weights of each particle
+    states (type : list of floats, shape : n x 1) : the states of the n particles 
+    weights (type : list of floats, shape : n x 1) : the current weights of each particle
     model (type : torch nn.Module, output_dim : s)
 
 
@@ -27,14 +28,18 @@ Parameters:
 
 """
 class Particle_Filter():
-    def __init__(self, init_states, cluster_centers, input_dim, model, weight_distribution='uniform'):
-
+    def __init__(self, init_states, location, cluster_centers, input_dim, model, weight_distribution='uniform'):
         #states
         if len(init_states[init_states < 0]) > 0:
             assert RuntimeError('Some states are representing a velocity that is negative')
         self.states = np.array(init_states)
 
-        self.cluster_centers = cluster_centers
+        #estimated location of baboon at initialization
+        self.estimated_location = estimated_location
+        
+        #cluster centers
+        self.cluster_centers = [0]
+        self.cluster_centers.extend(cluster_centers)
 
         #input_dim
         self.input_dim = input_dim
@@ -57,18 +62,29 @@ def predict(self, neighbors_and_historic):
     model_input[:][0] = self.velocities
     model_input[:][1:] = neighbors_and_historic
 
-    model_output = self.model(model_input).cpu().data.numpy().squeeze()
+    #TODO : make Sure to confirm that the output is N x output_dim
+    softmax_layer = nn.Softmax(dim=1) #need this since CEL in training techincally does it for us
+    model_output = self.model(model_input)
+    model_output = softmax_layer(model_output).cpu().data.numpy().squeeze()
 
     #upate the velocities
-    #TODO : do a gaussian sampling around self.cluster_centers[pred_idx] 
-    self.states = np.array( [self.cluster_centers[pred_idx] for pred_idx in np.argmax(model_output, axis=0) ])
+    # self.states = np.array( [self.cluster_centers[pred_idx] for pred_idx in np.argmax(model_output, axis=0) ])
 
     #update the weights
-    new_weights = np.zeros(self.states.size + (model_output.shape[1] - 1)*self.states.size, ) 
-    for idx, prediction in enumerate(model_output):
-        pass
+    new_weights = []
+    new_states = [] 
+
+    for previous_weight_idx, previous_weight in enumerate(self.weights):
+
+        current_weights = previous_weight * model_output[previous_weight_idx] # the new weights for new particles
+        #TODO : do a gaussian sampling around self.cluster_centers[pred_idx] 
+        current_states =  self.cluster_centers #the new velocities for each newly created particle above
+
+        new_weights.extend(current_weights)
+        new_states.extend(current_states)
 
     self.weights = new_weights 
+    self.states = new_states
 
 
     
