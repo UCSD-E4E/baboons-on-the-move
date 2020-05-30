@@ -16,8 +16,6 @@ Fields :
     input_dim : dimension of input into model. Must be sorted
     estimated_location : the estimated location at the end of an iteration of the particle filter
     estimated_velocity : the estimated velocity at the end of an iteratin of the particle fitler
-    d_historic : the number of historical velocities that we pass into the model
-    historic_estimated_velocities  : the historic velocities of the baboon in consideration
     velocities (type : list of floats, shape : n x 1) : the velocities of the n particles 
     weights (type : list of floats, shape : n x 1) : the current weights of each particle
     model (type : torch nn.Module, output_dim : s)
@@ -45,10 +43,6 @@ class Particle_Filter():
         self.estimated_location = estimated_location
 
         self.estimated_velocity = estimated_velocity
-
-        self.d_historic = d_historic
-
-        self.historic_estimated_velocities = [estimated_velocity]
 
         # cluster centers
         self.cluster_centers = [0]
