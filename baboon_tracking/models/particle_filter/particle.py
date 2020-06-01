@@ -83,8 +83,8 @@ def predict(self, neighbors_and_historic):
         new_weights.extend(current_weights)
         new_states.extend(current_states)
 
-    self.weights = new_weights 
-    self.states = new_states
+    self.weights = np.array(new_weights)
+    self.states = np.array(new_states)
 
 
     
