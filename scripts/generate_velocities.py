@@ -9,6 +9,20 @@ import ntpath
 from pathlib import Path
 import os
 
+# generate_velocities.py
+# Written by Christie & edited by Josh 
+# This script parses the XML files from the "LABLEPARTY" folder in the G-Drive
+# and turns it into a CSV file containing:
+# baboon id: unique identifier for each baboon represented by a number
+# frame: frame of the video
+# centroid x/y: center position of baboon
+# velocity: pixels/second movement from previous frame to current frame
+# direction: direction in radians
+# 
+# To Run:
+# A video must be provided to read the FPS. The path for the video is under VIDEO_FILEPATH
+# it is defaulted to data/input.mp4
+# ./generate_velocities.py inputpath.xml outputpath.csv
 
 parser = argparse.ArgumentParser(description='Generate velocities given xml')
 parser.add_argument('--input', '-i', required=True, type=str)
@@ -72,7 +86,7 @@ def computeDirection(centroid1, centroid2, FPS=FPS):
     return math.atan2(centroid2[1]-centroid1[1], centroid2[0]-centroid1[0])  # in radians
 
 
-# Outputs a CSV file containing headers "baboon id", "frame", "centroid_x", "centroid_y", "velocity"
+# Outputs a CSV file containing headers "baboon id", "frame", "centroid_x", "centroid_y", "velocity, direction"
 def outputToFile(fileContents, OUTPUT_FILEPATH=args.output):
     with open(OUTPUT_FILEPATH, "w", newline='') as file:
         writer = csv.writer(file)

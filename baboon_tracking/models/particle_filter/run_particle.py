@@ -20,10 +20,12 @@ config['model'] = root_path / 'baboon_tracking' / 'models' / 'particle_filter' /
 config['input_dim'] = 9
 config['output_dim'] = -1 
 config['kmeans_model_path'] = root_path / 'ml_data' / 'velocity_model.pkl'
-config['input_csv'] = root_path / 'ml_data' / 'DJI_0769_1st_2250_frames.csv'
+config['input_csv'] = root_path / 'ml_data' / 'input_mp4.csv'
+config['video_csv'] = root_path / 'ml_data' / '4_22_2020_mask.mp4_blobdetector.csv'
 
 ########## csv Initialization ##########
-data = pd.read_csv(config['input_training_data'])
+data = pd.read_csv(config['input_csv'])
+data = pd.read_csv(config['video_csv'])
 
 
 ########## KMEANS Initialization ##########
@@ -53,6 +55,10 @@ net.load_state_dict(state_dict)
 initial_state = [2,3]
 particle_filter = Particle_Filter(initial_state, kmeans_centers_sorted, config['input_dim'], config['output_dim'], net)
 
+# frame - pass in all coordinates of blob detected baboons for the current frame (nx2)
+#threshold - pixel distance from the previous position that points should be considered from the blob detector
+# alpha - degree of trust in blob detector (0.8-0.9)
+particle_filter.update(frame, threshold, 0.8)
 
 
 
