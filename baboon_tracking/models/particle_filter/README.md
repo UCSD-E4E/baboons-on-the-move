@@ -1,6 +1,9 @@
 # General Notes 
 ipynb have been converted to py files so that they can be more comfortably used in the nautilus environment for training
 
+# Fully Trained Model : 
+https://drive.google.com/file/d/1gPmGbGUJsBaN4G_LSLPstguJGMzG-ViI/view?usp=sharing
+
 # How to Train 
 1. A csv containing the velocities, centroid position, and direction of motion is always required (e.g : https://drive.google.com/file/d/1TnvxPk0-3TXeKXBKPRT3jVGX0ULoWaQW/view?usp=sharing)  
 2. Run the kmean_clustering.py file (be careful to use the right input_velocitioes_csv path). It will output a .pkl kmeans model in the same directory that it found the csv in step 1.  
