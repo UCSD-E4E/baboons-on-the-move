@@ -12,10 +12,10 @@
             "console": "integratedTerminal"
         },
         {
-            "name": "Python: Generate Mask",
+            "name": "Python: Main",
             "type": "python",
             "request": "launch",
-            "program": "generate_mask.py",
+            "program": "main.py",
             "console": "integratedTerminal"
         }
     ]
