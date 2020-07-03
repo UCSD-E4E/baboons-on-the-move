@@ -9,6 +9,10 @@ import baboon_tracking.registration
 import baboon_tracking.foreground_extraction
 from baboon_tracking.models.config import Config
 
+# Gather - Read from source
+# Preprocess - Prepares the frame
+# Observe - Converts the frame into Baboons
+
 def main():
 
     # load the data from the configuration file
