@@ -81,6 +81,8 @@ def _install_node_in_repo():
     node_path = './tools/node'
     if not os.path.exists(node_archive):
         urllib.request.urlretrieve(url, node_archive)
+
+    if not os.path.exists(node_path)
         _extract(node_archive, node_path)
 
         return True
@@ -108,6 +110,9 @@ def shell():
         subprocess.check_call([_get_node_executable('npm'), 'install', '-g', 'pyright'])
 
     subprocess.check_call(['poetry', 'install'])
+
+    if sys.platform == 'win32':
+        os.system('color 1f')
 
     subprocess.check_call(['poetry', 'shell'])
 
