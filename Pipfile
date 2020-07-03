@@ -1,0 +1,21 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+
+[packages]
+pika = "*"
+opencv-python = "*"
+scikit-image = "*"
+docker = "*"
+pyyaml = "*"
+pylint = "*"
+opencv-contrib-python = "*"
+torch = "*"
+pandas = "*"
+
+[requires]
+python_version = "3.8"
