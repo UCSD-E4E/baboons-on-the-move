@@ -197,3 +197,8 @@ $RECYCLE.BIN/
 *.mp4
 
 .vscode
+
+tools/node
+tools/node.zip
+tools/node.tar.gz
+tools/node.tar.xz

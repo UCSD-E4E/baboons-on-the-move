@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["data"]
+            "args": ["shell"]
         },
         {
             "name": "Python: Main",
