@@ -150,6 +150,7 @@ labels = []
 start_historic = 1 + config['k_nearest_baboons']
 
 for idx, row in training_data.iterrows():
+    print(f'Labeling Row  {idx}/{len(training_data)}')
     current_frame = row.loc['frame']
     current_position = (row.loc['centroid_x'], row.loc['centroid_y'])
     current_velocity = row.loc['velocity']

@@ -66,9 +66,8 @@ if not config['checkpoint_training']:
     net = Nnet(config['input_dimension'], config['output_dimension']).to(computing_device)
 
 optimizer = optim.Adam(net.parameters(),lr = config['learning_rate'])
-criterion = nn.CrossEntropyLoss()
 
-
+criterion = nn.MSELoss()
 dataset = loader(X, labels)
 
 batch_size = config['batch_size']
@@ -137,11 +136,11 @@ for epoch in range(config['epochs']):
         datapoints, labels = datapoints.to(computing_device), labels.to(computing_device)
         # Perform the forward pass through the network and compute the loss
         outputs = net(datapoints.float())
-        labels = torch.max(labels, 1)[1]
+        labels = labels.float()
         
         #computing the CEL using the net and the labels
         loss = criterion(outputs, labels)
-#         print(f'Minibatch {minibatch_count} loss : {loss.item()}')
+        print(f'Minibatch {minibatch_count} loss : {loss.item()}')
         
         # Automagically compute the gradients and backpropagate the loss through the network
         loss.backward()

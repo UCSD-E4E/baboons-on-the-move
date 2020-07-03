@@ -33,9 +33,9 @@ config['labels_output_path'] = './labels.npy'
 
 #DO NOT CHANGE THE FOLLOWING 
 config['input_dimension'] = config['k_nearest_baboons'] + config['k_historic_velocities'] + 1 #DON'T TOUCH THIS
+config['output_dimension'] = 6 #five moving classes and one stationary
 config['validation_loss_path'] = '' #leave empty 
 config['training_loss_path'] = '' #leave empty 
-config['output_dimension'] = -1 #leave empty
 
 #config checks
 assert( config['k_nearest_baboons'] % 2 == 0 )
@@ -47,9 +47,6 @@ writer = SummaryWriter(f'motion_model_tensorboard_{d1}', flush_secs=1)
 
 
 
-kmeans = pickle.load(open(config['kmeans_model_path'], 'rb'))
-kmeans_centers_sorted = np.sort(np.array(kmeans.cluster_centers_).squeeze())
-config['output_dimension'] = kmeans_centers_sorted.size + 1
 
 
 X = np.load(config['data_output_path'])
