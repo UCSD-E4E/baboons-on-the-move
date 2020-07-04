@@ -181,7 +181,7 @@ for epoch in range(config['epochs']):
             val_data_size += 1
             datapoints, labels = datapoints.to(computing_device), labels.to(computing_device)
             outputs = net(datapoints.float())
-            labels = torch.max(labels, 1)[1]
+            labels = labels.float()
 
             val_loss = criterion(outputs, labels).item()
             N_minibatch_val_loss += val_loss
