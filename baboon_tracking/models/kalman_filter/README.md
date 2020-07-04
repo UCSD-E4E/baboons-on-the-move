@@ -2,6 +2,7 @@
 ipynb have been converted to py files so that they can be more comfortably used in the nautilus environment for training. Please convert notebooks that run on gpu hardware to python scripts
 
 # Fully Trained Model : 
+https://drive.google.com/file/d/1jgGpDmE8lxPV0tLFP_Bu9-cgaPb4Cl4u/view?usp=sharing
 
 # How to Train 
 1. A csv containing the velocities, centroid position, and direction of motion is always required (link above)  
