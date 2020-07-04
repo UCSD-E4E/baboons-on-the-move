@@ -24,7 +24,7 @@ config['val_split'] = 0.2 #ratio of val and training data
 config['shuffle_dataset'] = True #shuffle data before start (TODO: change this if we use kfold?)
 config['epochs'] = 100  # Number of epochs to train the model
 config['early_stop'] = True  # Implement early stopping or not
-config['early_stop_epoch'] = 3 # Number of epochs for which validation loss increases to be counted as overfitting
+config['early_stop_epoch'] = 4 # Number of epochs for which validation loss increases to be counted as overfitting
 config['data_output_path'] = './data.npy'
 config['labels_output_path'] = './labels.npy'
 
@@ -140,7 +140,7 @@ for epoch in range(config['epochs']):
         
         #computing the CEL using the net and the labels
         loss = criterion(outputs, labels)
-        print(f'Minibatch {minibatch_count} loss : {loss.item()}')
+        #print(f'Minibatch {minibatch_count} loss : {loss.item()}')
         
         # Automagically compute the gradients and backpropagate the loss through the network
         loss.backward()
