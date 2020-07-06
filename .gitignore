@@ -196,9 +196,8 @@ $RECYCLE.BIN/
 *.avi
 *.mp4
 
-.vscode
+tools/
+data/
 
-tools/node
-tools/node.zip
-tools/node.tar.gz
-tools/node.tar.xz
+google_drive_credentials.json
+google_drive_token.pickle

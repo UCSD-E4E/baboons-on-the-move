@@ -3,22 +3,32 @@ import argparse
 import glob
 import os
 import pathlib
+import pickle
 import subprocess
 import sys
 import tarfile
+import time
 import urllib.request
 import zipfile
+
+GOOGLE_DRIVE_SCOPES = ['https://www.googleapis.com/auth/drive']
 
 def main():
     parser = argparse.ArgumentParser(description='Baboon Command Line Interface')
 
     subparsers = parser.add_subparsers()
 
-    shell_parser = subparsers.add_parser('shell')
-    shell_parser.set_defaults(func=shell)
+    code_parser = subparsers.add_parser('code')
+    code_parser.set_defaults(func=vscode)
+
+    data_parser = subparsers.add_parser('data')
+    data_parser.set_defaults(func=data)
 
     lint_parser = subparsers.add_parser('lint')
     lint_parser.set_defaults(func=lint)
+
+    shell_parser = subparsers.add_parser('shell')
+    shell_parser.set_defaults(func=shell)
 
     vscode_parser = subparsers.add_parser('vscode')
     vscode_parser.set_defaults(func=vscode)
@@ -27,12 +37,26 @@ def main():
 
     res.func()
 
-def _ensure_vscode_plugin(plugin: str):
+def _check_vscode_plugin(plugin: str):
     with os.popen('code --list-extensions') as f:
         installed = any([l.strip() == plugin for l in f.readlines()])
 
-    if not installed:
-        os.popen('code --install-extension ' + plugin)
+    return installed
+
+def _download_file_from_drive(id: str, path: str, service):
+    from googleapiclient.http import MediaIoBaseDownload
+    request = service.files().get_media(fileId=id)
+
+    with open(path, 'wb') as f:
+        downloader = MediaIoBaseDownload(f, request)
+
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+
+def _ensure_vscode_plugin(plugin: str):
+    if not _check_vscode_plugin(plugin):
+        subprocess.check_call(['code', '--install-extension', plugin], shell=True)
 
 def _extract(path: str, target: str):
     extensions = pathlib.Path(path).suffixes
@@ -45,6 +69,54 @@ def _extract(path: str, target: str):
 
     archive.extractall(target)
     archive.close()
+
+def _get_drive_folder_children(parent_id: str, drive_id: str, service):
+    page_token = None
+
+    files = []
+    while True:
+        results = service.files().list(
+            pageSize=10,
+            fields='nextPageToken, files(id, name, parents)',
+            corpora='drive', driveId=drive_id,
+            includeItemsFromAllDrives=True,
+            supportsAllDrives=True,
+            q="'" + parent_id + "' in parents",
+            pageToken=page_token
+        ).execute()
+
+        files += results.get('files', [])
+
+        if 'nextPageToken' not in results:
+            break
+
+        page_token = results['nextPageToken']
+
+    return files
+
+def _get_drive_file(name: str, parent_id: str, drive_id: str, service):
+    page_token = None
+
+    while True:
+        results = service.files().list(
+            pageSize=10,
+            fields='nextPageToken, files(id, name, parents)',
+            corpora='drive', driveId=drive_id,
+            includeItemsFromAllDrives=True,
+            supportsAllDrives=True,
+            q="'" + parent_id + "' in parents and name = '" + name + "'",
+            pageToken=page_token
+        ).execute()
+
+        files = results.get('files', [])
+
+        if 'nextPageToken' not in results:
+            break
+
+        page_token = results['nextPageToken']
+
+    if len(files):
+        return files[0]
 
 def _get_node_executable(name: str):
     if sys.platform == 'win32':
@@ -100,6 +172,60 @@ def _is_executable_in_path(executable: str):
 
     return which.returncode == 0
 
+def _load_google_drive_creds():
+    from google_auth_oauthlib.flow import InstalledAppFlow
+    from google.auth.transport.requests import Request
+
+    creds = None
+
+    if os.path.exists('google_drive_token.pickle'):
+        with open('google_drive_token.pickle', 'rb') as token:
+            creds = pickle.load(token)
+
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(
+                'google_drive_credentials.json', GOOGLE_DRIVE_SCOPES
+            )
+            creds = flow.run_local_server(port=0)
+
+        with open('google_drive_token.pickle', 'wb') as token:
+            pickle.dump(creds, token)
+
+    return creds
+
+def data():
+    from googleapiclient.discovery import build
+
+    pathlib.Path('./data').mkdir(exist_ok=True)
+
+    creds = _load_google_drive_creds()
+
+    service = build('drive', 'v3', credentials=creds)
+    results = service.drives().list(
+        fields='nextPageToken, drives(id, name)'
+    ).execute()
+    drive = [d for d in results.get('drives', []) if d['name'] == 'E4E_Aerial_Baboons'][0]
+
+    ci_folder = _get_drive_file('CI', drive['id'], drive['id'], service)
+    data_folder = _get_drive_file('data', ci_folder['id'], drive['id'], service)
+
+    data_files = _get_drive_folder_children(data_folder['id'], drive['id'], service)
+
+    for data_file in data_files:
+        _download_file_from_drive(data_file['id'], './data/' + data_file['name'], service)
+
+def lint():
+    from pylint.lint import Run
+
+    repo_directory = os.path.dirname(os.path.realpath(__file__))
+    python_files = [f for f in glob.iglob(repo_directory + '/**/*.py', recursive=True) if os.path.realpath('./tools/node') not in f]
+
+    Run(python_files)
+    subprocess.check_call(_get_node_executable('pyright'))
+
 def shell():
     if not _is_executable_in_path('poetry'):
         subprocess.check_call([sys.executable, '-m', 'pip', 'install', 'pipx'])
@@ -112,18 +238,11 @@ def shell():
     subprocess.check_call(['poetry', 'install'])
     subprocess.check_call(['poetry', 'shell'])
 
-def lint():
-    from pylint.lint import Run
-
-    repo_directory = os.path.dirname(os.path.realpath(__file__))
-    python_files = [f for f in glob.iglob(repo_directory + '/**/*.py', recursive=True) if os.path.realpath('./tools/node') not in f]
-
-    Run(python_files)
-    subprocess.check_call(_get_node_executable('pyright'))
-
 def vscode():
+    _ensure_vscode_plugin('eamodio.gitlens')
     _ensure_vscode_plugin('ms-python.python')
     _ensure_vscode_plugin('ms-python.vscode-pylance')
+    _ensure_vscode_plugin('VisualStudioExptTeam.vscodeintellicode')
 
     os.popen('code .')
 
