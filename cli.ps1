@@ -13,4 +13,6 @@ Set-ConsoleColor 09
 
 python ./cli.py $args[0]
 
-Set-ConsoleColor 5f
+if ($args[0] -eq "shell") {
+    Set-ConsoleColor 5f
+}

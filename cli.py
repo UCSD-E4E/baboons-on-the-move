@@ -7,7 +7,6 @@ import pickle
 import subprocess
 import sys
 import tarfile
-import time
 import urllib.request
 import zipfile
 
