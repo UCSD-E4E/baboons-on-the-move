@@ -164,7 +164,7 @@ def _is_executable_in_path(executable: str):
     if sys.platform == 'win32':
         whichExecutable = 'where'
     elif sys.platform == 'darwin' or sys.platform == 'linux' or sys.platform == 'linux2':
-        whichExecutable = 'which'
+        return False
 
     which = subprocess.Popen(whichExecutable + ' ' + executable, stdout = subprocess.PIPE)
     _ = which.communicate()
