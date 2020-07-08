@@ -63,8 +63,8 @@ def _extract(path: str, target: str):
 
     if extension == '.zip':
         archive = zipfile.ZipFile(path, 'r')
-    elif extension == 'tar.gz'or extension == 'tar.xz':
-        archive = tarfile.TarFile(path, 'r')
+    elif extension == '.tar.gz'or extension == '.tar.xz':
+        archive = tarfile.open(path)
 
     archive.extractall(target)
     archive.close()
@@ -126,9 +126,9 @@ def _get_node_executable(name: str):
     if sys.platform == 'win32':
         directory = 'node-v12.18.2-win-x64'
     elif sys.platform == 'darwin':
-        directory = 'node-v12.18.2-darwin-x64'
+        directory = 'node-v12.18.2-darwin-x64/bin'
     elif sys.platform == 'linux' or sys.platform == 'linux2':
-        directory = 'node-v12.18.2-linux-x64'
+        directory = 'node-v12.18.2-linux-x64/bin'
 
     return os.path.realpath('./tools/node/' + directory + '/' + executable)
 
