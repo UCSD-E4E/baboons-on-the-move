@@ -26,14 +26,14 @@ class Runner(ABC):
         img = Image.new("1", self._array2tuple(text_size_padding))
         draw = ImageDraw.Draw(img)
 
-        draw.rectangle(((0, 0), self._array2tuple(text_size_padding)), fill="white")
+        draw.rectangle(((0, 0), img.size), fill="white")
         draw.rectangle(
-            ((0, 0), self._array2tuple(text_size_padding - np.array([1, 1]))),
+            ((0, 0), self._array2tuple(np.array(img.size) - np.array([1, 1]))),
             outline="black",
         )
         draw.text(self._array2tuple(padding - np.array([0, 1])), self.name, font=font)
 
-        start = (0, text_size_padding[1] / 2)
-        end = (text_size_padding[0], text_size_padding[1] / 2)
+        start = (0, img.size[1] / 2)
+        end = (img.size[0], img.size[1] / 2)
 
         return (img, start, end)
