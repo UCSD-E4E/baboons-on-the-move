@@ -6,20 +6,20 @@ import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser(description="Find contours and centroids")
-parser.add_argument('input', help='Source video')
+parser.add_argument("input", help="Source video")
 args = parser.parse_args()
 
 # video capture (reader)
 cap = cv2.VideoCapture(args.input)
-cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
-cv2.resizeWindow('frame', 800, 600)
+cv2.namedWindow("frame", cv2.WINDOW_NORMAL)
+cv2.resizeWindow("frame", 800, 600)
 
 # video writer
-fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+fourcc = cv2.VideoWriter_fourcc(*"MP4V")
 h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
 fps = cap.get(cv2.CAP_PROP_FPS)
-out = cv2.VideoWriter('video_' + args.input + '.mp4', fourcc, fps, (w, h))
+out = cv2.VideoWriter("video_" + args.input + ".mp4", fourcc, fps, (w, h))
 
 # kernels
 erosion_kernel = np.ones((5, 5), np.uint8)
@@ -47,10 +47,10 @@ framenum = 0
 blobdetector_centroids = []
 contour_centroids = []
 
-while(cap.isOpened()):
+while cap.isOpened():
     ret, frame = cap.read()
 
-    if(frame is None):
+    if frame is None:
         break
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -63,13 +63,19 @@ while(cap.isOpened()):
     # contour detection
     ret, thresh = cv2.threshold(gray, 127, 255, 0)
     contours, hierarchy = cv2.findContours(
-        thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
+    )
 
     # blob detection
     keypoints = detector.detect(gray)
     frame = cv2.cvtColor(thresh, cv2.COLOR_GRAY2BGR)
-    frame = cv2.drawKeypoints(frame, keypoints, np.array(
-        []), (0, 255, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    frame = cv2.drawKeypoints(
+        frame,
+        keypoints,
+        np.array([]),
+        (0, 255, 0),
+        cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
+    )
 
     # add each keypoint to blobdetector_centroids
     for keypoint in keypoints:
@@ -90,20 +96,20 @@ while(cap.isOpened()):
         # add the centroid coordinates in array
         contour_centroids.append([framenum, cX, cY])
 
-        cv2.imshow('frame', frame)
+        cv2.imshow("frame", frame)
     out.write(frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord("q"):
         break
 
     framenum = framenum + 1
 
 blobdetector_centroids_df = pd.DataFrame.from_records(blobdetector_centroids)
-blobdetector_centroids_df.columns = ['frame', 'x', 'y']
-blobdetector_centroids_df.to_csv('blobdetector_' + args.input + '.csv')
+blobdetector_centroids_df.columns = ["frame", "x", "y"]
+blobdetector_centroids_df.to_csv("blobdetector_" + args.input + ".csv")
 
 contour_centroids_df = pd.DataFrame.from_records(contour_centroids)
-contour_centroids_df.columns = ['frame', 'x', 'y']
-contour_centroids_df.to_csv('contour_' + args.input + '.csv')
+contour_centroids_df.columns = ["frame", "x", "y"]
+contour_centroids_df.to_csv("contour_" + args.input + ".csv")
 
 cap.release()
 out.release()

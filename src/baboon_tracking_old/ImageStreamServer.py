@@ -1,15 +1,16 @@
 import io
-import numpy as np;
+import numpy as np
 import pika
 import cv2
 
 
-class ImageStreamServer():
-
+class ImageStreamServer:
     def __init__(self, host, port):
-        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=port))
+        self.connection = pika.BlockingConnection(
+            pika.ConnectionParameters(host=host, port=port)
+        )
         self.channel = self.connection.channel()
-        self.channel.queue_declare(queue='imshow')
+        self.channel.queue_declare(queue="imshow")
 
     def imshow(self, img):
         compressed_img = io.BytesIO()
@@ -17,9 +18,7 @@ class ImageStreamServer():
         compressed_img.seek(0)
 
         self.channel.basic_publish(
-            exchange = '',
-            routing_key='imshow',
-            body=compressed_img.read()
+            exchange="", routing_key="imshow", body=compressed_img.read()
         )
 
     def close(self):

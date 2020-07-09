@@ -6,9 +6,10 @@ import cmath
 from .Registration import Registration
 from ..models import Frame
 
+
 class ORB_RANSAC_Registration(Registration):
     def __init__(self, history_frame_count, max_features, good_match_percent):
-        super().__init__( history_frame_count, max_features, good_match_percent  )
+        super().__init__(history_frame_count, max_features, good_match_percent)
 
         self._orb = cv2.ORB_create(self.MAX_FEATURES)
         self._feature_hash = dict()
@@ -21,11 +22,11 @@ class ORB_RANSAC_Registration(Registration):
         return self._feature_hash[frame]
 
     def push_history_frame(self, frame: Frame):
-        '''Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count, remove the oldest frame
+        """Adds most recent frame into history_frames, and if history_frames exceeds history_frame_count, remove the oldest frame
 
         Args:
             frame: grayscale opencv image frame
-        '''
+        """
         popped_frame = super().push_history_frame(frame)
 
         if popped_frame is not None:
@@ -34,16 +35,18 @@ class ORB_RANSAC_Registration(Registration):
         return popped_frame
 
     def register(self, frame1: Frame, frame2: Frame):
-        '''
+        """
         Registration function to find homography transformation between two frames using ORB
         Returns list of tuples containing (warped_frame, transformation matrix)
         (Not including most recent frame)
-        '''
+        """
         keypoints1, descriptors1 = self._detectAndCompute(frame1)
         keypoints2, descriptors2 = self._detectAndCompute(frame2)
 
         # Match features.
-        matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+        matcher = cv2.DescriptorMatcher_create(
+            cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING
+        )
         matches = matcher.match(descriptors1, descriptors2, None)
 
         # Sort matches by score

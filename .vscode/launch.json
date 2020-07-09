@@ -10,14 +10,15 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["data"]
+            "args": ["flowchart"]
         },
         {
-            "name": "Python: Main",
+            "name": "Python: cli",
             "type": "python",
             "request": "launch",
-            "program": "main.py",
-            "console": "integratedTerminal"
+            "program": "cli.py",
+            "console": "integratedTerminal",
+            "args": ["flowchart"]
         }
     ]
 }
