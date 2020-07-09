@@ -10,7 +10,6 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["flowchart"]
         },
         {
             "name": "Python: cli",
@@ -18,7 +17,9 @@
             "request": "launch",
             "program": "cli.py",
             "console": "integratedTerminal",
-            "args": ["flowchart"]
+            "args": [
+                "run"
+            ]
         }
     ]
 }

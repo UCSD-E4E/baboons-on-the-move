@@ -2,8 +2,6 @@ import numpy as np
 
 
 class Frame:
-    __slots__ = ["_frame", "_frame_number"]
-
     def __init__(self, frame: np.array, frame_number: int):
         self._frame = frame
         self._frame_number = frame_number
