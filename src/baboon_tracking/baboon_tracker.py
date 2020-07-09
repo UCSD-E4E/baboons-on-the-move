@@ -1,4 +1,4 @@
-from .runners import CheckForExitRunner, FrameDisplayRunner, VideoRunner
+from .runners import BGR2GrayRunner, CheckForExitRunner, FrameDisplayRunner, VideoRunner
 from ..runner import Serial
 
 
@@ -10,6 +10,8 @@ class BaboonTracker:
             "BaboonTracker",
             self._videoRunner,
             FrameDisplayRunner("Frame"),
+            BGR2GrayRunner(),
+            FrameDisplayRunner("Gray"),
             CheckForExitRunner(),
         )
 
