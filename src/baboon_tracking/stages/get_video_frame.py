@@ -1,13 +1,11 @@
 import cv2
 
 from typing import Dict, Tuple
-from ...runner import Runner
+from ...pipeline import Stage
 
 
-class VideoRunner(Runner):
+class GetVideoFrame(Stage):
     def __init__(self, video_path: str):
-        Runner.__init__(self, "VideoRunner")
-
         self._capture = cv2.VideoCapture(video_path)
         self._frame_number = 1
 

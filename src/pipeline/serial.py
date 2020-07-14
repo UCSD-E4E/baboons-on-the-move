@@ -2,18 +2,17 @@ import numpy as np
 
 from PIL import Image, ImageDraw, ImageFont
 from typing import Dict, List, Tuple
-from .Runner import Runner
+from .stage import Stage
 
 
-class Serial(Runner):
-    def __init__(self, name: str, *runners: List[Runner]):
-        self._runners = runners
-
-        Runner.__init__(self, name)
+class Serial(Stage):
+    def __init__(self, name: str, *stages: List[Stage]):
+        self.name = name
+        self._stages = stages
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
-        for runner in self._runners:
-            success, state = runner.execute(state)
+        for stage in self._stages:
+            success, state = stage.execute(state)
 
             if not success:
                 return (False, state)
@@ -21,16 +20,18 @@ class Serial(Runner):
         return (True, state)
 
     def flowchart(self):
+        name = self.name
+
         font = ImageFont.truetype("arial.ttf", 16)
         padding = np.array([10, 10])
 
         subcharts: List[Tuple[Image.Image, Tuple[int, int], Tuple[int, int]]] = [
-            r.flowchart() for r in self._runners
+            s.flowchart() for s in self._stages
         ]
         width = sum([img.size[0] for img, _, _ in subcharts]) + 20 * len(subcharts)
 
         max_img_height = max([img.size[1] for img, _, _ in subcharts])
-        height = font.getsize(self.name)[1] + 20 + max_img_height
+        height = font.getsize(name)[1] + 20 + max_img_height
 
         img = Image.new("1", (width, height))
         draw = ImageDraw.Draw(img)
@@ -40,9 +41,9 @@ class Serial(Runner):
             ((0, 0), self._array2tuple(np.array(img.size) - np.array([1, 1]))),
             outline="black",
         )
-        draw.text(self._array2tuple(padding - np.array([0, 1])), self.name, font=font)
+        draw.text(self._array2tuple(padding - np.array([0, 1])), name, font=font)
 
-        origin = np.array([10, font.getsize(self.name)[1] + 15])
+        origin = np.array([10, font.getsize(name)[1] + 15])
         for i, subchart in enumerate(subcharts):
             sub, _, start = subchart
             height_pad = int((max_img_height - sub.size[1]) / 2)

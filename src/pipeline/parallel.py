@@ -2,7 +2,7 @@ from enum import Enum
 from multiprocessing import Pool, cpu_count
 from multiprocessing.pool import ThreadPool
 from typing import Dict, List, Tuple
-from .Runner import Runner
+from .stage import Stage
 
 
 class ThreadType(Enum):
@@ -11,14 +11,15 @@ class ThreadType(Enum):
     NONE = 3
 
 
-class Parallel(Runner):
+class Parallel(Stage):
     def __init__(
         self,
         name: str,
-        *runners: List[Runner],
+        *stages: List[Stage],
         thread_type: ThreadType = ThreadType.PROCESS
     ):
-        self._runners = runners
+        self.name = name
+        self._stages = stages
 
         if thread_type == ThreadType.PROCESS:
             self._pool = Pool(cpu_count())
@@ -27,18 +28,16 @@ class Parallel(Runner):
 
         self._thread_type = thread_type
 
-        Runner.__init__(self, name)
-
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         if (
             self.thread_type == ThreadType.PROCESS
             or self.thread_type == ThreadType.THREAD
         ):
             results = self._pool.map(
-                [r.execute for r in self._runners], [state for r in self._runners]
+                [s.execute for s in self._stages], [state for s in self._stages]
             )
         elif self.thread_type == ThreadType.NONE:
-            results = [r.execute(state) for r in self._runners]
+            results = [s.execute(state) for s in self._stages]
         else:
             results = None  # This case doesn't exist, but satisfies Pyright.
 

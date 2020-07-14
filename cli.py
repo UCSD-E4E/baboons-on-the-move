@@ -18,6 +18,9 @@ def main():
 
     subparsers = parser.add_subparsers()
 
+    chart_parser = subparsers.add_parser("chart")
+    chart_parser.set_defaults(func=flowchart)
+
     code_parser = subparsers.add_parser("code")
     code_parser.set_defaults(func=vscode)
 
