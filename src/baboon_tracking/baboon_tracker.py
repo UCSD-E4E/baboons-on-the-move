@@ -4,20 +4,19 @@ from ..runner import Serial
 
 class BaboonTracker:
     def __init__(self):
-        self._videoRunner = VideoRunner("./data/input.mp4")
-
         self._runner = Serial(
             "BaboonTracker",
-            self._videoRunner,
-            FrameDisplayRunner("Frame"),
+            VideoRunner("./data/input.mp4"),
+            FrameDisplayRunner("Frame", "frame"),
             BGR2GrayRunner(),
-            FrameDisplayRunner("Gray"),
+            FrameDisplayRunner("Gray", "gray"),
+            FrameDisplayRunner("Gray", "gray"),
             CheckForExitRunner(),
         )
 
     def run(self):
         while True:
-            success, _ = self._runner.execute(None)
+            success, _ = self._runner.execute({})
 
             if not success:
                 return

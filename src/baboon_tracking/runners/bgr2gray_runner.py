@@ -9,7 +9,5 @@ class BGR2GrayRunner(Runner):
         Runner.__init__(self, "BGR2GrayRunner")
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
-        state["frame"].set_frame(
-            cv2.cvtColor(state["frame"].get_frame(), cv2.COLOR_BGR2GRAY)
-        )
+        state["gray"] = cv2.cvtColor(state["frame"], cv2.COLOR_BGR2GRAY)
         return (True, state)
