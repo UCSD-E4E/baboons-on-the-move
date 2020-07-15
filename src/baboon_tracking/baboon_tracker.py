@@ -1,4 +1,6 @@
-from .stages import ConvertFromBGR2Gray, GetVideoFrame, ShowFrame, TestExit
+from .stages.motion_detector.motion_detector import MotionDetector
+from .stages.preprocess.preprocess_frame import PreprocessFrame
+from .stages import GetVideoFrame, ShowFrame, TestExit
 from ..pipeline import Serial
 
 
@@ -7,9 +9,8 @@ class BaboonTracker:
         self._runner = Serial(
             "BaboonTracker",
             GetVideoFrame("./data/input.mp4"),
-            ShowFrame("Frame", "frame"),
-            ConvertFromBGR2Gray(),
-            ShowFrame("Gray", "gray"),
+            PreprocessFrame(),
+            MotionDetector(),
             TestExit(),
         )
 

@@ -1,7 +1,7 @@
 import cv2
 
 from typing import Dict, Tuple
-from ...pipeline import Stage
+from ....pipeline import Stage
 
 
 class ConvertFromBGR2Gray(Stage):

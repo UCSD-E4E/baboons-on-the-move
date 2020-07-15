@@ -64,7 +64,7 @@ class Serial(Stage):
 
             origin += np.array([sub.size[0], 0]) + np.array([20, 0])
 
-        start = self._array2tuple(np.array(subcharts[0][1]) + np.array([10, 0]))
-        end = self._array2tuple(np.array(subcharts[-1][2]) - np.array([10, 0]))
+        start = self._array2tuple((0, img.size[1] / 2))
+        end = self._array2tuple((img.size[0], img.size[1] / 2))
 
         return (img, start, end)
