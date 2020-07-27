@@ -41,6 +41,9 @@ def main():
     format_parser = subparsers.add_parser("format")
     format_parser.set_defaults(func=format_files)
 
+    install_parser = subparsers.add_parser("install")
+    install_parser.set_defaults(func=install)
+
     lint_parser = subparsers.add_parser("lint")
     lint_parser.set_defaults(func=lint)
 
@@ -332,17 +335,41 @@ def format_files():
         subprocess.check_call(["black", python_file])
 
 
+def install():
+    """
+    Installs the necessary dependencies.
+    """
+    if not _is_executable_in_path("poetry"):
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
+        subprocess.check_call([sys.executable, "-m", "pipx", "install", "poetry"])
+        subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
+
+    if not _is_executable_in_path("poetry"):
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
+        subprocess.check_call([sys.executable, "-m", "pipx", "install", "black"])
+        subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
+
+    if _install_node_in_repo():
+        subprocess.check_call([_get_node_executable("npm"), "install", "-g", "pyright"])
+
+    subprocess.check_call(["poetry", "install"])
+
+
 def lint():
     """
     Lints all the Python files.
     """
+    if os.getenv("CLI_ACTIVE"):
+        from pylint.lint import Run  # pylint: disable=import-outside-toplevel
 
-    from pylint.lint import Run  # pylint: disable=import-outside-toplevel
+        python_files = _get_python_files()
 
-    python_files = _get_python_files()
+        Run(python_files)
+        subprocess.check_call(_get_node_executable("pyright"))
+    else:
+        os.environ["CLI_ACTIVE"] = "1"
 
-    Run(python_files)
-    subprocess.check_call(_get_node_executable("pyright"))
+        subprocess.check_call(["poetry", "run", "python", "./cli.py", "lint"])
 
 
 def run():
@@ -363,20 +390,8 @@ def shell():
     Starts a shell in the venv once setup.
     """
 
-    if not _is_executable_in_path("poetry"):
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "install", "poetry"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
+    install()
 
-    if not _is_executable_in_path("poetry"):
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "install", "black"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
-
-    if _install_node_in_repo():
-        subprocess.check_call([_get_node_executable("npm"), "install", "-g", "pyright"])
-
-    subprocess.check_call(["poetry", "install"])
     subprocess.check_call(["poetry", "shell"])
 
 
