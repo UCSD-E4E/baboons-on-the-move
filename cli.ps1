@@ -4,7 +4,7 @@ function Set-ConsoleColor {
         [string]$Color
     )
 
-    if (($IsWindows -or $null -eq $IsWindows) -and $env:TERM_PROGRAM -ne 'vscode') {
+    if (($IsWindows -or $null -eq $IsWindows) -and $env:TERM_PROGRAM -ne 'vscode' -and $null -eq $env:WT_PROFILE_ID) {
         cmd /c color $Color
     }
 }

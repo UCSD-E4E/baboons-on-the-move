@@ -1,3 +1,7 @@
+"""
+This module is a CLI for helping with development of the Baboon Tracking Project.
+"""
+
 # These are default python packages.  No installed modules here.
 import argparse
 import glob
@@ -14,6 +18,10 @@ GOOGLE_DRIVE_SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 
 def main():
+    """
+    Main entry point for CLI.
+    """
+
     parser = argparse.ArgumentParser(description="Baboon Command Line Interface")
 
     subparsers = parser.add_subparsers()
@@ -31,7 +39,7 @@ def main():
     flowchart_parser.set_defaults(func=flowchart)
 
     format_parser = subparsers.add_parser("format")
-    format_parser.set_defaults(func=format)
+    format_parser.set_defaults(func=format_files)
 
     lint_parser = subparsers.add_parser("lint")
     lint_parser.set_defaults(func=lint)
@@ -57,17 +65,19 @@ def _check_vscode_plugin(plugin: str):
     return installed
 
 
-def _download_file_from_drive(id: str, path: str, service):
-    from googleapiclient.http import MediaIoBaseDownload
+def _download_file_from_drive(identity: str, path: str, service):
+    from googleapiclient.http import (  # pylint: disable=import-outside-toplevel
+        MediaIoBaseDownload,
+    )
 
-    request = service.files().get_media(fileId=id)
+    request = service.files().get_media(fileId=identity)
 
     with open(path, "wb") as f:
         downloader = MediaIoBaseDownload(f, request)
 
         done = False
         while done is False:
-            status, done = downloader.next_chunk()
+            _, done = downloader.next_chunk()
 
 
 def _ensure_vscode_plugin(plugin: str):
@@ -81,7 +91,7 @@ def _extract(path: str, target: str):
 
     if extension == ".zip":
         archive = zipfile.ZipFile(path, "r")
-    elif extension == ".tar.gz" or extension == ".tar.xz":
+    elif extension in (".tar.gz", ".tar.xz"):
         archive = tarfile.open(path)
     else:
         archive = None
@@ -146,7 +156,7 @@ def _get_drive_file(name: str, parent_id: str, drive_id: str, service):
 
         page_token = results["nextPageToken"]
 
-    if len(files):
+    if files:
         return files[0]
 
 
@@ -178,6 +188,11 @@ def _get_python_files():
         f
         for f in glob.iglob(repo_directory + "/**/*.py", recursive=True)
         if os.path.realpath("./tools/node") not in f
+        and os.path.realpath("./src/baboon_tracking_old") not in f
+        and os.path.realpath("./utils") not in f
+        and os.path.realpath("./src/scripts") not in f
+        and os.path.realpath("./test") not in f
+        and f != os.path.realpath("./src/main.py")
     ]
 
 
@@ -215,23 +230,29 @@ def _install_node_in_repo():
 
 def _is_executable_in_path(executable: str):
     if sys.platform == "win32":
-        whichExecutable = "where"
+        which_executable = "where"
     elif (
         sys.platform == "darwin" or sys.platform == "linux" or sys.platform == "linux2"
     ):
         return False
     else:
-        whichExecutable = None
+        which_executable = None
 
-    which = subprocess.Popen(whichExecutable + " " + executable, stdout=subprocess.PIPE)
+    which = subprocess.Popen(
+        which_executable + " " + executable, stdout=subprocess.PIPE
+    )
     _ = which.communicate()
 
     return which.returncode == 0
 
 
 def _load_google_drive_creds():
-    from google_auth_oauthlib.flow import InstalledAppFlow
-    from google.auth.transport.requests import Request
+    from google_auth_oauthlib.flow import (  # pylint: disable=import-outside-toplevel
+        InstalledAppFlow,
+    )
+    from google.auth.transport.requests import (  # pylint: disable=import-outside-toplevel
+        Request,
+    )
 
     creds = None
 
@@ -255,14 +276,24 @@ def _load_google_drive_creds():
 
 
 def data():
-    from googleapiclient.discovery import build
+    """
+    Gets the data necessary to test the algorithm from Google Drive.
+    """
+
+    from googleapiclient.discovery import (  # pylint: disable=import-outside-toplevel
+        build,
+    )
 
     pathlib.Path("./data").mkdir(exist_ok=True)
 
     creds = _load_google_drive_creds()
 
     service = build("drive", "v3", credentials=creds)
-    results = service.drives().list(fields="nextPageToken, drives(id, name)").execute()
+    results = (
+        service.drives()  # pylint: disable=maybe-no-member
+        .list(fields="nextPageToken, drives(id, name)")
+        .execute()
+    )
     drive = [d for d in results.get("drives", []) if d["name"] == "E4E_Aerial_Baboons"][
         0
     ]
@@ -279,12 +310,22 @@ def data():
 
 
 def flowchart():
-    from src.baboon_tracking import BaboonTracker
+    """
+    Generates a flowchart representing the baboon tracking algorithm.
+    """
+
+    from src.baboon_tracking import (  # pylint: disable=import-outside-toplevel
+        BaboonTracker,
+    )
 
     BaboonTracker().flowchart().show()
 
 
-def format():
+def format_files():
+    """
+    Formats all Python files.
+    """
+
     python_files = _get_python_files()
 
     for python_file in python_files:
@@ -292,7 +333,11 @@ def format():
 
 
 def lint():
-    from pylint.lint import Run
+    """
+    Lints all the Python files.
+    """
+
+    from pylint.lint import Run  # pylint: disable=import-outside-toplevel
 
     python_files = _get_python_files()
 
@@ -301,12 +346,23 @@ def lint():
 
 
 def run():
-    from src.baboon_tracking import BaboonTracker
+    """
+    Starts the baboon tracker algorithm.
+    """
+
+    from src.baboon_tracking import (  # pylint: disable=import-outside-toplevel
+        BaboonTracker,
+    )
 
     BaboonTracker().run()
 
 
 def shell():
+    """
+    Ensures that a venv is setup and that all necessary dependencies are installed.
+    Starts a shell in the venv once setup.
+    """
+
     if not _is_executable_in_path("poetry"):
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
         subprocess.check_call([sys.executable, "-m", "pipx", "install", "poetry"])
@@ -325,6 +381,10 @@ def shell():
 
 
 def vscode():
+    """
+    Ensures that Visual Studio Code has the necessary Python extensions then launches VS Code.
+    """
+
     _ensure_vscode_plugin("eamodio.gitlens")
     _ensure_vscode_plugin("ms-python.python")
     _ensure_vscode_plugin("ms-python.vscode-pylance")

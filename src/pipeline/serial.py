@@ -1,16 +1,29 @@
-import numpy as np
+"""
+Implements a serial pipeline.
+"""
 
-from PIL import Image, ImageDraw, ImageFont
 from typing import Dict, List, Tuple
+
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+
 from .stage import Stage
 
 
 class Serial(Stage):
+    """
+    A serial pipeline which can be used as a stage to provide a logical unit.
+    """
+
     def __init__(self, name: str, *stages: List[Stage]):
         self.name = name
         self._stages = stages
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+        """
+        Executes all stages in this pipeline sequentially.
+        """
+
         for stage in self._stages:
             success, state = stage.execute(state)
 
@@ -20,7 +33,9 @@ class Serial(Stage):
         return (True, state)
 
     def flowchart(self):
-        name = self.name
+        """
+        Generates a chart that represents this pipeline.
+        """
 
         font = ImageFont.truetype("arial.ttf", 16)
         padding = np.array([10, 10])
@@ -31,19 +46,15 @@ class Serial(Stage):
         width = sum([img.size[0] for img, _, _ in subcharts]) + 20 * len(subcharts)
 
         max_img_height = max([img.size[1] for img, _, _ in subcharts])
-        height = font.getsize(name)[1] + 20 + max_img_height
+        height = font.getsize(self.name)[1] + 20 + max_img_height
 
         img = Image.new("1", (width, height))
         draw = ImageDraw.Draw(img)
 
-        draw.rectangle(((0, 0), img.size), fill="white")
-        draw.rectangle(
-            ((0, 0), self._array2tuple(np.array(img.size) - np.array([1, 1]))),
-            outline="black",
-        )
-        draw.text(self._array2tuple(padding - np.array([0, 1])), name, font=font)
+        self._draw_rectangle(img, draw)
+        draw.text(self._array2tuple(padding - np.array([0, 1])), self.name, font=font)
 
-        origin = np.array([10, font.getsize(name)[1] + 15])
+        origin = np.array([10, font.getsize(self.name)[1] + 15])
         for i, subchart in enumerate(subcharts):
             sub, _, start = subchart
             height_pad = int((max_img_height - sub.size[1]) / 2)

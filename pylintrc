@@ -1,0 +1,8 @@
+[GENERAL OPTIONS]
+extension-pkg-whitelist=cv2
+
+[MESSAGES CONTROL]
+disable=bad-continuation,too-few-public-methods,no-self-use,too-many-locals
+
+[OPTIONS]
+good-names=f,id,i
