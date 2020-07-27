@@ -1,7 +1,8 @@
 language: python
+sudo: required
 python:
   - "3.8"
 install:
-  - sudo python ./cli.py install
+  - python ./cli.py install
 script:
   - python ./cli.py lint
