@@ -2,6 +2,8 @@ language: python
 python:
   - "3.8"
 install:
+  - pip install pipx
+  - pipx install poetry
   - python ./cli.py install
 script:
   - python ./cli.py lint
