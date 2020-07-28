@@ -199,6 +199,15 @@ def _get_python_files():
     ]
 
 
+def _install_global_package(package_name: str):
+    if os.getenv("VIRTUAL_ENV"):
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+    else:
+        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
+        subprocess.check_call([sys.executable, "-m", "pipx", "install", package_name])
+        subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
+
+
 def _install_node_in_repo():
     if sys.platform == "win32":
         # Assume we are on 64 bit Intel
@@ -340,14 +349,10 @@ def install():
     Installs the necessary dependencies.
     """
     if not _is_executable_in_path("poetry"):
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "install", "poetry"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
+        _install_global_package("poetry")
 
     if not _is_executable_in_path("black"):
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "install", "black"])
-        subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
+        _install_global_package("black")
 
     if _install_node_in_repo():
         subprocess.check_call([_get_node_executable("npm"), "install", "-g", "pyright"])
