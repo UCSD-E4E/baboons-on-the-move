@@ -344,7 +344,7 @@ def install():
         subprocess.check_call([sys.executable, "-m", "pipx", "install", "poetry"])
         subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
 
-    if not _is_executable_in_path("poetry"):
+    if not _is_executable_in_path("black"):
         subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx"])
         subprocess.check_call([sys.executable, "-m", "pipx", "install", "black"])
         subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
