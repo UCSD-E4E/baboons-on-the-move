@@ -369,6 +369,9 @@ def lint():
 
         python_files = _get_python_files()
 
+        for f in python_files:
+            subprocess.check_call(["black", "--check", f])
+
         Run(python_files)
         subprocess.check_call(_get_node_executable("pyright"))
     else:
