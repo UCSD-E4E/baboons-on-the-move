@@ -1,3 +1,5 @@
+"""Quantizes the shifted history frame."""
+
 from typing import Iterable, Dict, Tuple
 import numpy as np
 from baboon_tracking.models.frame import Frame
@@ -5,12 +7,14 @@ from pipeline.stage import Stage
 
 
 class QuantizeHistoryFrames(Stage):
+    """Quantizes the shifted history frame."""
+
     def __init__(self, scale_factor: float):
         self._scale_factor = scale_factor
 
     def _quantize_frame(self, frame: Frame):
         """
-        Normalize pixel values from 0-255 to values from 0-10
+        Normalize pixel values from 0-255 to values from 0-self._scale_factor
         Returns quantized frame
         """
         return (
