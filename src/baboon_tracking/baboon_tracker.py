@@ -6,7 +6,7 @@ from pipeline import Serial
 
 from .stages.motion_detector.motion_detector import MotionDetector
 from .stages.preprocess.preprocess_frame import PreprocessFrame
-from .stages import GetVideoFrame, ShowFrame, TestExit
+from .stages import GetVideoFrame, TestExit
 
 
 class BaboonTracker:
