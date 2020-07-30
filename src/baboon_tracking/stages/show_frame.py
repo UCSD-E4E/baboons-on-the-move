@@ -1,11 +1,20 @@
-import cv2
-import tkinter as tk
-
+"""
+Displays the frame within a window for the user to see.
+Automatically sizes the window to the user's screen.
+"""
 from typing import Dict, Tuple
-from ...pipeline import Stage
+import tkinter as tk
+import cv2
+
+from pipeline import Stage
 
 
 class ShowFrame(Stage):
+    """
+    Displays the frame within a window for the user to see.
+    Automatically sizes the window to the user's screen.
+    """
+
     def __init__(self, window_title: str, image_key: str):
         root = tk.Tk()
 
@@ -20,6 +29,11 @@ class ShowFrame(Stage):
         self._image_key = image_key
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+        """
+        Displays the frame within a window for the user to see.
+        Automatically sizes the window to the user's screen.
+        """
+
         cv2.imshow(self._window_title, cv2.resize(state[self._image_key], self.im_size))
 
         return (True, state)
