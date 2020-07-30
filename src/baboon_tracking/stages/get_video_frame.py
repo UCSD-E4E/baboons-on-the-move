@@ -3,6 +3,7 @@ Get a video frame from a video file.
 """
 from typing import Dict, Tuple
 import cv2
+from baboon_tracking.models.frame import Frame
 
 from pipeline import Stage
 
@@ -23,8 +24,7 @@ class GetVideoFrame(Stage):
 
         success, frame = self._capture.read()
 
-        state["frame"] = frame
-        state["frame_number"] = self._frame_number
+        state["frame"] = Frame(frame, self._frame_number)
         self._frame_number += 1
 
         return (success, state)

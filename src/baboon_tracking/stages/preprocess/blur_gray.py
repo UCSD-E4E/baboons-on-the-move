@@ -18,6 +18,6 @@ class BlurGray(Stage):
         Blurs a gray frame using a Gaussian blur.
         """
 
-        state["gray"] = cv2.GaussianBlur(state["gray"], (5, 5), 0)
+        state["gray"].set_frame(cv2.GaussianBlur(state["gray"].get_frame(), (5, 5), 0))
 
         return (True, state)

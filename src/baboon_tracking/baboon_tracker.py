@@ -2,11 +2,12 @@
 Provides an algorithm for extracting baboons from drone footage.
 """
 
+from baboon_tracking.stages.get_video_frame import GetVideoFrame
+from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
+from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
+from baboon_tracking.stages.show_frame import ShowFrame
+from baboon_tracking.stages.test_exit import TestExit
 from pipeline import Serial
-
-from .stages.motion_detector.motion_detector import MotionDetector
-from .stages.preprocess.preprocess_frame import PreprocessFrame
-from .stages import GetVideoFrame, ShowFrame, TestExit
 
 
 class BaboonTracker:

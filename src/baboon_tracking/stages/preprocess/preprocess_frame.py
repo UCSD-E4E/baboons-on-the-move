@@ -2,10 +2,9 @@
 Provides a pipeline step for preprocessing a frame.
 """
 
+from baboon_tracking.stages.preprocess.blur_gray import BlurGray
+from baboon_tracking.stages.preprocess.convert_from_bgr2gray import ConvertFromBGR2Gray
 from pipeline import Serial
-
-from .blur_gray import BlurGray
-from .convert_from_bgr2gray import ConvertFromBGR2Gray
 
 
 class PreprocessFrame(Serial):

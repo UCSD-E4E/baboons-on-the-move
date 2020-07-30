@@ -4,10 +4,11 @@ Implements a storage of historical frame step for motion detection.
 
 from collections import deque
 from typing import Deque, Dict, Tuple
+from baboon_tracking.models.frame import Frame
 from pipeline import Stage
 
 
-class UpdateHistoryFrame(Stage):
+class StoreHistoryFrame(Stage):
     """
     Implements a storage of historical frame step for motion detection.
     """
@@ -23,11 +24,12 @@ class UpdateHistoryFrame(Stage):
             state["history_frames"] = deque([])
 
         # Allow for autocomplete.
-        history_frames: Deque = state["history_frames"]
+        history_frames: Deque[Frame] = state["history_frames"]
 
-        if len(history_frames) >= self._history_frame_count:
+        if "history_full" in state and state["history_full"]:
             history_frames.popleft()
 
         history_frames.append(state["gray"])
+        state["history_full"] = len(history_frames) >= self._history_frame_count
 
         return (True, state)
