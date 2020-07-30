@@ -2,6 +2,9 @@
 Implements a motion tracker pipeline.
 """
 
+from baboon_tracking.stages.motion_detector.quantize_history_frames import (
+    QuantizeHistoryFrames,
+)
 from baboon_tracking.stages.motion_detector.shift_history_frames import (
     ShiftHistoryFrames,
 )
@@ -16,5 +19,9 @@ class MotionDetector(Serial):
 
     def __init__(self):
         Serial.__init__(
-            self, "MotionDetector", StoreHistoryFrame(8), ShiftHistoryFrames(500, 0.15)
+            self,
+            "MotionDetector",
+            StoreHistoryFrame(8),
+            ShiftHistoryFrames(500, 0.15),
+            QuantizeHistoryFrames(50.0),
         )
