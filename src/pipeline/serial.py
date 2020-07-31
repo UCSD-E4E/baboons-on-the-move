@@ -2,12 +2,11 @@
 Implements a serial pipeline.
 """
 
-from typing import Dict, Iterable, List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-
-from utilities import flatten
+from pipeline.models.time import Time
 
 from .stage import Stage
 
@@ -38,8 +37,15 @@ class Serial(Stage):
 
         return (True, state)
 
-    def get_time(self) -> Iterable[Tuple[str, float]]:
-        return flatten([s.get_time() for s in self._stages])
+    def get_time(self) -> Time:
+        """
+        Calculates the average time per execution of this stage.
+        """
+
+        time = Stage.get_time(self)
+        time.children = [s.get_time() for s in self._stages]
+
+        return time
 
     def flowchart(self):
         """
