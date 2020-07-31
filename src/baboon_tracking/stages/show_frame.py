@@ -34,6 +34,9 @@ class ShowFrame(Stage):
         Automatically sizes the window to the user's screen.
         """
 
-        cv2.imshow(self._window_title, cv2.resize(state[self._image_key], self.im_size))
+        cv2.imshow(
+            self._window_title,
+            cv2.resize(state[self._image_key].get_frame(), self.im_size),
+        )
 
         return (True, state)
