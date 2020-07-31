@@ -10,6 +10,8 @@ class QuantizeHistoryFrames(Stage):
     """Quantizes the shifted history frame."""
 
     def __init__(self, scale_factor: float):
+        Stage.__init__(self)
+
         self._scale_factor = scale_factor
 
     def _quantize_frame(self, frame: Frame):

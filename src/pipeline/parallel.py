@@ -31,6 +31,8 @@ class Parallel(Stage):
         *stages: List[Stage],
         thread_type: ThreadType = ThreadType.PROCESS
     ):
+        Stage.__init__(self)
+
         self.name = name
         self._stages = stages
 

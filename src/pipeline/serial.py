@@ -2,10 +2,12 @@
 Implements a serial pipeline.
 """
 
-from typing import Dict, List, Tuple
+from typing import Dict, Iterable, List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+from utilities import flatten
 
 from .stage import Stage
 
@@ -15,7 +17,9 @@ class Serial(Stage):
     A serial pipeline which can be used as a stage to provide a logical unit.
     """
 
-    def __init__(self, name: str, *stages: List[Stage]):
+    def __init__(self, name: str, *stages: Stage):
+        Stage.__init__(self)
+
         self.name = name
         self._stages = stages
 
@@ -25,12 +29,17 @@ class Serial(Stage):
         """
 
         for stage in self._stages:
+            stage.before_execute()
             success, state = stage.execute(state)
+            stage.after_execute()
 
             if not success:
                 return (False, state)
 
         return (True, state)
+
+    def get_time(self) -> Iterable[Tuple[str, float]]:
+        return flatten([s.get_time() for s in self._stages])
 
     def flowchart(self):
         """

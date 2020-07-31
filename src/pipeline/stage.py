@@ -2,7 +2,8 @@
 Provides a super class for stages of a pipeline.
 """
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
+import time
+from typing import Dict, Iterable, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -12,6 +13,10 @@ class Stage(ABC):
     """
     A stage of a pipeline.
     """
+
+    def __init__(self):
+        self._time = 0
+        self._executions = 0
 
     def _array2tuple(self, array: np.array) -> Tuple[int, int]:
         return (array[0], array[1])
@@ -23,11 +28,21 @@ class Stage(ABC):
             outline="black",
         )
 
+    def before_execute(self):
+        self._start = time.perf_counter()
+        self._executions += 1
+
+    def after_execute(self):
+        self._time += time.perf_counter() - self._start
+
     @abstractmethod
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         """
         When implemented in a child class, processes the provided state and returns a new state.
         """
+
+    def get_time(self) -> Iterable[Tuple[str, float]]:
+        return [(type(self).__name__, self._time / self._executions)]
 
     def flowchart(self):
         """

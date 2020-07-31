@@ -14,6 +14,8 @@ class StoreHistoryFrame(Stage):
     """
 
     def __init__(self, history_frame_count: int):
+        Stage.__init__(self)
+
         self._history_frame_count = history_frame_count
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:

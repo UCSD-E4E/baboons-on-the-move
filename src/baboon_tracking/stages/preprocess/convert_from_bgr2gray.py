@@ -13,6 +13,9 @@ class ConvertFromBGR2Gray(Stage):
     Converts a color image to a gray-scale image.
     """
 
+    def __init__(self) -> None:
+        Stage.__init__(self)
+
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         """
         Converts a color image to a gray-scale image.

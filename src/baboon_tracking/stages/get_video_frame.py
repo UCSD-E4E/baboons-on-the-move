@@ -14,6 +14,8 @@ class GetVideoFrame(Stage):
     """
 
     def __init__(self, video_path: str):
+        Stage.__init__(self)
+
         self._capture = cv2.VideoCapture(video_path)
         self._frame_number = 1
 
