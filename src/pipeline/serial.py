@@ -7,6 +7,7 @@ from typing import Callable, List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from pipeline.models.time import Time
 
 from pipeline.initializer import initializer
 
@@ -21,6 +22,8 @@ class Serial(Stage):
     static_stages = []
 
     def __init__(self, name: str, *stage_types: List[Callable]):
+        Stage.__init__(self)
+
         self.name = name
         self.stages = []
         for stage_type in stage_types:
@@ -52,10 +55,24 @@ class Serial(Stage):
         """
 
         for stage in self.stages:
-            if not stage.execute():
+            stage.before_execute()
+            success = stage.execute()
+            stage.after_execute()
+
+            if not success:
                 return False
 
         return True
+
+    def get_time(self) -> Time:
+        """
+        Calculates the average time per execution of this stage.
+        """
+
+        time = Stage.get_time(self)
+        time.children = [s.get_time() for s in self.stages]
+
+        return time
 
     def flowchart(self):
         """

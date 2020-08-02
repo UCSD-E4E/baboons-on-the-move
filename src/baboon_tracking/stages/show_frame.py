@@ -18,6 +18,8 @@ class ShowFrame(Stage):
     """
 
     def __init__(self, dependent: any):
+        Stage.__init__(self)
+
         root = tk.Tk()
 
         scale = 0.85

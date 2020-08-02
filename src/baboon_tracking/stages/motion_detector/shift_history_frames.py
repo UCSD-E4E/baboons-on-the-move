@@ -30,6 +30,7 @@ class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
         history_frames: HistoryFramesMixin,
     ):
         ShiftedHistoryFramesMixin.__init__(self)
+        Stage.__init__(self)
 
         self._orb = cv2.ORB_create(max_features)
         self._good_match_percent = good_match_percent

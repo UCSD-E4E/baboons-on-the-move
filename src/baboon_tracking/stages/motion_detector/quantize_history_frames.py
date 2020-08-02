@@ -19,6 +19,7 @@ class QuantizeHistoryFrames(Stage, QuantizedFramesMixin):
         self, scale_factor: float, shifted_history_frames: ShiftedHistoryFramesMixin
     ):
         QuantizedFramesMixin.__init__(self)
+        Stage.__init__(self)
 
         self._scale_factor = scale_factor
         self._shifted_history_frames = shifted_history_frames

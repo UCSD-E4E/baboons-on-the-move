@@ -15,6 +15,7 @@ class GetVideoFrame(Stage, FrameMixin):
 
     def __init__(self, video_path: str):
         FrameMixin.__init__(self)
+        Stage.__init__(self)
 
         self._capture = cv2.VideoCapture(video_path)
         self._frame_number = 1

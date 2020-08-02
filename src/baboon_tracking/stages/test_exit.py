@@ -12,6 +12,9 @@ class TestExit(Stage):
     Tests for the press of the "Q" key or the end of the video.
     """
 
+    def __init__(self) -> None:
+        Stage.__init__(self)
+
     def execute(self) -> bool:
         """
         Tests for the press of the "Q" key or the end of the video.

@@ -19,6 +19,7 @@ class StoreHistoryFrame(Stage, HistoryFramesMixin):
         self, history_frame_count: int, preprocessed_frame: PreprocessedFrameMixin
     ):
         HistoryFramesMixin.__init__(self, history_frame_count)
+        Stage.__init__(self)
 
         self._history_frame_count = history_frame_count
         self._preprocessed_frame = preprocessed_frame

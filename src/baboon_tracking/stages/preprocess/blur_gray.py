@@ -17,6 +17,7 @@ class BlurGray(Stage, PreprocessedFrameMixin):
 
     def __init__(self, preprocessed_frame: PreprocessedFrameMixin):
         PreprocessedFrameMixin.__init__(self)
+        Stage.__init__(self)
 
         self._preprocessed_frame = preprocessed_frame
 

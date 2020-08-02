@@ -18,6 +18,7 @@ class ConvertFromBGR2Gray(Stage, PreprocessedFrameMixin):
 
     def __init__(self, frame_mixin: FrameMixin):
         PreprocessedFrameMixin.__init__(self)
+        Stage.__init__(self)
 
         self._frame_mixin = frame_mixin
 
