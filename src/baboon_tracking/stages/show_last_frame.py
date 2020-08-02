@@ -11,7 +11,7 @@ from baboon_tracking.models.frame import Frame
 
 
 @last_stage("dependent")
-class ShowFrame(Stage):
+class ShowLastFrame(Stage):
     """
     Displays the frame within a window for the user to see.
     Automatically sizes the window to the user's screen.
