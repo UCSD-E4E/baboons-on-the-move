@@ -2,7 +2,8 @@
 Implements a serial pipeline.
 """
 
-from typing import Callable, Dict, List, Tuple
+import inspect
+from typing import Callable, List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -17,32 +18,44 @@ class Serial(Stage):
     A serial pipeline which can be used as a stage to provide a logical unit.
     """
 
+    static_stages = []
+
     def __init__(self, name: str, *stage_types: List[Callable]):
         self.name = name
-        self._stages = []
+        self.stages = []
         for stage_type in stage_types:
             parameters_dict = {}
 
             if hasattr(stage_type, "last_stage"):
                 for parameter in stage_type.last_stage:
-                    parameters_dict[parameter] = self._stages[-1]
+                    parameters_dict[parameter] = self.stages[-1]
 
-            self._stages.append(
-                initializer(stage_type, parameters_dict=parameters_dict)
-            )
+            if hasattr(stage_type, "stages"):
+                for stage in stage_type.stages:
+                    signature = inspect.signature(stage_type)
+                    depen_type = signature.parameters[stage].annotation
 
-    def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+                    most_recent_mixin = [
+                        s
+                        for s in reversed(self.static_stages)
+                        if isinstance(s, depen_type)
+                    ][0]
+
+                    parameters_dict[stage] = most_recent_mixin
+
+            self.stages.append(initializer(stage_type, parameters_dict=parameters_dict))
+            self.static_stages.append(self.stages[-1])
+
+    def execute(self) -> bool:
         """
         Executes all stages in this pipeline sequentially.
         """
 
-        for stage in self._stages:
-            success, state = stage.execute(state)
+        for stage in self.stages:
+            if not stage.execute():
+                return False
 
-            if not success:
-                return (False, state)
-
-        return (True, state)
+        return True
 
     def flowchart(self):
         """
@@ -53,7 +66,7 @@ class Serial(Stage):
         padding = np.array([10, 10])
 
         subcharts: List[Tuple[Image.Image, Tuple[int, int], Tuple[int, int]]] = [
-            s.flowchart() for s in self._stages
+            s.flowchart() for s in self.stages
         ]
         width = sum([img.size[0] for img, _, _ in subcharts]) + 20 * len(subcharts)
 

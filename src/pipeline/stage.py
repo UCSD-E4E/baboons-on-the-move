@@ -2,7 +2,7 @@
 Provides a super class for stages of a pipeline.
 """
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
+from typing import Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -24,7 +24,7 @@ class Stage(ABC):
         )
 
     @abstractmethod
-    def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+    def execute(self) -> bool:
         """
         When implemented in a child class, processes the provided state and returns a new state.
         """

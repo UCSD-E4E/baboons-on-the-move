@@ -29,10 +29,9 @@ class BaboonTracker:
         Runs the algorithm until it finishes.
         """
 
-        state = {}
         while True:
             # By reusing the state, we can store state between frames.
-            success, state = self._runner.execute(state)
+            success = self._runner.execute()
 
             if not success:
                 return

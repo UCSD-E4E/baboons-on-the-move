@@ -2,28 +2,34 @@
 Blurs a gray frame using a Gaussian blur.
 """
 
-from typing import Dict, Tuple
 import cv2
-from baboon_tracking.mixins.preprocessor_mixin import PreprocessorMixin
+from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
 from pipeline import Stage
 from baboon_tracking.models.frame import Frame
+from pipeline.decorators import stage
 
 
-class BlurGray(Stage, PreprocessorMixin):
+@stage("preprocessed_frame")
+class BlurGray(Stage, PreprocessedFrameMixin):
     """
     Blurs a gray frame using a Gaussian blur.
     """
 
-    def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+    def __init__(self, preprocessed_frame: PreprocessedFrameMixin):
+        PreprocessedFrameMixin.__init__(self)
+
+        self._preprocessed_frame = preprocessed_frame
+
+    def execute(self) -> bool:
         """
         Blurs a gray frame using a Gaussian blur.
         """
 
         self.processed_frame = Frame(
-            cv2.GaussianBlur(state["gray"].get_frame(), (5, 5), 0),
-            state["gray"].get_frame_number(),
+            cv2.GaussianBlur(
+                self._preprocessed_frame.processed_frame.get_frame(), (5, 5), 0
+            ),
+            self._preprocessed_frame.processed_frame.get_frame_number(),
         )
 
-        state["gray"].set_frame(cv2.GaussianBlur(state["gray"].get_frame(), (5, 5), 0))
-
-        return (True, state)
+        return True

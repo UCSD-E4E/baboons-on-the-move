@@ -2,7 +2,6 @@
 Displays the frame within a window for the user to see.
 Automatically sizes the window to the user's screen.
 """
-from typing import Dict, Tuple
 import tkinter as tk
 import cv2
 
@@ -33,7 +32,7 @@ class ShowFrame(Stage):
         self._frame_attributes = None
         self._image_key = None
 
-    def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+    def execute(self) -> bool:
         """
         Displays the frame within a window for the user to see.
         Automatically sizes the window to the user's screen.
@@ -47,6 +46,7 @@ class ShowFrame(Stage):
                 if isinstance(getattr(self._dependent, a), Frame)
             ]
 
+        # Display one cv2.imshow for each frame object.
         for frame_attribute in self._frame_attributes:
             cv2.imshow(
                 "{stage_name}.{frame_attribute}".format(
@@ -58,4 +58,4 @@ class ShowFrame(Stage):
                 ),
             )
 
-        return (True, state)
+        return True

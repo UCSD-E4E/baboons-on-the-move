@@ -23,3 +23,15 @@ def last_stage(parameter: str):
         return function
 
     return inner_function
+
+
+def stage(parameter: str):
+    def inner_function(function: Callable):
+        if not hasattr(function, "stages"):
+            function.stages = []
+
+        function.stages.append(parameter)
+
+        return function
+
+    return inner_function
