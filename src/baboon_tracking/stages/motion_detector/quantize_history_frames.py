@@ -5,9 +5,9 @@ from baboon_tracking.mixins.shifted_history_frames_mixin import (
     ShiftedHistoryFramesMixin,
 )
 from baboon_tracking.models.frame import Frame
+from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
 from pipeline.decorators import config, stage
 from pipeline.stage import Stage
-from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
 
 
 @config(parameter_name="scale_factor", key="quantize_frames/scale_factor")

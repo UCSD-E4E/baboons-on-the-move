@@ -4,9 +4,9 @@ Blurs a gray frame using a Gaussian blur.
 
 import cv2
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
-from pipeline import Stage
 from baboon_tracking.models.frame import Frame
 from pipeline.decorators import stage
+from pipeline import Stage
 
 
 @stage("preprocessed_frame")

@@ -1,7 +1,6 @@
 """
 Converts a color image to a gray-scale image.
 """
-from typing import Dict, Tuple
 import cv2
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.frame import Frame

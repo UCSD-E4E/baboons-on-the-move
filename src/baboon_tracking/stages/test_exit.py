@@ -2,7 +2,6 @@
 Tests for the press of the "Q" key or the end of the video.
 """
 
-from typing import Dict, Tuple
 import cv2
 
 from pipeline import Stage
