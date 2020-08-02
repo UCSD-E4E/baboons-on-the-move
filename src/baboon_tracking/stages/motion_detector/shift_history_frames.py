@@ -15,6 +15,8 @@ class ShiftHistoryFrames(Stage):
     """
 
     def __init__(self, max_features: int, good_match_percent: float):
+        Stage.__init__(self)
+
         self._orb = cv2.ORB_create(max_features)
         self._good_match_percent = good_match_percent
         self._feature_hash = dict()

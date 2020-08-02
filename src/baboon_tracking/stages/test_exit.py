@@ -13,6 +13,9 @@ class TestExit(Stage):
     Tests for the press of the "Q" key or the end of the video.
     """
 
+    def __init__(self) -> None:
+        Stage.__init__(self)
+
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         """
         Tests for the press of the "Q" key or the end of the video.

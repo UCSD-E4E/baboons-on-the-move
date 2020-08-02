@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from pipeline.models.time import Time
 
 from .stage import Stage
 
@@ -15,7 +16,9 @@ class Serial(Stage):
     A serial pipeline which can be used as a stage to provide a logical unit.
     """
 
-    def __init__(self, name: str, *stages: List[Stage]):
+    def __init__(self, name: str, *stages: Stage):
+        Stage.__init__(self)
+
         self.name = name
         self._stages = stages
 
@@ -25,12 +28,24 @@ class Serial(Stage):
         """
 
         for stage in self._stages:
+            stage.before_execute()
             success, state = stage.execute(state)
+            stage.after_execute()
 
             if not success:
                 return (False, state)
 
         return (True, state)
+
+    def get_time(self) -> Time:
+        """
+        Calculates the average time per execution of this stage.
+        """
+
+        time = Stage.get_time(self)
+        time.children = [s.get_time() for s in self._stages]
+
+        return time
 
     def flowchart(self):
         """

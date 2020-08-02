@@ -13,6 +13,9 @@ class BlurGray(Stage):
     Blurs a gray frame using a Gaussian blur.
     """
 
+    def __init__(self) -> None:
+        Stage.__init__(self)
+
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         """
         Blurs a gray frame using a Gaussian blur.
