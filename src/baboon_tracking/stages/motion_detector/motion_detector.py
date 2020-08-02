@@ -21,7 +21,7 @@ class MotionDetector(Serial):
         Serial.__init__(
             self,
             "MotionDetector",
-            StoreHistoryFrame(8),
-            ShiftHistoryFrames(500, 0.15),
-            QuantizeHistoryFrames(50.0),
+            StoreHistoryFrame,
+            ShiftHistoryFrames,
+            QuantizeHistoryFrames,
         )

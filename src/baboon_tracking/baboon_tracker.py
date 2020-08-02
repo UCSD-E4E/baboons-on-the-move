@@ -8,6 +8,7 @@ from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
 from baboon_tracking.stages.show_frame import ShowFrame
 from baboon_tracking.stages.test_exit import TestExit
 from pipeline import Serial
+from pipeline.factory import factory
 
 
 class BaboonTracker:
@@ -18,11 +19,11 @@ class BaboonTracker:
     def __init__(self):
         self._runner = Serial(
             "BaboonTracker",
-            GetVideoFrame("./data/input.mp4"),
-            PreprocessFrame(),
-            MotionDetector(),
-            ShowFrame("Gray", "gray"),
-            TestExit(),
+            factory(GetVideoFrame, "./data/input.mp4"),
+            PreprocessFrame,
+            MotionDetector,
+            factory(ShowFrame, "Gray", "gray"),
+            TestExit,
         )
 
     def run(self):

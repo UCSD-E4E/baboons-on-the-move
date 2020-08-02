@@ -3,9 +3,11 @@
 from typing import Iterable, Dict, Tuple
 import numpy as np
 from baboon_tracking.models.frame import Frame
+from pipeline.decorators import config
 from pipeline.stage import Stage
 
 
+@config(parameter_name="scale_factor", key="quantize_frames/scale_factor")
 class QuantizeHistoryFrames(Stage):
     """Quantizes the shifted history frame."""
 

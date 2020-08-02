@@ -13,4 +13,4 @@ class PreprocessFrame(Serial):
     """
 
     def __init__(self):
-        Serial.__init__(self, "PreprocessFrame", ConvertFromBGR2Gray(), BlurGray())
+        Serial.__init__(self, "PreprocessFrame", ConvertFromBGR2Gray, BlurGray)

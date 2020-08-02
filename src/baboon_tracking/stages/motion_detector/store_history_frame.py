@@ -6,8 +6,10 @@ from collections import deque
 from typing import Deque, Dict, Tuple
 from baboon_tracking.models.frame import Frame
 from pipeline import Stage
+from pipeline.decorators import config
 
 
+@config(parameter_name="history_frame_count", key="history_frames")
 class StoreHistoryFrame(Stage):
     """
     Implements a storage of historical frame step for motion detection.

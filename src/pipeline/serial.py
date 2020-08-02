@@ -2,10 +2,12 @@
 Implements a serial pipeline.
 """
 
-from typing import Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+
+from pipeline.initializer import initializer
 
 from .stage import Stage
 
@@ -15,9 +17,9 @@ class Serial(Stage):
     A serial pipeline which can be used as a stage to provide a logical unit.
     """
 
-    def __init__(self, name: str, *stages: List[Stage]):
+    def __init__(self, name: str, *stages: List[Callable]):
         self.name = name
-        self._stages = stages
+        self._stages = [initializer(s) for s in stages]
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         """

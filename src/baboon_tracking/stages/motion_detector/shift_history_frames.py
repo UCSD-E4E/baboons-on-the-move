@@ -6,9 +6,12 @@ from typing import Deque, Dict, Tuple
 import cv2
 import numpy as np
 from baboon_tracking.models.frame import Frame
+from pipeline.decorators import config
 from pipeline.stage import Stage
 
 
+@config(parameter_name="max_features", key="registration/max_features")
+@config(parameter_name="good_match_percent", key="registration/good_match_percent")
 class ShiftHistoryFrames(Stage):
     """
     Implements a stage which shifts history frames.
