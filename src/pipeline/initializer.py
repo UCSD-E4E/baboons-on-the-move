@@ -1,11 +1,9 @@
 import inspect
-from typing import Callable, Dict, Iterable
+from typing import Callable, Dict
 from config import get_config
 
 
-def initializer(function: Callable):
-    parameters_dict = {}
-
+def initializer(function: Callable, parameters_dict={}):
     if hasattr(function, "config"):
         current_config: Dict[str, any] = get_config()
 

@@ -7,15 +7,18 @@ import tkinter as tk
 import cv2
 
 from pipeline import Stage
+from pipeline.decorators import last_stage
+from baboon_tracking.models.frame import Frame
 
 
+@last_stage("dependent")
 class ShowFrame(Stage):
     """
     Displays the frame within a window for the user to see.
     Automatically sizes the window to the user's screen.
     """
 
-    def __init__(self, window_title: str, image_key: str):
+    def __init__(self, dependent: any):
         root = tk.Tk()
 
         scale = 0.85
@@ -25,8 +28,10 @@ class ShowFrame(Stage):
 
         self.im_size = (width, height)
 
-        self._window_title = window_title
-        self._image_key = image_key
+        self._dependent = dependent
+
+        self._frame_attributes = None
+        self._image_key = None
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         """
@@ -34,9 +39,23 @@ class ShowFrame(Stage):
         Automatically sizes the window to the user's screen.
         """
 
-        cv2.imshow(
-            self._window_title,
-            cv2.resize(state[self._image_key].get_frame(), self.im_size),
-        )
+        # This searches the previous object for frame types.
+        if not self._frame_attributes:
+            self._frame_attributes = [
+                a
+                for a in dir(self._dependent)
+                if isinstance(getattr(self._dependent, a), Frame)
+            ]
+
+        for frame_attribute in self._frame_attributes:
+            cv2.imshow(
+                "{stage_name}.{frame_attribute}".format(
+                    stage_name=type(self._dependent).__name__,
+                    frame_attribute=frame_attribute,
+                ),
+                cv2.resize(
+                    getattr(self._dependent, frame_attribute).get_frame(), self.im_size
+                ),
+            )
 
         return (True, state)

@@ -17,9 +17,19 @@ class Serial(Stage):
     A serial pipeline which can be used as a stage to provide a logical unit.
     """
 
-    def __init__(self, name: str, *stages: List[Callable]):
+    def __init__(self, name: str, *stage_types: List[Callable]):
         self.name = name
-        self._stages = [initializer(s) for s in stages]
+        self._stages = []
+        for stage_type in stage_types:
+            parameters_dict = {}
+
+            if hasattr(stage_type, "last_stage"):
+                for parameter in stage_type.last_stage:
+                    parameters_dict[parameter] = self._stages[-1]
+
+            self._stages.append(
+                initializer(stage_type, parameters_dict=parameters_dict)
+            )
 
     def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
         """
