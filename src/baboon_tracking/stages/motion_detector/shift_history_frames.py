@@ -1,25 +1,43 @@
 """
 Implements a stage which shifts history frames.
 """
-from typing import Deque, Dict, Tuple
-
 import cv2
 import numpy as np
+from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
+from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
+from baboon_tracking.mixins.shifted_history_frames_mixin import (
+    ShiftedHistoryFramesMixin,
+)
 from baboon_tracking.models.frame import Frame
+from pipeline.decorators import config, stage
 from pipeline.stage import Stage
 
 
-class ShiftHistoryFrames(Stage):
+@config(parameter_name="max_features", key="registration/max_features")
+@config(parameter_name="good_match_percent", key="registration/good_match_percent")
+@stage("preprocessed_frame")
+@stage("history_frames")
+class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
     """
     Implements a stage which shifts history frames.
     """
 
-    def __init__(self, max_features: int, good_match_percent: float):
+    def __init__(
+        self,
+        max_features: int,
+        good_match_percent: float,
+        preprocessed_frame: PreprocessedFrameMixin,
+        history_frames: HistoryFramesMixin,
+    ):
+        ShiftedHistoryFramesMixin.__init__(self)
         Stage.__init__(self)
 
         self._orb = cv2.ORB_create(max_features)
         self._good_match_percent = good_match_percent
         self._feature_hash = dict()
+
+        self._preprocessed_frame = preprocessed_frame
+        self._history_frames = history_frames
 
     def _detect_and_compute(self, frame: Frame):
         if frame not in self._feature_hash:
@@ -58,18 +76,22 @@ class ShiftHistoryFrames(Stage):
 
         return transformation_matrix
 
-    def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+    def execute(self) -> bool:
         """
         Registers the history frame.
         """
-        previous_frame: Frame = state["gray"]
-        history_frames: Deque[Frame] = state["history_frames"]
+        # Do nothing.
+        if not self._history_frames.is_full():
+            return True
+
+        previous_frame = self._preprocessed_frame.processed_frame
+        history_frames = self._history_frames.history_frames
 
         transformation_matrices = [
             self._register(previous_frame, f) for f in history_frames
         ]
 
-        state["shifted_history_frames"] = [
+        self.shifted_history_frames = [
             Frame(
                 cv2.warpPerspective(
                     previous_frame.get_frame(),
@@ -84,4 +106,4 @@ class ShiftHistoryFrames(Stage):
             for M in transformation_matrices
         ]
 
-        return (True, state)
+        return True

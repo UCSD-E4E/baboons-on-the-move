@@ -2,36 +2,35 @@
 Implements a storage of historical frame step for motion detection.
 """
 
-from collections import deque
-from typing import Deque, Dict, Tuple
-from baboon_tracking.models.frame import Frame
+from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
+from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
 from pipeline import Stage
+from pipeline.decorators import config, stage
 
 
-class StoreHistoryFrame(Stage):
+@config(parameter_name="history_frame_count", key="history_frames")
+@stage("preprocessed_frame")
+class StoreHistoryFrame(Stage, HistoryFramesMixin):
     """
     Implements a storage of historical frame step for motion detection.
     """
 
-    def __init__(self, history_frame_count: int):
+    def __init__(
+        self, history_frame_count: int, preprocessed_frame: PreprocessedFrameMixin
+    ):
+        HistoryFramesMixin.__init__(self, history_frame_count)
         Stage.__init__(self)
 
         self._history_frame_count = history_frame_count
+        self._preprocessed_frame = preprocessed_frame
 
-    def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+    def execute(self) -> bool:
         """
         Implements a storage of historical frame step for motion detection.
         """
-        if "history_frames" not in state:
-            state["history_frames"] = deque([])
+        if self.is_full():
+            self.history_frames.popleft()
 
-        # Allow for autocomplete.
-        history_frames: Deque[Frame] = state["history_frames"]
+        self.history_frames.append(self._preprocessed_frame.processed_frame)
 
-        if "history_full" in state and state["history_full"]:
-            history_frames.popleft()
-
-        history_frames.append(state["gray"])
-        state["history_full"] = len(history_frames) >= self._history_frame_count
-
-        return (True, state)
+        return True

@@ -4,9 +4,9 @@ Provides an algorithm for extracting baboons from drone footage.
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
 from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
-from baboon_tracking.stages.show_frame import ShowFrame
 from baboon_tracking.stages.test_exit import TestExit
 from pipeline import Serial
+from pipeline.factory import factory
 
 
 class BaboonTracker:
@@ -17,11 +17,10 @@ class BaboonTracker:
     def __init__(self):
         self._pipeline = Serial(
             "BaboonTracker",
-            GetVideoFrame("./data/input.mp4"),
-            PreprocessFrame(),
-            MotionDetector(),
-            ShowFrame("Gray", "gray"),
-            TestExit(),
+            factory(GetVideoFrame, "./data/input.mp4"),
+            PreprocessFrame,
+            MotionDetector,
+            TestExit,
         )
 
     def run(self):
@@ -29,11 +28,9 @@ class BaboonTracker:
         Runs the algorithm until it finishes.
         """
 
-        state = {}
         while True:
             self._pipeline.before_execute()
-            # By reusing the state, we can store state between frames.
-            success, state = self._pipeline.execute(state)
+            success = self._pipeline.execute()
             self._pipeline.after_execute()
 
             if not success:

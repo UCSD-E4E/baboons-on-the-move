@@ -2,8 +2,8 @@
 Provides a super class for stages of a pipeline.
 """
 from abc import ABC, abstractmethod
+from typing import Tuple
 import time
-from typing import Dict, Tuple
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -47,7 +47,7 @@ class Stage(ABC):
         self._executions += 1
 
     @abstractmethod
-    def execute(self, state: Dict[str, any]) -> Tuple[bool, Dict[str, any]]:
+    def execute(self) -> bool:
         """
         When implemented in a child class, processes the provided state and returns a new state.
         """
