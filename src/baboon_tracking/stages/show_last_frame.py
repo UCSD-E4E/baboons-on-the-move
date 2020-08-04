@@ -32,7 +32,6 @@ class ShowLastFrame(Stage):
         self._dependent = dependent
 
         self._frame_attributes = None
-        self._image_key = None
 
     def execute(self) -> bool:
         """
