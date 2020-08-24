@@ -11,6 +11,7 @@ import pickle
 import subprocess
 import sys
 import tarfile
+from typing import List
 import urllib.request
 import zipfile
 
@@ -86,6 +87,17 @@ def _download_file_from_drive(identity: str, path: str, service):
 def _ensure_vscode_plugin(plugin: str):
     if not _check_vscode_plugin(plugin):
         subprocess.check_call(["code", "--install-extension", plugin], shell=True)
+
+
+def _execute_node_script(script: str, params=None):
+    if params is None:
+        params = []
+
+    params: List[str] = list(params)
+    params.insert(0, _get_node_executable(script))
+    params.insert(0, _get_node_executable("node"))
+
+    return subprocess.check_call(params)
 
 
 def _extract(path: str, target: str):
@@ -355,7 +367,7 @@ def install():
         _install_global_package("black")
 
     if _install_node_in_repo():
-        subprocess.check_call([_get_node_executable("npm"), "install", "-g", "pyright"])
+        _execute_node_script("npm", ["install", "-g", "pyright"])
 
     subprocess.check_call(["poetry", "install"])
 
@@ -373,7 +385,7 @@ def lint():
             subprocess.check_call(["black", "--check", f])
 
         Run(python_files)
-        subprocess.check_call(_get_node_executable("pyright"))
+        _execute_node_script("pyright")
     else:
         os.environ["CLI_ACTIVE"] = "1"
 
