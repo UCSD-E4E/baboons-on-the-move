@@ -2,11 +2,14 @@ input: './data/input.mp4'
 output: './output/output.mp4'
 mask_output: './output/mask.mp4'
 
+stop_on_frame: 
+
+display:
+    width: 1600
+    height: 900
+
 history_frames: 8
 
 registration:
     max_features: 500
     good_match_percent: 0.15
-
-quantize_frames:
-    scale_factor: 50

@@ -5,18 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Current File",
+            "name": "Python: cli",
             "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal"
-        },
-        {
-            "name": "Python: Generate Mask",
-            "type": "python",
-            "request": "launch",
-            "program": "generate_mask.py",
-            "console": "integratedTerminal"
+            "program": "cli.py",
+            "console": "integratedTerminal",
+            "args": [
+                "run"
+            ]
         }
     ]
 }
