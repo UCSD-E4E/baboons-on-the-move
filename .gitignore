@@ -199,5 +199,4 @@ $RECYCLE.BIN/
 tools/
 data/
 
-google_drive_credentials.json
-google_drive_token.pickle
+decrypted/

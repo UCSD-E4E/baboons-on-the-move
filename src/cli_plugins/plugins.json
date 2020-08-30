@@ -24,6 +24,20 @@
             ]
         },
         {
+            "module": "encrypt_decrypt",
+            "function": "decrypt",
+            "subcommands": [
+                "decrypt"
+            ]
+        },
+        {
+            "module": "encrypt_decrypt",
+            "function": "encrypt",
+            "subcommands": [
+                "encrypt"
+            ]
+        },
+        {
             "module": "format_files",
             "function": "format_files",
             "subcommands": [

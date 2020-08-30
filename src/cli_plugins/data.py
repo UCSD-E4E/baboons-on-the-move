@@ -98,7 +98,7 @@ def _load_google_drive_creds():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "google_drive_credentials.json", GOOGLE_DRIVE_SCOPES
+                "./decrypted/google_drive_credentials.json", GOOGLE_DRIVE_SCOPES
             )
             creds = flow.run_local_server(port=0)
 
