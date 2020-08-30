@@ -1,3 +1,6 @@
+"""
+Gets the data necessary to test the algorithm from Google Drive.
+"""
 import pathlib
 import pickle
 import os

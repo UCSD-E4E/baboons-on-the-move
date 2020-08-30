@@ -1,3 +1,6 @@
+"""
+Formats all Python files.
+"""
 import subprocess
 
 from cli_plugins.utils import get_python_files

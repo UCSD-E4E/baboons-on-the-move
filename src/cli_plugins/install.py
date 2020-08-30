@@ -1,3 +1,6 @@
+"""
+Installs the necessary dependencies.
+"""
 import pathlib
 import os
 import subprocess

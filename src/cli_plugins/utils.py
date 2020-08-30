@@ -1,3 +1,6 @@
+"""
+This module contains a set of methods that are shared between multiple subcommands.
+"""
 import glob
 import os
 import subprocess
@@ -28,6 +31,10 @@ def _get_node_executable(name: str):
 
 
 def execute_node_script(script: str, params=None):
+    """
+    Executes a global node module.
+    """
+
     if params is None:
         params = []
 
@@ -39,6 +46,10 @@ def execute_node_script(script: str, params=None):
 
 
 def get_python_files():
+    """
+    Get a list of all of the python files to check for linting.
+    """
+
     repo_directory = os.path.dirname(os.path.realpath(__file__))
     return [
         f

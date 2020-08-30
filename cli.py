@@ -30,7 +30,10 @@ def main():
     # Plugins are loaded dynamically from ./src/cli_plugins/plugins.json
     for plugin in plugins_dict["plugins"]:
 
+        # We wait until the module is needed to import the module.
+        # This allows the modules to not have to worry about if they are in a venv or not.
         def executor(plugin: Dict):
+            # This creates a closure that allows us to use plugin.
             def internal():
                 module = importlib.import_module(
                     "." + plugin["module"], "src.cli_plugins"

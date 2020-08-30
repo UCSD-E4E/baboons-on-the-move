@@ -1,3 +1,6 @@
+"""
+Lints all the Python files.
+"""
 import os
 import subprocess
 

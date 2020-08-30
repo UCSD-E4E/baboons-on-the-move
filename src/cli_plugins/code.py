@@ -1,3 +1,6 @@
+"""
+Ensures that Visual Studio Code has the necessary Python extensions then launches VS Code.
+"""
 import os
 import subprocess
 
