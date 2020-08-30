@@ -199,4 +199,6 @@ $RECYCLE.BIN/
 tools/
 data/
 
+google_drive_token.pickle
+
 decrypted/
