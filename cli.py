@@ -6,12 +6,17 @@ This module is a CLI for helping with development of the Baboon Tracking Project
 import argparse
 import importlib
 import json
+import os
+import sys
+from typing import Dict
 
 
 def main():
     """
     Main entry point for CLI.
     """
+
+    sys.path.append(os.getcwd() + "/src")
 
     parser = argparse.ArgumentParser(description="Baboon Command Line Interface")
 
@@ -22,13 +27,23 @@ def main():
     with open("./src/cli_plugins/plugins.json", "r") as f:
         plugins_dict = json.load(f)
 
+    # Plugins are loaded dynamically from ./src/cli_plugins/plugins.json
     for plugin in plugins_dict["plugins"]:
-        module = importlib.import_module("." + plugin["module"], "src.cli_plugins")
+
+        def executor(plugin: Dict):
+            def internal():
+                module = importlib.import_module(
+                    "." + plugin["module"], "src.cli_plugins"
+                )
+                func = getattr(module, plugin["function"])
+
+                func()
+
+            return internal
 
         for subcommand in plugin["subcommands"]:
             subparser = subparsers.add_parser(subcommand)
-            func = getattr(module, plugin["function"])
-            subparser.set_defaults(func=func)
+            subparser.set_defaults(func=executor(plugin))
 
     res = parser.parse_args()
 

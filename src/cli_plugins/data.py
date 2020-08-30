@@ -2,15 +2,17 @@ import pathlib
 import pickle
 import os
 
+from googleapiclient.http import MediaIoBaseDownload
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from tqdm import tqdm
+
 
 GOOGLE_DRIVE_SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 
 def _download_file_from_drive(identity: str, path: str, service):
-    from googleapiclient.http import (  # pylint: disable=import-outside-toplevel
-        MediaIoBaseDownload,
-    )
-
     request = service.files().get_media(fileId=identity)
 
     with open(path, "wb") as f:
@@ -82,13 +84,6 @@ def _get_drive_folder_children(parent_id: str, drive_id: str, service):
 
 
 def _load_google_drive_creds():
-    from google_auth_oauthlib.flow import (  # pylint: disable=import-outside-toplevel
-        InstalledAppFlow,
-    )
-    from google.auth.transport.requests import (  # pylint: disable=import-outside-toplevel
-        Request,
-    )
-
     creds = None
 
     if os.path.exists("google_drive_token.pickle"):
@@ -114,12 +109,6 @@ def data():
     """
     Gets the data necessary to test the algorithm from Google Drive.
     """
-
-    from googleapiclient.discovery import (  # pylint: disable=import-outside-toplevel
-        build,
-    )
-    from tqdm import tqdm  # pylint: disable=import-outside-toplevel
-
     pathlib.Path("./data").mkdir(exist_ok=True)
 
     creds = _load_google_drive_creds()
