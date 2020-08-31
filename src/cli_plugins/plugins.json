@@ -1,0 +1,62 @@
+{
+    "plugins": [
+        {
+            "module": "chart",
+            "function": "chart",
+            "subcommands": [
+                "chart",
+                "flowchart"
+            ]
+        },
+        {
+            "module": "code",
+            "function": "code",
+            "subcommands": [
+                "code",
+                "vscode"
+            ]
+        },
+        {
+            "module": "data",
+            "function": "data",
+            "subcommands": [
+                "data"
+            ]
+        },
+        {
+            "module": "format_files",
+            "function": "format_files",
+            "subcommands": [
+                "format"
+            ]
+        },
+        {
+            "module": "install",
+            "function": "install",
+            "subcommands": [
+                "install"
+            ]
+        },
+        {
+            "module": "lint",
+            "function": "lint",
+            "subcommands": [
+                "lint"
+            ]
+        },
+        {
+            "module": "run",
+            "function": "run",
+            "subcommands": [
+                "run"
+            ]
+        },
+        {
+            "module": "shell",
+            "function": "shell",
+            "subcommands": [
+                "shell"
+            ]
+        }
+    ]
+}
