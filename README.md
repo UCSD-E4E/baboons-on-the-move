@@ -1,100 +1,50 @@
 # baboon-tracking
+[![Build Status](https://travis-ci.org/UCSD-E4E/baboon-tracking.svg?branch=master)](https://travis-ci.org/UCSD-E4E/baboon-tracking)
 
-[[![Build Status](https://travis-ci.org/UCSD-E4E/baboon-tracking.svg?branch=master)](https://travis-ci.org/UCSD-E4E/baboon-tracking)](https://travis-ci.org/UCSD-E4E/baboon-tracking)
-This repo holds all of the [Baboon Team](http://e4e.ucsd.edu/baboons-on-the-move)'s attempted algorithms and implementations to track baboons from aerial drone footage, as well as any other code written for the project.
+This repository contains the state-of-the-art aerial drone background tracking algorithm.  This project is sponsored by [UCSD Engineers for Exploration](http://e4e.ucsd.edu/).
 
-# User Setup Instructions
+- [baboon-tracking](#baboon-tracking)
+- [Contributing](#contributing)
+  - [System Requirements](#system-requirements)
+  - [Recommended Development Enviornment](#recommended-development-enviornment)
+  - [Development Procedures](#development-procedures)
+  - [Commands](#commands)
+    - [Chart/Flowchart](#chartflowchart)
+    - [Code/VSCode](#codevscode)
+    - [Data](#data)
+    - [Format](#format)
+    - [Install](#install)
+    - [Lint](#lint)
+    - [Run](#run)
+    - [Shell](#shell)
 
-1. Build everything and start docker container
+# Contributing
+## System Requirements
+This baboon tracking project should be able to run anywhere where Python 3.x is supported.
 
-```
-make
-```
+## Recommended Development Enviornment
+This repository provides some default configurations for Visual Studio Code.  In order for the default configuration to work, it is necessary to run `./cli code` at least once.  While it is possible to run this project using other tools, these configurations are not supported and YMMV.
 
-2. Open localhost:8888 to access jupyter notebook inside docker container, the password is ucsde4e
-3. Navigate into utils and run ImageStreamClient to receive images from rabbitmq
+## Development Procedures
+This project leverages a CLI written in Python with bootstrappers for PowerShell and Bash.
 
-```
-cd utils; python3 ImageStreamClient.py
-```
+It is recommended that as a new contributor to the project, you first run `./cli chart` and understand the flow of information through the program.
 
-# Dev Setup Instructions, python 3.8 needed (conda environment recommended)
+## Commands
+### Chart/Flowchart
+Running `./cli chart` or `./cli flowchart` will display a chart that shows each step of the execution.
+### Code/VSCode
+Running `./cli code` will open the installed instance of Visual Studio Code and ensure that the expected extensions are installed.
+### Data
+Running `./cli data` will download the data from the Team's Google Drive.
+### Format
+Running `./cli format` will use `black` to automatically format all of the Python scripts.
+### Install
+Running `./cli install` will setup up the enviornment.
+### Lint
+Running `./cli lint` will run `pylint`, `pyright`, and `black` to check for lint errors.
+### Run
+Running `./cli run` will run the algorithm and display the time of each step.
+### Shell
+Running `./cli shell` internally runs `./cli install` and then opens a shell in the virtual environment.
 
-1. Set up python virtual environment
-   conda (uses the conda_requirements.txt):
-
-```
-(base) $ conda create --name py38 python=3.8
-(base) $ conda activate py38
-(py38) $ conda install --file conda_requirements.txt
-```
-
-pipenv (uses the Pipfile):
-
-```
-$ pipenv install
-$ pipenv shell
-```
-
-venv (just don't, but if you really wanted to...):
-
-```
-$ pip install -r requirements.txt
-```
-
-2. Add "baboon_tracking" to be importable
-   cd into the directory at which the baboon-tracking on your local directory  
-   pwd (to get the full path of where the directory lives)  
-   add the following line (but your path found in the previous step) to your ~/.bashrc (or ~/.zshrc if you're a ninja)  
-   restart your terminal session (or use the command "source ~/.zshrc", if you're a ninja of course)
-
-```
-export PYTHONPATH="/Users/joshuakang/git/baboon-tracking:$PYTHONPATH"
-```
-
-3. Test if package is accessible by the python path
-
-```
-$ python3
->>> import baboon_tracking
-```
-
-4. Add a video dataset to the /data directory named "input.mp4"
-5. Run the provided sample files
-
-```
-$ python3 generate_mask.py
-$ python3 detect_blobs.py
-```
-
-# Test Instructions
-
-```
-python3 -m unittest discover
-```
-
-# Included Projects
-
-### scraper
-
-Webscraper to download streamed videos from the San Diego Zoo's [Baboon Live Cams](https://zoo.sandiegozoo.org/cams/baboon-cam). These videos have been determined to not be useful at the current time in the project, as drone footage has very different properties.
-
-### kcf_tracking
-
-Attempt to track baboons using Kernelized Correlation Filters. (TODO: Insert blurb here to explain how well this worked)
-
-### background_subtraction
-
-Attempt to detect baboons using simple background subtraction methods. Works well with stationary cameras, but translational and rotational background movement causes issues with this approach.
-
-### opencv_builtin_tracking
-
-Interactive test of various common builtin [opencv tracking methods](https://www.learnopencv.com/object-tracking-using-opencv-cpp-python/). Allows user to draw bounding box around baboon, and attempts to track it for duration of the video. Only able to track, not detect baboons.
-
-### variable_background_tracking
-
-Attempt to isolate moving foreground from a variable background by implementing the algorithm described in [this paper](https://arxiv.org/abs/1706.02672). At the moment, algorithm works well but is incredibly slow, as it has not been optimized for performance.
-
-### registration_bg_subtraction
-
-Use registration (stabilization) functions from variable_background_tracking, and apply regular background subtraction on the results
