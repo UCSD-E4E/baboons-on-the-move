@@ -86,7 +86,7 @@ def _download_file_from_drive(identity: str, path: str, service):
 
 def _ensure_vscode_plugin(plugin: str):
     if not _check_vscode_plugin(plugin):
-        subprocess.check_call(["code", "--install-extension", plugin], shell=True)
+        subprocess.check_call(["code", "--install-extension", plugin])
 
 
 def _execute_node_script(script: str, params=None):
@@ -307,6 +307,7 @@ def data():
     from googleapiclient.discovery import (  # pylint: disable=import-outside-toplevel
         build,
     )
+    from tqdm import tqdm  # pylint: disable=import-outside-toplevel
 
     pathlib.Path("./data").mkdir(exist_ok=True)
 
@@ -327,7 +328,7 @@ def data():
 
     data_files = _get_drive_folder_children(data_folder["id"], drive["id"], service)
 
-    for data_file in data_files:
+    for data_file in tqdm(data_files, total=len(data_files)):
         _download_file_from_drive(
             data_file["id"], "./data/" + data_file["name"], service
         )

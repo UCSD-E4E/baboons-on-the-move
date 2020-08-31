@@ -66,7 +66,7 @@ class Stage(ABC):
 
         name = type(self).__name__
 
-        font = ImageFont.truetype("arial.ttf", 24)
+        font = ImageFont.truetype("SpaceGrotesk-Regular.ttf", 24)
 
         padding = np.array([10, 10])
         text_size = np.array(font.getsize(name))

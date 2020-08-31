@@ -79,7 +79,7 @@ class Serial(Stage):
         Generates a chart that represents this pipeline.
         """
 
-        font = ImageFont.truetype("arial.ttf", 16)
+        font = ImageFont.truetype("SpaceGrotesk-Regular.ttf", 16)
         padding = np.array([10, 10])
 
         subcharts: List[Tuple[Image.Image, Tuple[int, int], Tuple[int, int]]] = [
