@@ -12,6 +12,8 @@ This repository contains the state-of-the-art aerial drone background tracking a
     - [Chart/Flowchart](#chartflowchart)
     - [Code/VSCode](#codevscode)
     - [Data](#data)
+    - [Decrypt](#decrypt)
+    - [Encrypt](#encrypt)
     - [Format](#format)
     - [Install](#install)
     - [Lint](#lint)
@@ -37,6 +39,10 @@ Running `./cli chart` or `./cli flowchart` will display a chart that shows each 
 Running `./cli code` will open the installed instance of Visual Studio Code and ensure that the expected extensions are installed.
 ### Data
 Running `./cli data` will download the data from the Team's Google Drive.
+### Decrypt
+Running `./cli decrypt` will ask for a password for decrypting all files in the `encrypted` folder.  It will use the `ENCRYPTION_KEY` environment variable as the password if supplied.
+### Encrypt
+Running `./cli encrypt` will ask for a password for encrypting all files in the `decrypted` folder.  It will use the `ENCRYPTION_KEY` environment variable as the password if supplied.
 ### Format
 Running `./cli format` will use `black` to automatically format all of the Python scripts.
 ### Install
