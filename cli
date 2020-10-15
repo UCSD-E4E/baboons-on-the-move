@@ -18,8 +18,7 @@ then
     eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
     
     # Source the changes so that we can get our new path.
-    echo Please start a new instance of bash.
-    exit
+    . ~/.bashrc
 fi
 
 PYTHON_VERSION=3.8.3
