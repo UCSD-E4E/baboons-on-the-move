@@ -40,6 +40,9 @@ def decrypt():
     """
     Decrypt all the files in the encrypted folder.
     """
+    if not os.path.exists("./decrypted"):
+        os.makedirs("./decrypted")
+
     password = os.getenv("ENCRYPTION_KEY")
     if not password:
         password = _get_password()
