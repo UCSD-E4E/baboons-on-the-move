@@ -19,8 +19,8 @@ then
 
     # Update PATH
     export PATH="~/.pyenv/bin:$PATH"
-    eval $(pyenv init -)
-    eval $(pyenv virtualenv-init -)
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
 fi
 
 PYTHON_VERSION=3.8.3
