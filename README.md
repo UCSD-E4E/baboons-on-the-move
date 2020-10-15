@@ -24,6 +24,12 @@ This repository contains the state-of-the-art aerial drone background tracking a
 ## System Requirements
 This baboon tracking project should be able to run anywhere where Python 3.x is supported.
 
+### Ubuntu
+To run the project on Ubuntu please ensure you run the following command.
+```
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+```
+
 ## Recommended Development Enviornment
 This repository provides some default configurations for Visual Studio Code.  In order for the default configuration to work, it is necessary to run `./cli code` at least once.  While it is possible to run this project using other tools, these configurations are not supported and YMMV.
 
