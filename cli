@@ -41,7 +41,8 @@ then
     # Install pipx
     pip install pipx
 
-    export PATH="~/.local/bin:$PATH"
+    echo Please restart Bash.
+    exit
 fi
 
 python ./cli.py $@
