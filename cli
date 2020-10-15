@@ -16,9 +16,11 @@ then
     echo 'export PATH="~/.pyenv/bin:$PATH"
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
-    
-    # Source the changes so that we can get our new path.
-    . ~/.bashrc
+
+    # Update PATH
+    export PATH="~/.pyenv/bin:$PATH"
+    eval $(pyenv init -)
+    eval $(pyenv virtualenv-init -)
 fi
 
 PYTHON_VERSION=3.8.3
@@ -31,5 +33,14 @@ then
     pyenv install $PYTHON_VERSION
 fi
 pyenv local $PYTHON_VERSION
+
+# Ensure pipx
+pipx > /dev/null
+if [ $? -ne 0 ]
+then
+    # Install pipx
+    pip install pipx
+    pipx ensurepath
+fi
 
 python ./cli.py $@
