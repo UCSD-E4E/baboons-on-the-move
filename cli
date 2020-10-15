@@ -35,7 +35,7 @@ fi
 pyenv local $PYTHON_VERSION
 
 # Ensure pipx
-pipx > /dev/null
+pip list | grep pipx > /dev/null
 if [ $? -ne 0 ]
 then
     # Install pipx
