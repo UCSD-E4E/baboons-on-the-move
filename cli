@@ -40,7 +40,8 @@ if [ $? -ne 0 ]
 then
     # Install pipx
     pip install pipx
-    pipx ensurepath
+
+    export PATH="~/.local/bin:$PATH"
 fi
 
 python ./cli.py $@
