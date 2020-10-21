@@ -46,7 +46,7 @@ def main():
             return internal
 
         for subcommand in plugin["subcommands"]:
-            subparser = subparsers.add_parser(subcommand)
+            subparser = subparsers.add_parser(subcommand, description=plugin['description'])
             subparser.set_defaults(func=executor(plugin))
 
     res = parser.parse_args()
