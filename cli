@@ -12,16 +12,16 @@ then
 fi
 
 # Check to see if pyenv has been added to the path.
-cat ~/.${SHELL_NAME}rc | grep 'export PATH="~/.pyenv/bin:$PATH"' > /dev/null
+cat ~/.${SHELL_NAME}rc | grep 'export PATH="$HOME/.pyenv/bin:$PATH"' > /dev/null
 if [ $? -ne 0 ]
 then
     # Add pyenv to your path.
-    echo 'export PATH="~/.pyenv/bin:$PATH"
+    echo 'export PATH="$HOME/.pyenv/bin:$PATH"
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"' >> ~/.${SHELL_NAME}rc
 
     # Update PATH
-    export PATH="~/.pyenv/bin:$PATH"
+    export PATH="$HOME/.pyenv/bin:$PATH"
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
 fi
