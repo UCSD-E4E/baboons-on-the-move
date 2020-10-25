@@ -14,7 +14,7 @@ def _check_vscode_plugin(plugin: str):
 
 def _ensure_vscode_plugin(plugin: str):
     if not _check_vscode_plugin(plugin):
-        subprocess.check_call(["code", "--install-extension", plugin])
+        subprocess.check_call(["code", "--install-extension", plugin], shell=True)
 
 
 def code():
