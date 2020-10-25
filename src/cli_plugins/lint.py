@@ -24,4 +24,6 @@ def lint():
     else:
         os.environ["CLI_ACTIVE"] = "1"
 
-        subprocess.check_call(["poetry", "run", "python", "./cli.py", "lint"])
+        subprocess.check_call(
+            ["poetry", "run", "python", "./cli.py", "lint"], shell=True
+        )
