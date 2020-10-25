@@ -31,7 +31,9 @@ def _install_global_package(package_name: str):
     if os.getenv("VIRTUAL_ENV"):
         subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
     else:
-        subprocess.check_call([sys.executable, "-m", "pip", "install", "pipx", "--user"])
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "pipx", "--user"]
+        )
         subprocess.check_call([sys.executable, "-m", "pipx", "install", package_name])
         subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
 
