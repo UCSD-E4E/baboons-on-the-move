@@ -19,7 +19,7 @@ function Restart-ScriptAdministrator {
 }
 
 function Import-Path {
-    $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User") + ";$env:APPDATA\Python\Python38\Scripts;$env:USERPROFILE\.local\bin"
 }
 
 where.exe choco 1> $null 2>&1
@@ -46,10 +46,5 @@ if ("$env:USERPROFILE\AppData\Local\Microsoft\WindowsApps\python.exe" -eq (where
     }
 }
 
-Set-ConsoleColor 09
-
+Import-Path
 python ./cli.py $args[0]
-
-if ($args[0] -eq "shell") {
-    Set-ConsoleColor 5f
-}
