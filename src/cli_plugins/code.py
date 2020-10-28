@@ -17,8 +17,15 @@ def _ensure_vscode_plugin(plugin: str):
     if not _check_vscode_plugin(plugin):
         try:
             subprocess.check_call(["code", "--install-extension", plugin])
-        except Exception as e:
-            print(Fore.RED, "WARNING: PLUGIN ", plugin, " NOT INSTALLED: ", str(e), Style.RESET_ALL)
+        except subprocess.CalledProcessError as exception:
+            print(
+                Fore.RED,
+                "WARNING: PLUGIN ",
+                plugin,
+                " NOT INSTALLED: ",
+                str(exception),
+                Style.RESET_ALL,
+            )
 
 
 def code():
