@@ -6,7 +6,8 @@
             "subcommands": [
                 "chart",
                 "flowchart"
-            ]
+            ],
+            "description": "Generates flowchart dynamically from code"
         },
         {
             "module": "code",
@@ -14,63 +15,72 @@
             "subcommands": [
                 "code",
                 "vscode"
-            ]
+            ],
+            "description": "Opens VSCode with designated plugins"
         },
         {
             "module": "data",
             "function": "data",
             "subcommands": [
                 "data"
-            ]
+            ],
+            "description": "Download data from team Google Drive"
         },
         {
             "module": "encrypt_decrypt",
             "function": "decrypt",
             "subcommands": [
                 "decrypt"
-            ]
+            ],
+            "description": "Decrypts data folder"
         },
         {
             "module": "encrypt_decrypt",
             "function": "encrypt",
             "subcommands": [
                 "encrypt"
-            ]
+            ],
+            "description": "Encrypts data folder"
         },
         {
             "module": "format_files",
             "function": "format_files",
             "subcommands": [
                 "format"
-            ]
+            ],
+            "description": "Format all python files to follow standard"
         },
         {
             "module": "install",
             "function": "install",
             "subcommands": [
                 "install"
-            ]
+            ],
+            "description": "Install python environment"
         },
         {
             "module": "lint",
             "function": "lint",
             "subcommands": [
                 "lint"
-            ]
+            ],
+            "description": "Checks code for error using pylint, pyright, and black"
         },
         {
             "module": "run",
             "function": "run",
             "subcommands": [
                 "run"
-            ]
+            ],
+            "description": "Runs algorithm and display time of each step"
         },
         {
             "module": "shell",
             "function": "shell",
             "subcommands": [
                 "shell"
-            ]
+            ],
+            "description": "Opens shell in virtual environment"
         }
     ]
 }

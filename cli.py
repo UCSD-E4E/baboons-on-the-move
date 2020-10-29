@@ -20,7 +20,8 @@ def main():
 
     parser = argparse.ArgumentParser(description="Baboon Command Line Interface")
 
-    subparsers = parser.add_subparsers()
+    subparsers = parser.add_subparsers(dest='func')
+    subparsers.required = True
 
     # We import the Cli plugin list from a json file instead of yaml,
     # Python's yaml support is not built in
@@ -45,7 +46,7 @@ def main():
             return internal
 
         for subcommand in plugin["subcommands"]:
-            subparser = subparsers.add_parser(subcommand)
+            subparser = subparsers.add_parser(subcommand, description=plugin['description'])
             subparser.set_defaults(func=executor(plugin))
 
     res = parser.parse_args()
