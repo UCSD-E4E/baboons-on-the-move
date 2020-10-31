@@ -15,7 +15,7 @@ function Test-Administrator {
 }
 
 function Restart-ScriptAdministrator {
-    Start-Process powershell.exe -Verb runAs -ArgumentList "-File `"$PSCommandPath`""
+    Start-Process powershell.exe -Verb runAs -ArgumentList "-File `"$PSCommandPath`"" -Wait
 }
 
 function Import-Path {
