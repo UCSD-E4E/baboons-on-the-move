@@ -9,8 +9,6 @@ if [ $? -ne 0 ]
 then
     # Update PATH
     export PATH="$HOME/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
 
     pyenv --version > /dev/null
     if [ $? -ne 0 ]
@@ -18,6 +16,9 @@ then
         # Install pyenv if not found.
         curl https://pyenv.run | $SHELL
     fi
+    
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
 fi
 
 # Check to see if pyenv has been added to the path.
