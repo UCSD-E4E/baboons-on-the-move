@@ -36,16 +36,6 @@ To run the project on Ubuntu, please ensure you run the following command.
 sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 ```
 
-### Fedora
-To run the project on Fedora, please ensure you run the following command.
-```
-sudo dnf groupinstall "Development Tools"
-```
-and
-```
-sudo dnf install libffi-devel zlib-devel bzip2-devel readline-devel sqlite-devel wget curl llvm ncurses-devel openssl-devel lzma-sdk-devel libyaml-devel redhat-rpm-config 
-```
-
 ## Recommended Development Enviornment
 This repository provides some default configurations for Visual Studio Code.  In order for the default configuration to work, it is necessary to run `./cli code` at least once.  While it is possible to run this project using other tools, these configurations are not supported and YMMV.
 
