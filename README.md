@@ -25,13 +25,13 @@ This repository contains the state-of-the-art aerial drone background tracking a
 This baboon tracking project should be able to run anywhere where Python 3.x is supported.
 
 ### Windows
-To run the project on Windows please ensure you run the following command in an admin PowerShell
+To run the project on Windows, please ensure you run the following command in an admin PowerShell
 ```
 Set-ExecutionPolicy Unrestricted
 ```
 
 ### Ubuntu
-To run the project on Ubuntu please ensure you run the following command.
+To run the project on Ubuntu, please ensure you run the following command.
 ```
 sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 ```
