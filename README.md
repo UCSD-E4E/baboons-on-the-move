@@ -30,6 +30,9 @@ To run the project on Windows, please ensure you run the following command in an
 Set-ExecutionPolicy Unrestricted
 ```
 
+### Windows (WSL2 with Ubuntu 20.04)
+This is the only supported way to run on Windows.  We do not support WSL1, only WSL2.
+
 ### Ubuntu
 To run the project on Ubuntu, please ensure you run the following command.
 ```
