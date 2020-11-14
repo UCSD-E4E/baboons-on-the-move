@@ -3,6 +3,7 @@ Lints all the Python files.
 """
 import os
 import subprocess
+import sys
 
 from cli_plugins.utils import execute_node_script, get_python_files
 
@@ -24,4 +25,7 @@ def lint():
     else:
         os.environ["CLI_ACTIVE"] = "1"
 
-        subprocess.check_call(["poetry", "run", "python", "./cli.py", "lint"])
+        subprocess.check_call(
+            ["poetry", "run", "python", "./cli.py", "lint"],
+            shell=(sys.platform == "win32"),
+        )
