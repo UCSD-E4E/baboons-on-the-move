@@ -52,7 +52,7 @@ if (-not $?) {
 Import-Path
 
 # Start XServer
-if ($null -eq (Get-Process vcxsrv)) {
+if ($null -eq (Get-Process | Where-Object { 'vcxsrv' -eq $_.Name } )) {
     & "C:\Program Files\VcXsrv\vcxsrv.exe" :0 -multiwindow -clipboard -wgl
 }
 
