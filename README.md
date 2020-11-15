@@ -22,16 +22,16 @@ This repository contains the state-of-the-art aerial drone background tracking a
 
 # Contributing
 ## System Requirements
-This project only officially runs on Ubuntu 20.04.  Other operating systems may be compatible, but are not guaranteed. We are willing to accept PRs to introduce compatibility for other operating systems, but will not be prioritizing such compatibility.
+This project only officially runs on Ubuntu 20.04.  Other operating systems are compatibile through the use of Vagrant.
 
-### Windows (Not officially supported)
+### Windows
 To run the project on Windows, please ensure you run the following command in an admin PowerShell
 ```
 Set-ExecutionPolicy Unrestricted
 ```
 
-### Windows (WSL2 with Ubuntu 20.04)
-This is the only supported way to run on Windows.  We do not support WSL1, only WSL2.
+### macOS
+Please ensure you have HomeBrew installed.
 
 ### Ubuntu 20.04
 To run the project on Ubuntu, please ensure you run the following command.
