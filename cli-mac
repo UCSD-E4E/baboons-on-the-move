@@ -1,0 +1,8 @@
+#!/bin/bash
+brew cask install xquartz
+brew cask install virtualbox
+brew cask install vagrant
+
+vagrant up
+vagrant -Y ssh -- -t "cd /baboon-tracking; bash ./cli $($args[0])"
+vagrant suspend

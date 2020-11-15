@@ -15,7 +15,7 @@ function Test-Administrator {
 }
 
 function Restart-ScriptAdministrator {
-    Start-Process powershell.exe -Verb runAs -ArgumentList "-File `"$PSCommandPath`"" -Wait
+    Start-Process powershell.exe -Verb runAs -ArgumentList "-File `"$PSCommandPath`"" -Wait -WorkingDirectory $PWD.Path
 }
 
 function Import-Path {
@@ -42,6 +42,8 @@ function Install-Package {
     }
 }
 
+Push-Location $PSScriptRoot
+
 where.exe choco 1> $null 2>&1
 if (-not $?) {
     if (Test-Administrator) {
@@ -56,10 +58,6 @@ if (-not $?) {
 }
 
 "vagrant", "virtualbox", "vcxsrv" | Install-Package
-
-if (Test-Administrator) {
-    exit
-}
 
 Import-Path
 
@@ -77,6 +75,15 @@ if ("true" -eq (git config core.autocrlf)) {
 $memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum / 1mb
 $vagrantMemory = [System.Math]::Ceiling($memory * 0.6)
 
+$vagrantCustomFile = @"
+config.vm.provider :virtualbox do |v|
+  v.customize ["modifyvm", :id, "--memory", 2048]
+end
+"@
+$vagrantCustomFile = $vagrantCustomFile.Replace('2048', "$vagrantMemory")
+
+Set-Content -Path ./Customfile -Value $vagrantCustomFile
+
 vagrant up
-vagrant -Y ssh -- -t "cd /baboon-tracking; bash ./cli $($args[0])"
+vagrant -Y ssh -- -t "cd /baboon-tracking; ./cli $($args[0])"
 vagrant suspend
