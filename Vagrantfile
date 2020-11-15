@@ -1,6 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+require 'yaml'
+dir = File.dirname(File.expand_path(__FILE__))
+
+# defaults
+settings = YAML::load_file("#{dir}/defaults.yml")
+
+if File.exist?("#{dir}/env.yml")
+  env_settings = YAML::load_file("#{dir}/env.yml")
+  settings.merge!(env_settings)
+end
+
 # All Vagrant configuration is done below. The "2" in Vagrant.configure
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
@@ -49,13 +60,12 @@ Vagrant.configure("2") do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
+  config.vm.provider "virtualbox" do |vb|
+    # Customize the amount of CPUS on the VM:
+    vb.cpus = settings["vb"]["cpus"]
+    # Customize the amount of memory on the VM:
+    vb.memory = settings["vb"]["memory"]
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -63,8 +73,12 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
-  SHELL
+  config.vm.provision "shell" do |shell|
+    shell.binary = true
+
+    shell.inline = "apt-get update
+                    apt install firefox imagemagick -y
+                    snap install code --classic
+                    apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git"
+  end
 end

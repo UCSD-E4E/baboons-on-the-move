@@ -4,6 +4,7 @@ Automatically sizes the window to the user's screen.
 """
 import tkinter as tk
 import cv2
+import os
 
 from pipeline import Stage
 from pipeline.decorators import last_stage
@@ -24,8 +25,15 @@ class ShowLastFrame(Stage):
 
         scale = 0.85
 
-        width = int(root.winfo_screenwidth() * scale)
-        height = int(root.winfo_screenheight() * scale)
+        width = int(os.environ["WIDTH"])
+        height = int(os.environ["HEIGHT"])
+
+        if not width or not height:
+            width = int(root.winfo_screenwidth)
+            height = int(root.winfo_screenheight)
+
+        width = int(width * scale)
+        height = int(height * scale)
 
         self.im_size = (width, height)
 

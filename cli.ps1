@@ -24,7 +24,7 @@ function Import-Path {
 
 function Install-Package {
     param(
-        [Parameter(ValueFromPipeline=$True)]
+        [Parameter(ValueFromPipeline = $True)]
         $PackageName
     )
 
@@ -43,6 +43,7 @@ function Install-Package {
 }
 
 Push-Location $PSScriptRoot
+Add-Type -AssemblyName System.Windows.Forms
 
 where.exe choco 1> $null 2>&1
 if (-not $?) {
@@ -75,15 +76,31 @@ if ("true" -eq (git config core.autocrlf)) {
 $memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum / 1mb
 $vagrantMemory = [System.Math]::Ceiling($memory * 0.6)
 
+$cpus = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
+$vagrantCpus = $cpus / 2
+
 $vagrantCustomFile = @"
-config.vm.provider :virtualbox do |v|
-  v.customize ["modifyvm", :id, "--memory", 2048]
-end
+vb:
+  cpus: CPUS
+  memory: RAM
 "@
-$vagrantCustomFile = $vagrantCustomFile.Replace('2048', "$vagrantMemory")
+$vagrantCustomFile = $vagrantCustomFile.Replace('CPUS', "$vagrantCpus")
+$vagrantCustomFile = $vagrantCustomFile.Replace('RAM', "$vagrantMemory")
 
-Set-Content -Path ./Customfile -Value $vagrantCustomFile
+Set-Content -Path ./env.yml -Value $vagrantCustomFile
 
-vagrant up
-vagrant -Y ssh -- -t "cd /baboon-tracking; ./cli $($args[0])"
-vagrant suspend
+$virtualBoxIpAddress = ((Get-NetIPAddress -InterfaceIndex (Get-NetAdapter | Where-Object { $_.InterfaceDescription.Contains("VirtualBox") }).ifIndex) | Where-Object { $_.AddressFamily -eq "IPv4" }).IPAddress
+
+$screens = [System.Windows.Forms.Screen]::AllScreens
+$pixels = $screens | ForEach-Object { $_.WorkingArea.Width * $_.WorkingArea.Height } | Sort-Object -Descending | Select-Object -First 1
+$smallestScreen = $screens | Where-Object { $pixels -eq ($_.WorkingArea.Width * $_.WorkingArea.Height) } | Select-Object -First 1
+
+if ($null -eq (vagrant status | Where-Object { $_.Contains("running") })) {
+    vagrant up
+}
+
+vagrant -Y ssh -- -t "export DISPLAY=$($virtualBoxIpAddress):0.0; export WIDTH=$($smallestScreen.WorkingArea.Width); export HEIGHT=$($smallestScreen.WorkingArea.Height); cd /baboon-tracking; ./cli $($args[0])"
+
+if ($null -eq (Get-Process | Where-Object { 'vagrant' -eq $_.Name } )) {
+    vagrant suspend
+}

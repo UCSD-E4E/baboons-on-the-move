@@ -219,4 +219,4 @@ google_drive_token.pickle
 decrypted/
 
 # Vagrant Customfile
-Customfile
+env.yml
