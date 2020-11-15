@@ -7,8 +7,18 @@ echo Using $SHELL_NAME...
 pyenv --version > /dev/null
 if [ $? -ne 0 ]
 then
-    # Install pyenv if not found.
-    curl https://pyenv.run | $SHELL
+    # Update PATH
+    export PATH="$HOME/.pyenv/bin:$PATH"
+
+    pyenv --version > /dev/null
+    if [ $? -ne 0 ]
+    then
+        # Install pyenv if not found.
+        curl https://pyenv.run | $SHELL
+    fi
+    
+    eval "$(pyenv init -)"
+    eval "$(pyenv virtualenv-init -)"
 fi
 
 # Check to see if pyenv has been added to the path.
@@ -16,14 +26,10 @@ cat ~/.${SHELL_NAME}rc | grep 'export PATH="$HOME/.pyenv/bin:$PATH"' > /dev/null
 if [ $? -ne 0 ]
 then
     # Add pyenv to your path.
-    echo 'export PATH="$HOME/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"' >> ~/.${SHELL_NAME}rc
-
-    # Update PATH
-    export PATH="$HOME/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+    echo '
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"' >> ~/.${SHELL_NAME}rc
 fi
 
 PYTHON_VERSION=3.8.3
@@ -44,9 +50,13 @@ then
     # Install pipx
     pip install pipx
     pipx ensurepath
+fi
 
-    echo Please restart Bash.
-    exit
+# Ensure that pipx is in path.
+echo $PATH | grep "$HOME/.local/bin" > /dev/null
+if [ $? -ne 0 ]
+then
+    export PATH="$PATH:$HOME/.local/bin"
 fi
 
 python ./cli.py $@

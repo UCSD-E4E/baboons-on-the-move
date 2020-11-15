@@ -101,4 +101,4 @@ def install():
     if _install_node_in_repo():
         execute_node_script("npm", ["install", "-g", "pyright"])
 
-    subprocess.check_call(["poetry", "install"], shell=True)
+    subprocess.check_call(["poetry", "install"], shell=(sys.platform == "win32"))

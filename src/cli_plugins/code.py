@@ -3,6 +3,7 @@ Ensures that Visual Studio Code has the necessary Python extensions then launche
 """
 import os
 import subprocess
+import sys
 from colorama import Fore, Style
 
 
@@ -16,7 +17,9 @@ def _check_vscode_plugin(plugin: str):
 def _ensure_vscode_plugin(plugin: str):
     if not _check_vscode_plugin(plugin):
         try:
-            subprocess.check_call(["code", "--install-extension", plugin], shell=True)
+            subprocess.check_call(
+                ["code", "--install-extension", plugin], shell=(sys.platform == "win32")
+            )
         except subprocess.CalledProcessError as exception:
             print(
                 Fore.RED,
