@@ -67,8 +67,12 @@ if ($null -eq (Get-Process vcxsrv)) {
     & "C:\Program Files\VcXsrv\vcxsrv.exe" :0 -multiwindow -clipboard -wgl
 }
 
-# Update line endings
-git config core.autocrlf false
+if ("true" -eq (git config core.autocrlf)) {
+    # Update line endings
+    git config core.autocrlf false
+    git add --renormalize .
+    git reset --hard HEAD
+}
 
 $memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum / 1mb
 $vagrantMemory = [System.Math]::Ceiling($memory * 0.6)
