@@ -1,10 +1,10 @@
 #!/bin/bash
 
 function BrewInstallCask {
-    brew list --cask | grep $ > /dev/null
+    brew list --cask | grep $1 > /dev/null
     if [ $? -ne 0 ]
     then
-        brew cask install $?
+        brew cask install $1
     fi
 }
 
@@ -23,8 +23,8 @@ echo "vb:" > env.yml
 echo "  cpus: $VAGRANT_CPUS" >> env.yml
 echo "  memory: $VAGRANT_MEMORY" >> env.yml
 
-WIDTH=`SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $1 }'`
-HEIGHT=`SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $2 }' | awk -F" " '{ print $ 1 }'`
+WIDTH=`system_profiler SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $1 }'`
+HEIGHT=`system_profiler SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $2 }' | awk -F" " '{ print $ 1 }'`
 
 VIRTUALBOX_IP_Address=`ifconfig vboxnet0 | awk '$1 == "inet" {print $2}'`
 
