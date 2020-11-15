@@ -1,14 +1,3 @@
-function Set-ConsoleColor {
-    param (
-        [Parameter(Position = 0)]
-        [string]$Color
-    )
-
-    if (($IsWindows -or $null -eq $IsWindows) -and $env:TERM_PROGRAM -ne 'vscode' -and $null -eq $env:WT_PROFILE_ID) {
-        cmd /c color $Color
-    }
-}
-
 function Test-Administrator {  
     $user = [Security.Principal.WindowsIdentity]::GetCurrent();
     (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)  
@@ -62,15 +51,9 @@ if (-not $?) {
 
 Import-Path
 
+# Start XServer
 if ($null -eq (Get-Process vcxsrv)) {
     & "C:\Program Files\VcXsrv\vcxsrv.exe" :0 -multiwindow -clipboard -wgl
-}
-
-if ("true" -eq (git config core.autocrlf)) {
-    # Update line endings
-    git config core.autocrlf false
-    git add --renormalize .
-    git reset --hard HEAD
 }
 
 $memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum / 1mb

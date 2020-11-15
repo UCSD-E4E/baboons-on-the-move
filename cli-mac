@@ -1,8 +1,43 @@
 #!/bin/bash
-brew cask install xquartz
-brew cask install virtualbox
-brew cask install vagrant
 
-vagrant up
-vagrant -Y ssh -- -t "cd /baboon-tracking; bash ./cli $($args[0])"
-vagrant suspend
+function BrewInstallCask {
+    brew list --cask | grep $ > /dev/null
+    if [ $? -ne 0 ]
+    then
+        brew cask install $?
+    fi
+}
+
+# Install dependencies
+BrewInstallCask xquartz
+BrewInstallCask virtualbox
+BrewInstallCask vagrant
+
+MEMORY=`sysctl -a | grep '^hw\.m' | awk -F": " '/hw.memsize:/ { print $2 }'`
+VAGRANT_MEMORY=`expr $MEMORY \* 0.6`
+
+CPUS=`sysctl -a | grep '^machdep\.cpu\.core_count' | awk -F": " '/machdep.cpu.cpu_count:/ { print $2 }'`
+VAGRANT_CPUS=`expr $CPUS / 2`
+
+echo "vb:" > env.yml
+echo "  cpus: $VAGRANT_CPUS" >> env.yml
+echo "  memory: $VAGRANT_MEMORY" >> env.yml
+
+WIDTH=`SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $1 }'`
+HEIGHT=`SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $2 }' | awk -F" " '{ print $ 1 }'`
+
+VIRTUALBOX_IP_Address=`ifconfig vboxnet0 | awk '$1 == "inet" {print $2}'`
+
+vagrant status | grep 'running' > /dev/null
+if [ $? -ne 0 ]
+then
+    vagrant up
+fi
+
+vagrant -Y ssh -- -t "export DISPLAY=$VIRTUALBOX_IP_Address:0.0; export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
+
+ps | grep 'vagrant' > /dev/null
+if [ $? -ne 0 ]
+then
+    vagrant suspend
+fi
