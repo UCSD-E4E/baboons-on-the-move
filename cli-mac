@@ -16,7 +16,7 @@ BrewInstallCask vagrant
 MEMORY=`sysctl -a | grep '^hw\.m' | awk -F": " '/hw.memsize:/ { print $2 }'`
 VAGRANT_MEMORY=`expr $MEMORY \* 0.6`
 
-CPUS=`sysctl -a | grep '^machdep\.cpu\.core_count' | awk -F": " '/machdep.cpu.cpu_count:/ { print $2 }'`
+CPUS=`sysctl -a | grep '^machdep\.cpu\.core_count' | awk -F": " '/machdep.cpu.core_count:/ { print $2 }'`
 VAGRANT_CPUS=`expr $CPUS / 2`
 
 echo "vb:" > env.yml
