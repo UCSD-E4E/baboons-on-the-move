@@ -3,13 +3,13 @@ Displays the frame within a window for the user to see.
 Automatically sizes the window to the user's screen.
 """
 import tkinter as tk
-import cv2
 import os
+import cv2
 
 from pipeline import Stage
 from pipeline.decorators import last_stage
-from baboon_tracking.models.frame import Frame
 from pipeline.stage_result import StageResult
+from baboon_tracking.models.frame import Frame
 
 
 @last_stage("dependent")

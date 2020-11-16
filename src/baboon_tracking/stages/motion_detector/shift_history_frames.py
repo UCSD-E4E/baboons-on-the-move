@@ -1,8 +1,6 @@
 """
 Implements a stage which shifts history frames.
 """
-from collections import deque
-from typing import Deque
 import cv2
 import numpy as np
 from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
@@ -42,9 +40,7 @@ class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
         self._preprocessed_frame = preprocessed_frame
         self._history_frames = history_frames
 
-        history_frames.history_frame_popped.subscribe(
-            lambda x: self._feature_hash.pop(x)
-        )
+        history_frames.history_frame_popped.subscribe(self._feature_hash.pop)
 
     def _detect_and_compute(self, frame: Frame):
         if frame not in self._feature_hash:
