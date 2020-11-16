@@ -1,4 +1,4 @@
- #!/bin/bash
+#!/bin/bash
 
 function BrewInstallCask {
     brew list --cask | grep $1 > /dev/null
@@ -14,7 +14,7 @@ BrewInstallCask virtualbox
 BrewInstallCask vagrant
 
 MEMORY=`sysctl -a | grep '^hw\.m' | awk -F": " '/hw.memsize:/ { print $2 }'`
-VAGRANT_MEMORY=`expr $MEMORY \* 6 / 10000`
+VAGRANT_MEMORY=`expr $MEMORY / 1024 / 1024 \* 60 / 100`
 
 CPUS=`sysctl -a | grep '^machdep\.cpu\.core_count' | awk -F": " '/machdep.cpu.core_count:/ { print $2 }'`
 VAGRANT_CPUS=`expr $CPUS / 2`
