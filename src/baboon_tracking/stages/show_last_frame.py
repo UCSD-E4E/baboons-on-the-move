@@ -9,6 +9,7 @@ import os
 from pipeline import Stage
 from pipeline.decorators import last_stage
 from baboon_tracking.models.frame import Frame
+from pipeline.stage_result import StageResult
 
 
 @last_stage("dependent")
@@ -36,12 +37,11 @@ class ShowLastFrame(Stage):
         height = int(height * scale)
 
         self.im_size = (width, height)
-
         self._dependent = dependent
 
         self._frame_attributes = None
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         Displays the frame within a window for the user to see.
         Automatically sizes the window to the user's screen.
@@ -67,4 +67,4 @@ class ShowLastFrame(Stage):
                 ),
             )
 
-        return True
+        return StageResult(True, True)

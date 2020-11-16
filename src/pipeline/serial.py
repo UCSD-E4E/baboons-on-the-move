@@ -10,6 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 from pipeline.models.time import Time
 
 from pipeline.initializer import initializer
+from pipeline.stage_result import StageResult
 
 from .stage import Stage
 
@@ -25,7 +26,7 @@ class Serial(Stage):
         Stage.__init__(self)
 
         self.name = name
-        self.stages = []
+        self.stages: List[Stage] = []
         for stage_type in stage_types:
             parameters_dict = {}
 
@@ -49,20 +50,23 @@ class Serial(Stage):
             self.stages.append(initializer(stage_type, parameters_dict=parameters_dict))
             self.static_stages.append(self.stages[-1])
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         Executes all stages in this pipeline sequentially.
         """
 
         for stage in self.stages:
             stage.before_execute()
-            success = stage.execute()
+            result = stage.execute()
             stage.after_execute()
 
-            if not success:
-                return False
+            if result.continue_pipeline and not result.next_stage:
+                break
 
-        return True
+            if not result.continue_pipeline:
+                return StageResult(False, None)
+
+        return StageResult(True, True)
 
     def get_time(self) -> Time:
         """
