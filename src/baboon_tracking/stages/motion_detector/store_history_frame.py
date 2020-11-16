@@ -2,6 +2,7 @@
 Implements a storage of historical frame step for motion detection.
 """
 
+from rx.subject import Subject
 from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
 from pipeline import Stage
@@ -18,7 +19,12 @@ class StoreHistoryFrame(Stage, HistoryFramesMixin):
     def __init__(
         self, history_frame_count: int, preprocessed_frame: PreprocessedFrameMixin
     ):
-        HistoryFramesMixin.__init__(self, history_frame_count)
+        self._history_frame_popped_subject = Subject()
+        self.history_frame_popped = self._history_frame_popped_subject
+
+        HistoryFramesMixin.__init__(
+            self, history_frame_count, self.history_frame_popped
+        )
         Stage.__init__(self)
 
         self._history_frame_count = history_frame_count
@@ -29,7 +35,8 @@ class StoreHistoryFrame(Stage, HistoryFramesMixin):
         Implements a storage of historical frame step for motion detection.
         """
         if self.is_full():
-            self.history_frames.popleft()
+            frame = self.history_frames.popleft()
+            self._history_frame_popped_subject.on_next(frame)
 
         self.history_frames.append(self._preprocessed_frame.processed_frame)
 
