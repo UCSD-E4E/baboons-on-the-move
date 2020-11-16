@@ -28,16 +28,20 @@ HEIGHT=`system_profiler SPDisplaysDataType | grep Resolution | awk -F": " '/Reso
 
 VIRTUALBOX_IP_Address=`ifconfig vboxnet0 | awk '$1 == "inet" {print $2}'`
 
-vagrant status | grep 'running' > /dev/null
-if [ $? -ne 0 ]
-then
-    vagrant up
-fi
+echo $VIRTUALBOX_IP_Address
+echo $WIDTH
+echo $HEIGHT
 
-vagrant -Y ssh -- -t "export DISPLAY=$VIRTUALBOX_IP_Address:0.0; export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
+# vagrant status | grep 'running' > /dev/null
+# if [ $? -ne 0 ]
+# then
+#     vagrant up
+# fi
 
-ps | grep 'vagrant' > /dev/null
-if [ $? -ne 0 ]
-then
-    vagrant suspend
-fi
+# vagrant -Y ssh -- -t "export DISPLAY=$VIRTUALBOX_IP_Address:0.0; export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
+
+# ps | grep 'vagrant' > /dev/null
+# if [ $? -ne 0 ]
+# then
+#     vagrant suspend
+# fi
