@@ -53,7 +53,9 @@ def get_python_files():
     Get a list of all of the python files to check for linting.
     """
 
-    repo_directory = os.path.dirname(os.path.realpath(__file__))
+    repo_directory = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    )
     return [
         f
         for f in glob.iglob(repo_directory + "/**/*.py", recursive=True)

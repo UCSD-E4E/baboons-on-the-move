@@ -9,6 +9,8 @@ import tarfile
 import urllib.request
 import zipfile
 
+from shutil import which
+
 from cli_plugins.utils import execute_node_script
 
 
@@ -71,21 +73,7 @@ def _install_node_in_repo():
 
 
 def _is_executable_in_path(executable: str):
-    if sys.platform == "win32":
-        which_executable = "where"
-    elif (
-        sys.platform == "darwin" or sys.platform == "linux" or sys.platform == "linux2"
-    ):
-        return False
-    else:
-        which_executable = None
-
-    which = subprocess.Popen(
-        which_executable + " " + executable, stdout=subprocess.PIPE
-    )
-    _ = which.communicate()
-
-    return which.returncode == 0
+    return which(executable) is not None
 
 
 def install():
