@@ -7,6 +7,7 @@ import argparse
 import importlib
 import json
 import os
+import subprocess
 import sys
 from typing import Dict
 
@@ -17,6 +18,21 @@ def main():
     """
 
     sys.path.append(os.getcwd() + "/src")
+
+    if not os.getenv("VIRTUAL_ENV"):
+        from src.cli_plugins.install import (  # pylint: disable=import-outside-toplevel
+            install,
+        )
+
+        install()
+
+        if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
+            subprocess.check_call(
+                ["poetry", "run", "python", "./cli.py"] + sys.argv[1:],
+                shell=(sys.platform == "win32"),
+            )
+
+            return
 
     parser = argparse.ArgumentParser(description="Baboon Command Line Interface")
 
