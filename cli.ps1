@@ -34,6 +34,13 @@ function Install-Package {
 Push-Location $PSScriptRoot
 Add-Type -AssemblyName System.Windows.Forms
 
+if ('true' -eq (git config core.autocrlf)) {
+    git config core.eol lf
+    git config core.autocrlf input
+
+    git checkout-index --force --all # Rebuild working dir with all text files corrected
+}
+
 where.exe choco 1> $null 2>&1
 if (-not $?) {
     if (Test-Administrator) {
