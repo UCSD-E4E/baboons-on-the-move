@@ -56,7 +56,7 @@ class Parallel(ParentStage):
         draw.text(self._array2tuple(padding - np.array([0, 1])), self.name, font=font)
 
         origin = np.array([10, font.getsize(self.name)[1] + 20])
-        for i, subchart in enumerate(subcharts):
+        for subchart in subcharts:
             sub, _, start = subchart
             width_pad = int((max_img_width - sub.size[0]) / 2)
             start = np.array(start) + np.array([width_pad, 0])
