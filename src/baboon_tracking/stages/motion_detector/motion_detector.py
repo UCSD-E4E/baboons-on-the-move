@@ -8,8 +8,8 @@ from baboon_tracking.stages.motion_detector.compute_transformation_matrices impo
 from baboon_tracking.stages.motion_detector.quantize_history_frames import (
     QuantizeHistoryFrames,
 )
-from baboon_tracking.stages.motion_detector.shift_history_frames import (
-    ShiftHistoryFrames,
+from baboon_tracking.stages.motion_detector.transformed_frames.transformed_frames import (
+    TransformedFrames,
 )
 from baboon_tracking.stages.motion_detector.store_history_frame import StoreHistoryFrame
 from pipeline import Serial
@@ -26,6 +26,6 @@ class MotionDetector(Serial):
             "MotionDetector",
             StoreHistoryFrame,
             ComputeTransformationMatrices,
-            ShiftHistoryFrames,
+            TransformedFrames,
             QuantizeHistoryFrames,
         )
