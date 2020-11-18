@@ -26,12 +26,12 @@ class ShowLastFrame(Stage):
 
         scale = 0.85
 
-        width = int(os.getenv["WIDTH"])
-        height = int(os.getenv["HEIGHT"])
+        width = int(os.getenv("WIDTH"))
+        height = int(os.getenv("HEIGHT"))
 
         if not width or not height:
-            width = int(root.winfo_screenwidth)
-            height = int(root.winfo_screenheight)
+            width = int(root.winfo_screenwidth())
+            height = int(root.winfo_screenheight())
 
         width = int(width * scale)
         height = int(height * scale)
