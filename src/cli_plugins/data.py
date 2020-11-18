@@ -1,7 +1,7 @@
 """
 Gets the data necessary to test the algorithm from Google Drive.
 """
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import pathlib
 import pickle
 import os
@@ -26,7 +26,7 @@ class Data(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         pathlib.Path("./data").mkdir(exist_ok=True)
 
         creds = self._load_google_drive_creds()

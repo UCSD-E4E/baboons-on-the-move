@@ -2,12 +2,10 @@ from abc import abstractmethod
 from argparse import ArgumentParser, Namespace
 
 
-class CliPlugin:
+class Schematic:
     def __init__(self, parser: ArgumentParser):
-        pass
+        self.parser = parser
 
     @abstractmethod
     def execute(self, args: Namespace):
-        """
-        In a child class, this method is executed by a CLI plugin.
-        """
+        pass

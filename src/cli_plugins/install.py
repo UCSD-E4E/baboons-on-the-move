@@ -1,7 +1,7 @@
 """
 Installs the necessary dependencies.
 """
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import pathlib
 import os
 import subprocess
@@ -20,7 +20,7 @@ def install():
     """
     Installs the necessary dependencies.
     """
-    Install(None).execute()
+    Install(None).execute(None)
 
 
 class Install(CliPlugin):
@@ -31,7 +31,7 @@ class Install(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         if not self._is_executable_in_path("poetry"):
             self._install_global_package("poetry")
 

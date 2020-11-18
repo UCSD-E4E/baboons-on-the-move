@@ -1,7 +1,7 @@
 """
 Manages encryption and decryption.
 """
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import getpass
 import os
 import pyAesCrypt
@@ -24,7 +24,7 @@ class Encrypt(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         password = os.getenv("ENCRYPTION_KEY")
         if not password:
             password = _get_password()
@@ -52,7 +52,7 @@ class Decrypt(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         if not os.path.exists("./decrypted"):
             os.makedirs("./decrypted")
 

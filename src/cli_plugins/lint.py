@@ -1,7 +1,7 @@
 """
 Lints all the Python files.
 """
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import subprocess
 from pylint.lint import Run
 from cli_plugins.cli_plugin import CliPlugin
@@ -17,7 +17,7 @@ class Lint(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         python_files = get_python_files()
 
         for f in python_files:

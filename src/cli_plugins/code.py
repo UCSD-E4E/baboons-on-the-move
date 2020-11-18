@@ -1,7 +1,7 @@
 """
 Ensures that Visual Studio Code has the necessary Python extensions then launches VS Code.
 """
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import os
 import subprocess
 import sys
@@ -18,7 +18,7 @@ class Code(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         self._ensure_vscode_plugin("eamodio.gitlens")
         self._ensure_vscode_plugin("ms-python.python")
         self._ensure_vscode_plugin("ms-python.vscode-pylance")

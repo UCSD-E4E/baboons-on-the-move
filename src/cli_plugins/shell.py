@@ -2,7 +2,7 @@
 Ensures that a venv is setup and that all necessary dependencies are installed.
 Starts a shell in the venv once setup.
 """
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import subprocess
 from cli_plugins.cli_plugin import CliPlugin
 
@@ -18,7 +18,7 @@ class Shell(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         install()
 
         subprocess.check_call(["poetry", "shell"])

@@ -9,7 +9,6 @@ import json
 import os
 import subprocess
 import sys
-from typing import Dict
 
 from cli_plugins.cli_plugin import CliPlugin
 
@@ -38,7 +37,7 @@ def main():
 
     parser = argparse.ArgumentParser(description="Baboon Command Line Interface")
 
-    subparsers = parser.add_subparsers(dest="func")
+    subparsers = parser.add_subparsers(dest="command")
     subparsers.required = True
 
     # We import the Cli plugin list from a json file instead of yaml,
@@ -57,11 +56,11 @@ def main():
             class_type = getattr(module, plugin["class"])
 
             cli_plugin: CliPlugin = class_type(subparser)
-            subparser.set_defaults(func=cli_plugin.execute)
+            subparser.set_defaults(command=cli_plugin.execute)
 
     res = parser.parse_args()
 
-    res.func()
+    res.command(res)
 
 
 if __name__ == "__main__":

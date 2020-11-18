@@ -51,6 +51,16 @@
             "description": "Format all python files to follow standard"
         },
         {
+            "module": "generate",
+            "class": "Generate",
+            "subcommands": [
+                "generate",
+                "gen",
+                "g"
+            ],
+            "description": "Generate Python files"
+        },
+        {
             "module": "install",
             "class": "Install",
             "subcommands": [

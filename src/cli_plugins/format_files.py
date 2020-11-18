@@ -1,7 +1,7 @@
 """
 Formats all Python files.
 """
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Namespace
 import subprocess
 from cli_plugins.cli_plugin import CliPlugin
 
@@ -16,7 +16,7 @@ class FormatFiles(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-    def execute(self):
+    def execute(self, args: Namespace):
         python_files = get_python_files()
 
         for python_file in python_files:
