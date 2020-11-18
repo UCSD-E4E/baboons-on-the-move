@@ -1,17 +1,23 @@
 """
 Formats all Python files.
 """
+from argparse import ArgumentParser
 import subprocess
+from cli_plugins.cli_plugin import CliPlugin
 
 from cli_plugins.utils import get_python_files
 
 
-def format_files():
+class FormatFiles(CliPlugin):
     """
     Formats all Python files.
     """
 
-    python_files = get_python_files()
+    def __init__(self, parser: ArgumentParser):
+        CliPlugin.__init__(self, parser)
 
-    for python_file in python_files:
-        subprocess.check_call(["black", python_file])
+    def execute(self):
+        python_files = get_python_files()
+
+        for python_file in python_files:
+            subprocess.check_call(["black", python_file])

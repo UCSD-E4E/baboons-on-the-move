@@ -2,7 +2,7 @@
     "plugins": [
         {
             "module": "chart",
-            "function": "chart",
+            "class": "Chart",
             "subcommands": [
                 "chart",
                 "flowchart"
@@ -11,7 +11,7 @@
         },
         {
             "module": "code",
-            "function": "code",
+            "class": "Code",
             "subcommands": [
                 "code",
                 "vscode"
@@ -20,7 +20,7 @@
         },
         {
             "module": "data",
-            "function": "data",
+            "class": "Data",
             "subcommands": [
                 "data"
             ],
@@ -28,7 +28,7 @@
         },
         {
             "module": "encrypt_decrypt",
-            "function": "decrypt",
+            "class": "Decrypt",
             "subcommands": [
                 "decrypt"
             ],
@@ -36,7 +36,7 @@
         },
         {
             "module": "encrypt_decrypt",
-            "function": "encrypt",
+            "class": "Encrypt",
             "subcommands": [
                 "encrypt"
             ],
@@ -44,7 +44,7 @@
         },
         {
             "module": "format_files",
-            "function": "format_files",
+            "class": "FormatFiles",
             "subcommands": [
                 "format"
             ],
@@ -52,7 +52,7 @@
         },
         {
             "module": "install",
-            "function": "install",
+            "class": "Install",
             "subcommands": [
                 "install"
             ],
@@ -60,7 +60,7 @@
         },
         {
             "module": "lint",
-            "function": "lint",
+            "class": "Lint",
             "subcommands": [
                 "lint"
             ],
@@ -68,7 +68,7 @@
         },
         {
             "module": "run",
-            "function": "run",
+            "class": "Run",
             "subcommands": [
                 "run"
             ],
@@ -76,7 +76,7 @@
         },
         {
             "module": "shell",
-            "function": "shell",
+            "class": "Shell",
             "subcommands": [
                 "shell"
             ],

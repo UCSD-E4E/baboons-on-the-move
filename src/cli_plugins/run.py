@@ -1,12 +1,18 @@
 """
 Starts the baboon tracker algorithm.
 """
-from baboon_tracking import BaboonTracker  # pylint: disable=import-outside-toplevel
+from argparse import ArgumentParser
+from baboon_tracking import BaboonTracker
+from cli_plugins.cli_plugin import CliPlugin  # pylint: disable=import-outside-toplevel
 
 
-def run():
+class Run(CliPlugin):
     """
     Starts the baboon tracker algorithm.
     """
 
-    BaboonTracker().run()
+    def __init__(self, parser: ArgumentParser):
+        CliPlugin.__init__(self, parser)
+
+    def execute(self):
+        BaboonTracker().run()

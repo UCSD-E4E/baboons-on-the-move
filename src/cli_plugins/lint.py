@@ -1,20 +1,23 @@
 """
 Lints all the Python files.
 """
-import os
+from argparse import ArgumentParser
 import subprocess
-import sys
+from pylint.lint import Run
+from cli_plugins.cli_plugin import CliPlugin
 
 from cli_plugins.utils import execute_node_script, get_python_files
 
 
-def lint():
+class Lint(CliPlugin):
     """
     Lints all the Python files.
     """
-    if os.getenv("CLI_ACTIVE"):
-        from pylint.lint import Run  # pylint: disable=import-outside-toplevel
 
+    def __init__(self, parser: ArgumentParser):
+        CliPlugin.__init__(self, parser)
+
+    def execute(self):
         python_files = get_python_files()
 
         for f in python_files:
@@ -22,10 +25,3 @@ def lint():
 
         Run(python_files)
         execute_node_script("pyright")
-    else:
-        os.environ["CLI_ACTIVE"] = "1"
-
-        subprocess.check_call(
-            ["poetry", "run", "python", "./cli.py", "lint"],
-            shell=(sys.platform == "win32"),
-        )
