@@ -26,6 +26,7 @@ class Stage(Schematic):
         string_builder = StringBuilder()
 
         string_builder.append_line("from pipeline import Stage")
+        string_builder.append_line("from pipeline.stage_result import StageResult")
         string_builder.append_line("")
         string_builder.append_line("")
 
@@ -37,8 +38,8 @@ class Stage(Schematic):
         string_builder.append_line("        Stage.__init__(self)")
         string_builder.append_line("")
 
-        string_builder.append_line("    def execute(self) -> bool:")
-        string_builder.append_line("        pass")
+        string_builder.append_line("    def execute(self) -> StageResult:")
+        string_builder.append_line("        return StageResult(True, True)")
         string_builder.append_line("")
 
         with open(path, "w") as f:
