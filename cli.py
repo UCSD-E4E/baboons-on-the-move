@@ -10,7 +10,7 @@ import os
 import subprocess
 import sys
 
-from cli_plugins.cli_plugin import CliPlugin
+from src.cli_plugins.cli_plugin import CliPlugin
 
 
 def main():
@@ -27,11 +27,19 @@ def main():
 
         install()
 
-        if len(sys.argv) > 1 and sys.argv[1].lower() not in ["shell", "install"]:
+        if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
             subprocess.check_call(
                 ["poetry", "run", "python", "./cli.py"] + sys.argv[1:],
                 shell=(sys.platform == "win32"),
             )
+
+            return
+        elif len(sys.argv) > 1 and sys.argv[1].lower() == "shell":
+            from src.cli_plugins.shell import (  # pylint: disable=import-outside-toplevel
+                shell,
+            )
+
+            shell()
 
             return
 
