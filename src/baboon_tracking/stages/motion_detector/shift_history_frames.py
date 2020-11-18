@@ -1,8 +1,6 @@
 """
 Implements a stage which shifts history frames.
 """
-from collections import deque
-from typing import Deque
 import cv2
 import numpy as np
 from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
@@ -13,6 +11,7 @@ from baboon_tracking.mixins.shifted_history_frames_mixin import (
 from baboon_tracking.models.frame import Frame
 from pipeline.decorators import config, stage
 from pipeline.stage import Stage
+from pipeline.stage_result import StageResult
 
 
 @config(parameter_name="max_features", key="registration/max_features")
@@ -41,9 +40,7 @@ class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
         self._preprocessed_frame = preprocessed_frame
         self._history_frames = history_frames
 
-        history_frames.history_frame_popped.subscribe(
-            lambda x: self._feature_hash.pop(x)
-        )
+        history_frames.history_frame_popped.subscribe(self._feature_hash.pop)
 
     def _detect_and_compute(self, frame: Frame):
         if frame not in self._feature_hash:
@@ -82,13 +79,13 @@ class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
 
         return transformation_matrix
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         Registers the history frame.
         """
         # Do nothing.
         if not self._history_frames.is_full():
-            return True
+            return StageResult(True, False)
 
         previous_frame = self._preprocessed_frame.processed_frame
         history_frames = self._history_frames.history_frames
@@ -112,4 +109,4 @@ class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
             for M in transformation_matrices
         ]
 
-        return True
+        return StageResult(True, True)

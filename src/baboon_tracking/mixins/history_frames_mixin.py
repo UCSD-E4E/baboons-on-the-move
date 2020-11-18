@@ -3,8 +3,8 @@ Mixin for returning history frames.
 """
 
 from collections import deque
-from rx.core.typing import Observable
 from typing import Deque
+from rx.core.typing import Observable
 
 from baboon_tracking.models.frame import Frame
 
