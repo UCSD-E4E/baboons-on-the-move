@@ -1,3 +1,6 @@
+"""
+A cli plugin that is used for creating Python files.
+"""
 from argparse import ArgumentParser, Namespace
 import importlib
 import json
@@ -6,6 +9,10 @@ from cli_plugins.schematics.schematic import Schematic
 
 
 class Generate(CliPlugin):
+    """
+    A cli plugin that is used for creating Python files.
+    """
+
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 

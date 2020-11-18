@@ -1,3 +1,7 @@
+"""
+Implementation of a schematic that creates a custom stage in the specified location.
+"""
+
 import os
 from argparse import ArgumentParser, Namespace
 from cli_plugins.schematics.schematic import Schematic
@@ -5,6 +9,10 @@ from cli_plugins.schematics.string_builder import StringBuilder
 
 
 class Stage(Schematic):
+    """
+    Implementation of a schematic that creates a custom stage in the specified location.
+    """
+
     def __init__(self, parser: ArgumentParser):
         Schematic.__init__(self, parser)
 
