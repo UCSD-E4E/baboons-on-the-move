@@ -61,14 +61,6 @@
             "description": "Generate Python files"
         },
         {
-            "module": "install",
-            "class": "Install",
-            "subcommands": [
-                "install"
-            ],
-            "description": "Install python environment"
-        },
-        {
             "module": "lint",
             "class": "Lint",
             "subcommands": [
