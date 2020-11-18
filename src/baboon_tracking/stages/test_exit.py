@@ -5,6 +5,7 @@ Tests for the press of the "Q" key or the end of the video.
 import cv2
 
 from pipeline import Stage
+from pipeline.stage_result import StageResult
 
 
 class TestExit(Stage):
@@ -15,12 +16,12 @@ class TestExit(Stage):
     def __init__(self) -> None:
         Stage.__init__(self)
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         Tests for the press of the "Q" key or the end of the video.
         """
 
         if cv2.waitKey(25) & 0xFF == ord("q"):
-            return False
+            return StageResult(False, None)
 
-        return True
+        return StageResult(True, True)
