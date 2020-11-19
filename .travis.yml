@@ -2,5 +2,6 @@ language: python
 python:
   - "3.8"
 install:
+  - echo noop
 script:
   - python ./cli.py lint
