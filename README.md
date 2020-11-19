@@ -60,8 +60,6 @@ Running `./cli decrypt` will ask for a password for decrypting all files in the 
 Running `./cli encrypt` will ask for a password for encrypting all files in the `decrypted` folder.  It will use the `ENCRYPTION_KEY` environment variable as the password if supplied.
 ### Format
 Running `./cli format` will use `black` to automatically format all of the Python scripts.
-### Install
-Running `./cli install` will setup up the enviornment.
 ### Lint
 Running `./cli lint` will run `pylint`, `pyright`, and `black` to check for lint errors.
 ### Run
