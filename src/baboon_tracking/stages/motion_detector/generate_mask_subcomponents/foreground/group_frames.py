@@ -1,3 +1,6 @@
+"""
+Create pairs of frames.
+"""
 from baboon_tracking.mixins.group_shifted_history_frames_mixin import (
     GroupShiftedHistoryFramesMixin,
 )
@@ -14,6 +17,10 @@ from pipeline.stage_result import StageResult
 @stage("shifted_history_frames")
 @stage("quantized_frames")
 class GroupFrames(Stage, GroupShiftedHistoryFramesMixin):
+    """
+    Create pairs of frames.
+    """
+
     def __init__(
         self,
         shifted_history_frames: ShiftedHistoryFramesMixin,

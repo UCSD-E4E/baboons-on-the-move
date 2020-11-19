@@ -1,3 +1,6 @@
+"""
+Computes the moving foreground using the subcomponents previously computed
+"""
 import math
 import numpy as np
 
@@ -20,6 +23,10 @@ from pipeline.decorators import config, stage
 @stage("frame_mixin")
 @config(parameter_name="history_frames", key="history_frames")
 class ComputeMovingForeground(Stage, MovingForegroundMixin):
+    """
+    Computes the moving foreground using the subcomponents previously computed
+    """
+
     def __init__(
         self,
         history_of_dissimilarity: HistoryOfDissimilarityMixin,

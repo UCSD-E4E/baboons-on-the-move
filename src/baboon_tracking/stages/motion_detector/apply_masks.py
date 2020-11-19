@@ -1,3 +1,7 @@
+"""
+Applies the masks to the moving foreground.
+"""
+
 import numpy as np
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
@@ -12,6 +16,10 @@ from pipeline.decorators import stage
 @stage("shifted_masks")
 @stage("frame")
 class ApplyMasks(Stage, MovingForegroundMixin):
+    """
+    Applies the masks to the moving foreground.
+    """
+
     def __init__(
         self,
         moving_foreground: MovingForegroundMixin,

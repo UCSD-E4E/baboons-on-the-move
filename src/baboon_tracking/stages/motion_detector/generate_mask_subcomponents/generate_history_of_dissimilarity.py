@@ -1,3 +1,7 @@
+"""
+Generate the history of dissimilarity
+"""
+
 import numpy as np
 from baboon_tracking.mixins.history_of_dissimilarity_mixin import (
     HistoryOfDissimilarityMixin,
@@ -15,6 +19,10 @@ from pipeline.stage_result import StageResult
 @stage("shifted_history_frames")
 @stage("quantized_frames")
 class GenerateHistoryOfDissimilarity(Stage, HistoryOfDissimilarityMixin):
+    """
+    Generate the history of dissimilarity
+    """
+
     def __init__(
         self,
         shifted_history_frames: ShiftedHistoryFramesMixin,

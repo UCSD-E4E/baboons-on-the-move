@@ -1,3 +1,6 @@
+"""
+Reduces the noise as a result of the motion detector.
+"""
 import cv2
 import numpy as np
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
@@ -10,6 +13,10 @@ from pipeline.decorators import stage
 
 @stage("moving_foreground")
 class NoiseReduction(Stage, MovingForegroundMixin):
+    """
+    Reduces the noise as a result of the motion detector.
+    """
+
     def __init__(self, moving_foreground: MovingForegroundMixin) -> None:
         Stage.__init__(self)
         MovingForegroundMixin.__init__(self)

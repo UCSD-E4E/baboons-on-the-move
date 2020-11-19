@@ -1,3 +1,6 @@
+"""
+Generates a set of weights to represent how often a pixel changes.
+"""
 import numpy as np
 from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
 from baboon_tracking.mixins.weights_mixin import WeightsMixin
@@ -8,6 +11,10 @@ from pipeline.decorators import stage
 
 @stage("quantized_frames")
 class GenerateWeights(Stage, WeightsMixin):
+    """
+    Generates a set of weights to represent how often a pixel changes.
+    """
+
     def __init__(self, quantized_frames: QuantizedFramesMixin) -> None:
         Stage.__init__(self)
         WeightsMixin.__init__(self)
