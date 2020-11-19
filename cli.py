@@ -13,6 +13,24 @@ import sys
 from src.cli_plugins.cli_plugin import CliPlugin
 
 
+def _short_circuit():
+    if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
+        subprocess.check_call(
+            ["poetry", "run", "python", "./cli.py"] + sys.argv[1:],
+            shell=(sys.platform == "win32"),
+        )
+    elif len(sys.argv) > 1 and sys.argv[1].lower() == "shell":
+        from src.cli_plugins.shell import (  # pylint: disable=import-outside-toplevel
+            shell,
+        )
+
+        shell()
+    else:
+        return False
+
+    return True
+
+
 def main():
     """
     Main entry point for CLI.
@@ -20,27 +38,16 @@ def main():
 
     sys.path.append(os.getcwd() + "/src")
 
-    if not os.getenv("VIRTUAL_ENV") or (os.getenv("TRAVIS") and not os.getenv("POETRY_ACTIVE")):
+    if not os.getenv("VIRTUAL_ENV") or (
+        os.getenv("TRAVIS") and not os.getenv("POETRY_ACTIVE")
+    ):
         from src.cli_plugins.install import (  # pylint: disable=import-outside-toplevel
             install,
         )
 
         install()
 
-        if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
-            subprocess.check_call(
-                ["poetry", "run", "python", "./cli.py"] + sys.argv[1:],
-                shell=(sys.platform == "win32"),
-            )
-
-            return
-        elif len(sys.argv) > 1 and sys.argv[1].lower() == "shell":
-            from src.cli_plugins.shell import (  # pylint: disable=import-outside-toplevel
-                shell,
-            )
-
-            shell()
-
+        if _short_circuit():
             return
 
     parser = argparse.ArgumentParser(description="Baboon Command Line Interface")
