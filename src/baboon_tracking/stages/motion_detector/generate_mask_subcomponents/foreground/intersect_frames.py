@@ -1,3 +1,4 @@
+"Intersect frames to pull out the foreground."
 import numpy as np
 from baboon_tracking.mixins.intersected_frames_mixin import IntersectedFramesMixin
 from baboon_tracking.mixins.group_shifted_history_frames_mixin import (
@@ -11,6 +12,8 @@ from pipeline.stage_result import StageResult
 
 @stage("group_shifted_history_frames")
 class IntersectFrames(Stage, IntersectedFramesMixin):
+    "Intersect frames to pull out the foreground."
+
     def __init__(
         self, group_shifted_history_frames: GroupShiftedHistoryFramesMixin
     ) -> None:
@@ -53,4 +56,3 @@ class IntersectFrames(Stage, IntersectedFramesMixin):
             self._intersect_frames(z[0], z[1])
             for z in zip(grouped_shifted_history_frames, grouped_quantized_frames)
         ]
-

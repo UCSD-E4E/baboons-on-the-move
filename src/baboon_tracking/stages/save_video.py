@@ -1,10 +1,10 @@
+"""
+Save the frames from the previous step to the output folder.
+"""
 import cv2
-import os
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
-from baboon_tracking.models.frame import Frame
 from baboon_tracking.stages.show_last_frame import ShowLastFrame
 
-from pipeline import Stage
 from pipeline.decorators import last_stage, stage
 from pipeline.stage_result import StageResult
 
@@ -12,6 +12,10 @@ from pipeline.stage_result import StageResult
 @stage("capture")
 @last_stage("dependent")
 class SaveVideo(ShowLastFrame):
+    """
+    Save the frames from the previous step to the output folder.
+    """
+
     def __init__(self, dependent: any, capture: CaptureMixin) -> None:
         ShowLastFrame.__init__(self, dependent)
         self._capture = capture

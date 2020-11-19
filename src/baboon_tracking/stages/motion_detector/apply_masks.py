@@ -2,9 +2,9 @@ import numpy as np
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.mixins.shifted_masks_mixin import ShiftedMasksMixin
+from baboon_tracking.models.frame import Frame
 from pipeline import Stage
 from pipeline.stage_result import StageResult
-from baboon_tracking.models.frame import Frame
 from pipeline.decorators import stage
 
 
@@ -36,4 +36,3 @@ class ApplyMasks(Stage, MovingForegroundMixin):
             )
 
         return StageResult(True, True)
-

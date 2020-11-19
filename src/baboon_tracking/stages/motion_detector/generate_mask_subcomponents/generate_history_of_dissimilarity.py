@@ -1,4 +1,3 @@
-import cv2
 import numpy as np
 from baboon_tracking.mixins.history_of_dissimilarity_mixin import (
     HistoryOfDissimilarityMixin,
@@ -58,4 +57,3 @@ class GenerateHistoryOfDissimilarity(Stage, HistoryOfDissimilarityMixin):
             )
 
         return (dissimilarity / len(frames)).astype(np.uint8)
-

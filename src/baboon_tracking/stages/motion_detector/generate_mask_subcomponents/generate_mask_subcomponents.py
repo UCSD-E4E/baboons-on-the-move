@@ -15,4 +15,3 @@ class GenerateMaskSubcomponents(Parallel):
             GenerateHistoryOfDissimilarity,
             Foreground,
         )
-

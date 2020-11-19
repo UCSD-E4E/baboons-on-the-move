@@ -1,3 +1,6 @@
+"""
+Compute shifted masks for use in throwing pixels not common between frames.
+"""
 import cv2
 import numpy as np
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
@@ -14,6 +17,10 @@ from pipeline.stage_result import StageResult
 @stage("transformation_matrices")
 @stage("frame")
 class ComputeShiftedMasks(Stage, ShiftedMasksMixin):
+    """
+    Compute shifted masks for use in throwing pixels not common between frames.
+    """
+
     def __init__(
         self,
         transformation_matrices: TransformationMatricesMixin,

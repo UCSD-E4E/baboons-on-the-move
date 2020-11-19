@@ -41,4 +41,3 @@ class GroupFrames(Stage, GroupShiftedHistoryFramesMixin):
         ]
 
         return StageResult(True, True)
-

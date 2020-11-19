@@ -23,4 +23,3 @@ class Foreground(Serial):
             UnionIntersections,
             SubtractBackground,
         )
-

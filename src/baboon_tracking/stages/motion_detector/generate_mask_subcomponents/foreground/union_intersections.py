@@ -1,3 +1,6 @@
+"""
+Union frames that were previously intersected.
+"""
 import numpy as np
 
 from baboon_tracking.mixins.intersected_frames_mixin import IntersectedFramesMixin
@@ -9,6 +12,10 @@ from pipeline.stage_result import StageResult
 
 @stage("intersected_frames")
 class UnionIntersections(Stage, UnionedFramesMixin):
+    """
+    Union frames that were previously intersected.
+    """
+
     def __init__(self, intersected_frames: IntersectedFramesMixin) -> None:
         Stage.__init__(self)
         UnionedFramesMixin.__init__(self)
@@ -35,4 +42,3 @@ class UnionIntersections(Stage, UnionedFramesMixin):
             union[union == 0] = f[union == 0]
 
         return union
-

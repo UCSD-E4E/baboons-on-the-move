@@ -1,11 +1,11 @@
 import cv2
 import numpy as np
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
+from baboon_tracking.models.frame import Frame
 
 from pipeline import Stage
 from pipeline.stage_result import StageResult
 from pipeline.decorators import stage
-from baboon_tracking.models.frame import Frame
 
 
 @stage("moving_foreground")
@@ -37,4 +37,3 @@ class NoiseReduction(Stage, MovingForegroundMixin):
         )
 
         return StageResult(True, True)
-

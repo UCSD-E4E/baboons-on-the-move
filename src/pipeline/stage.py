@@ -54,7 +54,9 @@ class Stage(ABC):
         """
 
     def on_destroy(self) -> None:
-        pass
+        """
+        Called when the application is closed, just before the pipeline is destroyed.
+        """
 
     def get_time(self) -> Time:
         """

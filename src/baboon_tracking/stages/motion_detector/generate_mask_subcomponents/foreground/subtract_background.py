@@ -1,3 +1,7 @@
+"""
+Subtracts background representation from the frame.
+"""
+
 import cv2
 from baboon_tracking.mixins.foreground_mixin import ForegroundMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
@@ -13,6 +17,10 @@ from pipeline.stage_result import StageResult
 @stage("weights")
 @config(parameter_name="history_frames", key="history_frames")
 class SubtractBackground(Stage, ForegroundMixin):
+    """
+    Subtracts background representation from the frame.
+    """
+
     def __init__(
         self,
         preprocessed_frame: PreprocessedFrameMixin,
@@ -42,12 +50,13 @@ class SubtractBackground(Stage, ForegroundMixin):
 
     def _zero_weights(self, frame, weights):
         """
-        Gets foreground of frame by zeroing out all pixels with large weights, i.e. pixels in which frequency of commonality
-        is really high, meaning that it hasn't changed much or at all in the history frames, according to figure 13 of paper
+        Gets foreground of frame by zeroing out all pixels with large weights,
+        i.e. pixels in which frequency of commonality
+        is really high, meaning that it hasn't changed much or at all in the
+        history frames, according to figure 13 of paper
         Returns frame representing the foreground
         """
         f = frame.copy()
         f[weights >= self._history_frames - 1] = 0
 
         return f
-

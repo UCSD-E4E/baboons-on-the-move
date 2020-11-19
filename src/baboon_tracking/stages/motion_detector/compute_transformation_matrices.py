@@ -1,3 +1,6 @@
+"""
+Compute the transformation matrices between the current frame and the historical frames.
+"""
 import cv2
 import numpy as np
 from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
@@ -16,6 +19,10 @@ from pipeline.stage_result import StageResult
 @stage("preprocessed_frame")
 @stage("history_frames")
 class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
+    """
+    Compute the transformation matrices between the current frame and the historical frames.
+    """
+
     def __init__(
         self,
         max_features: int,

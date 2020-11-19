@@ -37,4 +37,3 @@ class GenerateWeights(Stage, WeightsMixin):
             weights = weights + mask
 
         return weights
-

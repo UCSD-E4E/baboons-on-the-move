@@ -1,3 +1,6 @@
+"""
+Executes child stages in parallel.
+"""
 from typing import Callable, List, Tuple
 
 import numpy as np
@@ -8,12 +11,16 @@ from pipeline.stage_result import StageResult
 
 
 class Parallel(ParentStage):
+    """
+    Executes child stages in parallel.
+    """
+
     def __init__(self, name: str, *stage_types: List[Callable]):
         ParentStage.__init__(self, name, *stage_types)
 
     def execute(self) -> StageResult:
         """
-        Executes all stages in this pipeline sequentially.
+        Executes all stages in this pipeline in parallel.
         """
 
         for stage in self.stages:

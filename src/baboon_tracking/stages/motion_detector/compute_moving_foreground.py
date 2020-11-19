@@ -112,4 +112,3 @@ class ComputeMovingForeground(Stage, MovingForegroundMixin):
         ).astype(np.uint8)
 
         return moving_foreground * 255
-

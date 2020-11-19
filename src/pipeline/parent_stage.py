@@ -1,3 +1,6 @@
+"""
+Base class for Serial and Parallel classes.  Implements common functionality between the two.
+"""
 import inspect
 from typing import Callable, List
 
@@ -8,6 +11,10 @@ from .stage import Stage
 
 
 class ParentStage(Stage):
+    """
+    Base class for Serial and Parallel classes.  Implements common functionality between the two.
+    """
+
     static_stages = []
 
     def __init__(self, name: str, *stage_types: List[Callable]):
