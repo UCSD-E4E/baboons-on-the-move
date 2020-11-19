@@ -15,7 +15,6 @@ This repository contains the state-of-the-art aerial drone background tracking a
     - [Decrypt](#decrypt)
     - [Encrypt](#encrypt)
     - [Format](#format)
-    - [Install](#install)
     - [Lint](#lint)
     - [Run](#run)
     - [Shell](#shell)
