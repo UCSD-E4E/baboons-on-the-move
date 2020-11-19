@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from baboon_tracking.mixins.frame_mixin import FrameMixin
+from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
 
 from baboon_tracking.mixins.shifted_masks_mixin import ShiftedMasksMixin
 from baboon_tracking.mixins.transformation_matrices_mixin import (
@@ -15,7 +15,9 @@ from pipeline.stage_result import StageResult
 @stage("frame")
 class ComputeShiftedMasks(Stage, ShiftedMasksMixin):
     def __init__(
-        self, transformation_matrices: TransformationMatricesMixin, frame: FrameMixin
+        self,
+        transformation_matrices: TransformationMatricesMixin,
+        frame: PreprocessedFrameMixin,
     ):
         ShiftedMasksMixin.__init__(self)
         Stage.__init__(self)
@@ -25,7 +27,7 @@ class ComputeShiftedMasks(Stage, ShiftedMasksMixin):
 
     def execute(self) -> StageResult:
         transformation_matrices = self._transformation_matrices.transformation_matrices
-        frame = self._frame.frame
+        frame = self._frame.processed_frame
 
         img = np.ones(frame.get_frame().shape).astype(np.uint8)
         self.shifted_masks = [

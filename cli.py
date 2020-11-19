@@ -20,7 +20,9 @@ def main():
 
     sys.path.append(os.getcwd() + "/src")
 
-    if not os.getenv("VIRTUAL_ENV"):
+    if not os.getenv("VIRTUAL_ENV") or (
+        len(sys.argv) > 1 and sys.argv[1].lower() == "shell"
+    ):
         from src.cli_plugins.install import (  # pylint: disable=import-outside-toplevel
             install,
         )

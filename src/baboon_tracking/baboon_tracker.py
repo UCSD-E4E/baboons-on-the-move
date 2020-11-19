@@ -37,6 +37,8 @@ class BaboonTracker:
                 print("Average Runtime per stage:")
                 self._pipeline.get_time().print_to_console()
 
+                self._pipeline.on_destroy()
+
                 return
 
     def flowchart(self):
