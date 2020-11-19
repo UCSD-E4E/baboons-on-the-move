@@ -20,7 +20,7 @@ def main():
 
     sys.path.append(os.getcwd() + "/src")
 
-    if not os.getenv("VIRTUAL_ENV"):
+    if not os.getenv("VIRTUAL_ENV") or (os.getenv("TRAVIS") and not os.getenv("POETRY_ACTIVE")):
         from src.cli_plugins.install import (  # pylint: disable=import-outside-toplevel
             install,
         )
