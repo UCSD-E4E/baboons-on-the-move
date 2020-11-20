@@ -15,6 +15,8 @@ from src.cli_plugins.cli_plugin import CliPlugin
 
 def _short_circuit():
     if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
+        os.environ["CLI_ACTIVE"] = "1"
+
         subprocess.check_call(
             ["poetry", "run", "python", "./cli.py"] + sys.argv[1:],
             shell=(sys.platform == "win32"),
@@ -39,7 +41,7 @@ def main():
     sys.path.append(os.getcwd() + "/src")
 
     if os.getenv("VIRTUAL_ENV") is None or (
-        os.getenv("TRAVIS") is not None and os.getenv("POETRY_ACTIVE") is None
+        os.getenv("TRAVIS") is not None and os.getenv("CLI_ACTIVE") is None
     ):
         from src.cli_plugins.install import (  # pylint: disable=import-outside-toplevel
             install,
