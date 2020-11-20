@@ -16,7 +16,7 @@ from src.cli_plugins.cli_plugin import CliPlugin
 def _short_circuit():
     if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
         os.environ["CLI_ACTIVE"] = "1"
-        
+
         subprocess.check_call(
             ["poetry", "run", "python", "./cli.py"] + sys.argv[1:],
             shell=(sys.platform == "win32"),
