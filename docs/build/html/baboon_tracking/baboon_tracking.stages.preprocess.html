@@ -1,0 +1,181 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>baboon_tracking.stages.preprocess package &#8212; baboon-tracking 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pipeline" href="../pipeline/modules.html" />
+    <link rel="prev" title="baboon_tracking.stages.motion_detector package" href="baboon_tracking.stages.motion_detector.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="baboon-tracking-stages-preprocess-package">
+<h1>baboon_tracking.stages.preprocess package<a class="headerlink" href="#baboon-tracking-stages-preprocess-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-baboon_tracking.stages.preprocess.blur_gray">
+<span id="baboon-tracking-stages-preprocess-blur-gray-module"></span><h2>baboon_tracking.stages.preprocess.blur_gray module<a class="headerlink" href="#module-baboon_tracking.stages.preprocess.blur_gray" title="Permalink to this headline">¶</a></h2>
+<p>Blurs a gray frame using a Gaussian blur.</p>
+<dl class="py class">
+<dt id="baboon_tracking.stages.preprocess.blur_gray.BlurGray">
+<em class="property">class </em><code class="sig-prename descclassname">baboon_tracking.stages.preprocess.blur_gray.</code><code class="sig-name descname">BlurGray</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">preprocessed_frame</span><span class="p">:</span> <span class="n"><a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin" title="baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin">baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#baboon_tracking.stages.preprocess.blur_gray.BlurGray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage.Stage" title="pipeline.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.stage.Stage</span></code></a>, <a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin" title="baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin</span></code></a></p>
+<p>Blurs a gray frame using a Gaussian blur.</p>
+<dl class="py method">
+<dt id="baboon_tracking.stages.preprocess.blur_gray.BlurGray.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage_result.StageResult" title="pipeline.stage_result.StageResult">pipeline.stage_result.StageResult</a><a class="headerlink" href="#baboon_tracking.stages.preprocess.blur_gray.BlurGray.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Blurs a gray frame using a Gaussian blur.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.preprocess.blur_gray.BlurGray.stages">
+<code class="sig-name descname">stages</code><em class="property"> = ['preprocessed_frame']</em><a class="headerlink" href="#baboon_tracking.stages.preprocess.blur_gray.BlurGray.stages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-baboon_tracking.stages.preprocess.convert_from_bgr2gray">
+<span id="baboon-tracking-stages-preprocess-convert-from-bgr2gray-module"></span><h2>baboon_tracking.stages.preprocess.convert_from_bgr2gray module<a class="headerlink" href="#module-baboon_tracking.stages.preprocess.convert_from_bgr2gray" title="Permalink to this headline">¶</a></h2>
+<p>Converts a color image to a gray-scale image.</p>
+<dl class="py class">
+<dt id="baboon_tracking.stages.preprocess.convert_from_bgr2gray.ConvertFromBGR2Gray">
+<em class="property">class </em><code class="sig-prename descclassname">baboon_tracking.stages.preprocess.convert_from_bgr2gray.</code><code class="sig-name descname">ConvertFromBGR2Gray</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">frame_mixin</span><span class="p">:</span> <span class="n"><a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.frame_mixin.FrameMixin" title="baboon_tracking.mixins.frame_mixin.FrameMixin">baboon_tracking.mixins.frame_mixin.FrameMixin</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#baboon_tracking.stages.preprocess.convert_from_bgr2gray.ConvertFromBGR2Gray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage.Stage" title="pipeline.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.stage.Stage</span></code></a>, <a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin" title="baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin</span></code></a></p>
+<p>Converts a color image to a gray-scale image.</p>
+<dl class="py method">
+<dt id="baboon_tracking.stages.preprocess.convert_from_bgr2gray.ConvertFromBGR2Gray.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage_result.StageResult" title="pipeline.stage_result.StageResult">pipeline.stage_result.StageResult</a><a class="headerlink" href="#baboon_tracking.stages.preprocess.convert_from_bgr2gray.ConvertFromBGR2Gray.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a color image to a gray-scale image.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.preprocess.convert_from_bgr2gray.ConvertFromBGR2Gray.stages">
+<code class="sig-name descname">stages</code><em class="property"> = ['frame_mixin']</em><a class="headerlink" href="#baboon_tracking.stages.preprocess.convert_from_bgr2gray.ConvertFromBGR2Gray.stages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-baboon_tracking.stages.preprocess.preprocess_frame">
+<span id="baboon-tracking-stages-preprocess-preprocess-frame-module"></span><h2>baboon_tracking.stages.preprocess.preprocess_frame module<a class="headerlink" href="#module-baboon_tracking.stages.preprocess.preprocess_frame" title="Permalink to this headline">¶</a></h2>
+<p>Provides a pipeline step for preprocessing a frame.</p>
+<dl class="py class">
+<dt id="baboon_tracking.stages.preprocess.preprocess_frame.PreprocessFrame">
+<em class="property">class </em><code class="sig-prename descclassname">baboon_tracking.stages.preprocess.preprocess_frame.</code><code class="sig-name descname">PreprocessFrame</code><a class="headerlink" href="#baboon_tracking.stages.preprocess.preprocess_frame.PreprocessFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../pipeline/pipeline.html#pipeline.serial.Serial" title="pipeline.serial.Serial"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.serial.Serial</span></code></a></p>
+<p>Pipeline step for preprocessing a frame.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-baboon_tracking.stages.preprocess">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-baboon_tracking.stages.preprocess" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">baboon-tracking</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">baboon_tracking</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="baboon_tracking.html">baboon_tracking package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline/modules.html">pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripts/modules.html">scripts</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">baboon_tracking</a><ul>
+  <li><a href="baboon_tracking.html">baboon_tracking package</a><ul>
+  <li><a href="baboon_tracking.stages.html">baboon_tracking.stages package</a><ul>
+      <li>Previous: <a href="baboon_tracking.stages.motion_detector.html" title="previous chapter">baboon_tracking.stages.motion_detector package</a></li>
+      <li>Next: <a href="../pipeline/modules.html" title="next chapter">pipeline</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, ucsd-e4e.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/baboon_tracking/baboon_tracking.stages.preprocess.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

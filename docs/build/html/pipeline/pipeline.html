@@ -1,0 +1,264 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pipeline package &#8212; baboon-tracking 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="pipeline.models package" href="pipeline.models.html" />
+    <link rel="prev" title="pipeline" href="modules.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="pipeline-package">
+<h1>pipeline package<a class="headerlink" href="#pipeline-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.models.html">pipeline.models package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.models.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.models.html#module-pipeline.models.time">pipeline.models.time module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline.models.html#module-pipeline.models">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pipeline.decorators">
+<span id="pipeline-decorators-module"></span><h2>pipeline.decorators module<a class="headerlink" href="#module-pipeline.decorators" title="Permalink to this headline">¶</a></h2>
+<p>Reusable decorators for the pipeline.</p>
+<dl class="py function">
+<dt id="pipeline.decorators.config">
+<code class="sig-prename descclassname">pipeline.decorators.</code><code class="sig-name descname">config</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameter_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.decorators.config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satisfies a parameter with a value from config.yml</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pipeline.decorators.last_stage">
+<code class="sig-prename descclassname">pipeline.decorators.</code><code class="sig-name descname">last_stage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameter</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.decorators.last_stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satisfies a parameter with the last stage executed of the pipeline.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pipeline.decorators.stage">
+<code class="sig-prename descclassname">pipeline.decorators.</code><code class="sig-name descname">stage</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">parameter</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.decorators.stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Satisfies a parameter with the last stage executed which is an instance of the mixin type.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pipeline.factory">
+<span id="pipeline-factory-module"></span><h2>pipeline.factory module<a class="headerlink" href="#module-pipeline.factory" title="Permalink to this headline">¶</a></h2>
+<p>Factory function used to wrap a function with zero parameters.</p>
+<dl class="py function">
+<dt id="pipeline.factory.factory">
+<code class="sig-prename descclassname">pipeline.factory.</code><code class="sig-name descname">factory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">any</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.factory.factory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a function, passing args and kwargs to it.  Returns a wrapper with 0 parameters.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pipeline.initializer">
+<span id="pipeline-initializer-module"></span><h2>pipeline.initializer module<a class="headerlink" href="#module-pipeline.initializer" title="Permalink to this headline">¶</a></h2>
+<p>Intializes classes, satisfying configuration and supplied parameters.</p>
+<dl class="py function">
+<dt id="pipeline.initializer.initializer">
+<code class="sig-prename descclassname">pipeline.initializer.</code><code class="sig-name descname">initializer</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">function</span><span class="p">:</span> <span class="n">Callable</span></em>, <em class="sig-param"><span class="n">parameters_dict</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>any<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.initializer.initializer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Intializes classes, satisfying configuration and supplied parameters.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pipeline.serial">
+<span id="pipeline-serial-module"></span><h2>pipeline.serial module<a class="headerlink" href="#module-pipeline.serial" title="Permalink to this headline">¶</a></h2>
+<p>Implements a serial pipeline.</p>
+<dl class="py class">
+<dt id="pipeline.serial.Serial">
+<em class="property">class </em><code class="sig-prename descclassname">pipeline.serial.</code><code class="sig-name descname">Serial</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">*</span><span class="n">stage_types</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Callable<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.serial.Serial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#pipeline.stage.Stage" title="pipeline.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.stage.Stage</span></code></a></p>
+<p>A serial pipeline which can be used as a stage to provide a logical unit.</p>
+<dl class="py method">
+<dt id="pipeline.serial.Serial.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#pipeline.stage_result.StageResult" title="pipeline.stage_result.StageResult">pipeline.stage_result.StageResult</a><a class="headerlink" href="#pipeline.serial.Serial.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes all stages in this pipeline sequentially.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pipeline.serial.Serial.flowchart">
+<code class="sig-name descname">flowchart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.serial.Serial.flowchart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a chart that represents this pipeline.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pipeline.serial.Serial.get_time">
+<code class="sig-name descname">get_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pipeline.models.html#pipeline.models.time.Time" title="pipeline.models.time.Time">pipeline.models.time.Time</a><a class="headerlink" href="#pipeline.serial.Serial.get_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the average time per execution of this stage.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="pipeline.serial.Serial.static_stages">
+<code class="sig-name descname">static_stages</code><em class="property"> = []</em><a class="headerlink" href="#pipeline.serial.Serial.static_stages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pipeline.stage">
+<span id="pipeline-stage-module"></span><h2>pipeline.stage module<a class="headerlink" href="#module-pipeline.stage" title="Permalink to this headline">¶</a></h2>
+<p>Provides a super class for stages of a pipeline.</p>
+<dl class="py class">
+<dt id="pipeline.stage.Stage">
+<em class="property">class </em><code class="sig-prename descclassname">pipeline.stage.</code><code class="sig-name descname">Stage</code><a class="headerlink" href="#pipeline.stage.Stage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>A stage of a pipeline.</p>
+<dl class="py method">
+<dt id="pipeline.stage.Stage.after_execute">
+<code class="sig-name descname">after_execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.stage.Stage.after_execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executed after the execute method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pipeline.stage.Stage.before_execute">
+<code class="sig-name descname">before_execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.stage.Stage.before_execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executed before the execute method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pipeline.stage.Stage.execute">
+<em class="property">abstract </em><code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#pipeline.stage_result.StageResult" title="pipeline.stage_result.StageResult">pipeline.stage_result.StageResult</a><a class="headerlink" href="#pipeline.stage.Stage.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>When implemented in a child class, processes the provided state and returns a new state.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pipeline.stage.Stage.flowchart">
+<code class="sig-name descname">flowchart</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.stage.Stage.flowchart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates a flowchart for the current stage.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pipeline.stage.Stage.get_time">
+<code class="sig-name descname">get_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="pipeline.models.html#pipeline.models.time.Time" title="pipeline.models.time.Time">pipeline.models.time.Time</a><a class="headerlink" href="#pipeline.stage.Stage.get_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the average time per execution of this stage.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pipeline.stage_result">
+<span id="pipeline-stage-result-module"></span><h2>pipeline.stage_result module<a class="headerlink" href="#module-pipeline.stage_result" title="Permalink to this headline">¶</a></h2>
+<p>Contains a result of a stage execution.</p>
+<dl class="py class">
+<dt id="pipeline.stage_result.StageResult">
+<em class="property">class </em><code class="sig-prename descclassname">pipeline.stage_result.</code><code class="sig-name descname">StageResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">continue_pipeline</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">next_stage</span><span class="p">:</span> <span class="n">bool</span></em><span class="sig-paren">)</span><a class="headerlink" href="#pipeline.stage_result.StageResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Contains a result of a stage execution.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pipeline">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pipeline" title="Permalink to this headline">¶</a></h2>
+<p>Entry point for the pipeline module.</p>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">baboon-tracking</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../baboon_tracking/modules.html">baboon_tracking</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">pipeline</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">pipeline package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../scripts/modules.html">scripts</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">pipeline</a><ul>
+      <li>Previous: <a href="modules.html" title="previous chapter">pipeline</a></li>
+      <li>Next: <a href="pipeline.models.html" title="next chapter">pipeline.models package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, ucsd-e4e.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/pipeline/pipeline.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
