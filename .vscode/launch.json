@@ -11,9 +11,7 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                "generate",
-                "stage",
-                "motion_detector/test_file.py"
+                "run"
             ]
         }
     ]

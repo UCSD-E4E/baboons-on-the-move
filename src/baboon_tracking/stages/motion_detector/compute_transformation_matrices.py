@@ -1,12 +1,12 @@
 """
-Implements a stage which shifts history frames.
+Compute the transformation matrices between the current frame and the historical frames.
 """
 import cv2
 import numpy as np
 from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
-from baboon_tracking.mixins.shifted_history_frames_mixin import (
-    ShiftedHistoryFramesMixin,
+from baboon_tracking.mixins.transformation_matrices_mixin import (
+    TransformationMatricesMixin,
 )
 from baboon_tracking.models.frame import Frame
 from pipeline.decorators import config, stage
@@ -18,9 +18,9 @@ from pipeline.stage_result import StageResult
 @config(parameter_name="good_match_percent", key="registration/good_match_percent")
 @stage("preprocessed_frame")
 @stage("history_frames")
-class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
+class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
     """
-    Implements a stage which shifts history frames.
+    Compute the transformation matrices between the current frame and the historical frames.
     """
 
     def __init__(
@@ -30,7 +30,7 @@ class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
         preprocessed_frame: PreprocessedFrameMixin,
         history_frames: HistoryFramesMixin,
     ):
-        ShiftedHistoryFramesMixin.__init__(self)
+        TransformationMatricesMixin.__init__(self)
         Stage.__init__(self)
 
         self._orb = cv2.ORB_create(max_features)
@@ -90,23 +90,8 @@ class ShiftHistoryFrames(Stage, ShiftedHistoryFramesMixin):
         previous_frame = self._preprocessed_frame.processed_frame
         history_frames = self._history_frames.history_frames
 
-        transformation_matrices = [
+        self.transformation_matrices = [
             self._register(previous_frame, f) for f in history_frames
-        ]
-
-        self.shifted_history_frames = [
-            Frame(
-                cv2.warpPerspective(
-                    previous_frame.get_frame(),
-                    M,
-                    (
-                        previous_frame.get_frame().shape[1],
-                        previous_frame.get_frame().shape[0],
-                    ),
-                ).astype(np.uint8),
-                previous_frame.get_frame_number(),
-            )
-            for M in transformation_matrices
         ]
 
         return StageResult(True, True)
