@@ -2,7 +2,7 @@ language: python
 python:
   - "3.8"
 install:
-  - python ./cli.py install
+  - echo noop
 script:
   - python ./cli.py lint
   - python ./cli.py test
