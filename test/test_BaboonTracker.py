@@ -1,5 +1,4 @@
 import unittest
-import baboon_tracking
 from baboon_tracking import BaboonTracker
 
 
@@ -20,8 +19,9 @@ class TestBaboonTracker(unittest.TestCase):
         self.assertIsNotNone(1)
 
     def test_successful_import(self):
-        self.assertIsNotNone(baboon_tracking)
         self.assertIsNotNone(BaboonTracker)
+        tracker = BaboonTracker()
+        self.assertIsNotNone(tracker)
 
 
 if __name__ == "__main__":
