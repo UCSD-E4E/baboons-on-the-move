@@ -81,6 +81,14 @@
                 "shell"
             ],
             "description": "Opens shell in virtual environment"
+        },
+        {
+            "module": "test",
+            "function": "test",
+            "subcommands": [
+                "test"
+            ],
+            "description": "Runs pytest unit and integration tests"
         }
     ]
 }
