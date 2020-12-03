@@ -15,13 +15,13 @@ def docs():
 
         packages = ["baboon_tracking", "pipeline", "scripts"]
 
-        for p in packages:
+        for package in packages:
             subprocess.check_call(
                 [
                     "sphinx-apidoc",
                     "-o",
-                    os.path.join("./docs/src/", p),
-                    os.path.join("./src/", p),
+                    os.path.join("./docs/src/", package),
+                    os.path.join("./src/", package),
                 ]
             )
 
