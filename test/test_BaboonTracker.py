@@ -1,7 +1,6 @@
-import baboon_tracking as bt
-from baboon_tracking import BaboonTracker
-import multiprocessing
 import unittest
+import baboon_tracking
+from baboon_tracking import BaboonTracker
 
 
 class TestBaboonTracker(unittest.TestCase):
@@ -19,6 +18,10 @@ class TestBaboonTracker(unittest.TestCase):
     def test_sample_2(self):
         self.assertIsNone(None)
         self.assertIsNotNone(1)
+
+    def test_successful_import(self):
+        self.assertIsNotNone(baboon_tracking)
+        self.assertIsNotNone(BaboonTracker)
 
 
 if __name__ == "__main__":
