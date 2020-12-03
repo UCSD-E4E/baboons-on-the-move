@@ -1,0 +1,10 @@
+{
+    "schematics": [
+        {
+            "name": "stage",
+            "module": "stage",
+            "description": "Creates a custom stage python file.",
+            "class": "Stage"
+        }
+    ]
+}
