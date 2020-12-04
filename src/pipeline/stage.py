@@ -53,6 +53,11 @@ class Stage(ABC):
         When implemented in a child class, processes the provided state and returns a new state.
         """
 
+    def on_destroy(self) -> None:
+        """
+        Called when the application is closed, just before the pipeline is destroyed.
+        """
+
     def get_time(self) -> Time:
         """
         Calculates the average time per execution of this stage.
