@@ -31,6 +31,17 @@ function Install-Package {
     }
 }
 
+function ConvertTo-LF {
+    param (
+        [Parameter(ValueFromPipeline = $True)]
+        $Path
+    )
+
+    PROCESS {
+        (Get-Content $Path -Raw).Replace("`r`n", "`n") | Set-Content $Path -Force
+    }
+}
+
 Push-Location $PSScriptRoot
 Add-Type -AssemblyName System.Windows.Forms
 
@@ -48,6 +59,7 @@ if (-not $?) {
 }
 
 "vagrant", "virtualbox", "vcxsrv" | Install-Package
+"cli", "cli-mac", "cli-linux" | ConvertTo-LF
 
 Import-Path
 

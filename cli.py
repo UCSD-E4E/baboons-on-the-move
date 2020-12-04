@@ -7,8 +7,30 @@ import argparse
 import importlib
 import json
 import os
+import subprocess
 import sys
-from typing import Dict
+
+from src.cli_plugins.cli_plugin import CliPlugin
+
+
+def _short_circuit():
+    if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
+        os.environ["CLI_ACTIVE"] = "1"
+
+        subprocess.check_call(
+            ["poetry", "run", "python", "./cli.py"] + sys.argv[1:],
+            shell=(sys.platform == "win32"),
+        )
+    elif len(sys.argv) > 1 and sys.argv[1].lower() == "shell":
+        from src.cli_plugins.shell import (  # pylint: disable=import-outside-toplevel
+            shell,
+        )
+
+        shell()
+    else:
+        return False
+
+    return True
 
 
 def main():
@@ -18,9 +40,21 @@ def main():
 
     sys.path.append(os.getcwd() + "/src")
 
+    if os.getenv("VIRTUAL_ENV") is None or (
+        os.getenv("TRAVIS") is not None and os.getenv("CLI_ACTIVE") is None
+    ):
+        from src.cli_plugins.install import (  # pylint: disable=import-outside-toplevel
+            install,
+        )
+
+        install()
+
+        if _short_circuit():
+            return
+
     parser = argparse.ArgumentParser(description="Baboon Command Line Interface")
 
-    subparsers = parser.add_subparsers(dest='func')
+    subparsers = parser.add_subparsers(dest="command")
     subparsers.required = True
 
     # We import the Cli plugin list from a json file instead of yaml,
@@ -30,28 +64,20 @@ def main():
 
     # Plugins are loaded dynamically from ./src/cli_plugins/plugins.json
     for plugin in plugins_dict["plugins"]:
-
-        # We wait until the module is needed to import the module.
-        # This allows the modules to not have to worry about if they are in a venv or not.
-        def executor(plugin: Dict):
-            # This creates a closure that allows us to use plugin.
-            def internal():
-                module = importlib.import_module(
-                    "." + plugin["module"], "src.cli_plugins"
-                )
-                func = getattr(module, plugin["function"])
-
-                func()
-
-            return internal
-
         for subcommand in plugin["subcommands"]:
-            subparser = subparsers.add_parser(subcommand, description=plugin['description'])
-            subparser.set_defaults(func=executor(plugin))
+            subparser = subparsers.add_parser(
+                subcommand, description=plugin["description"]
+            )
+
+            module = importlib.import_module("." + plugin["module"], "src.cli_plugins")
+            class_type = getattr(module, plugin["class"])
+
+            cli_plugin: CliPlugin = class_type(subparser)
+            subparser.set_defaults(command=cli_plugin.execute)
 
     res = parser.parse_args()
 
-    res.func()
+    res.command(res)
 
 
 if __name__ == "__main__":

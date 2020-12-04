@@ -58,8 +58,8 @@ __pycache__/
 # Distribution / packaging
 .Python
 build/
-!docs/build
 develop-eggs/
+!docs/build
 dist/
 downloads/
 eggs/
@@ -218,6 +218,7 @@ data/
 google_drive_token.pickle
 
 decrypted/
+output
 
 # Vagrant Customfile
 env.yml
