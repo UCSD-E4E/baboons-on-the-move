@@ -72,17 +72,9 @@ class Install(CliPlugin):
             subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
 
     def _install_node_in_repo(self):
-        if sys.platform == "win32":
+        if sys.platform == "linux" or sys.platform == "linux2":
             # Assume we are on 64 bit Intel
-            url = "https://nodejs.org/dist/v12.18.2/node-v12.18.2-win-x64.zip"
-            ext = "zip"
-        elif sys.platform == "darwin":
-            # Assume we are on 64 bit Intel
-            url = "https://nodejs.org/dist/v12.18.2/node-v12.18.2-darwin-x64.tar.gz"
-            ext = "tar.gz"
-        elif sys.platform == "linux" or sys.platform == "linux2":
-            # Assume we are on 64 bit Intel
-            url = "https://nodejs.org/dist/v12.18.2/node-v12.18.2-linux-x64.tar.xz"
+            url = "https://nodejs.org/dist/v14.15.1/node-v14.15.1-linux-x64.tar.xz"
             ext = "tar.xz"
         else:
             url = None
