@@ -30,12 +30,14 @@ class BaboonTracker:
 
         while True:
             self._pipeline.before_execute()
-            success = self._pipeline.execute()
+            result = self._pipeline.execute()
             self._pipeline.after_execute()
 
-            if not success:
+            if not result.continue_pipeline:
                 print("Average Runtime per stage:")
                 self._pipeline.get_time().print_to_console()
+
+                self._pipeline.on_destroy()
 
                 return
 

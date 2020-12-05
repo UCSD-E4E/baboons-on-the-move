@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from pipeline.models.time import Time
+from pipeline.stage_result import StageResult
 
 
 class Stage(ABC):
@@ -47,9 +48,14 @@ class Stage(ABC):
         self._executions += 1
 
     @abstractmethod
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         When implemented in a child class, processes the provided state and returns a new state.
+        """
+
+    def on_destroy(self) -> None:
+        """
+        Called when the application is closed, just before the pipeline is destroyed.
         """
 
     def get_time(self) -> Time:

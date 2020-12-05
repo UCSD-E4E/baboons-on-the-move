@@ -7,6 +7,7 @@ from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMix
 from baboon_tracking.models.frame import Frame
 from pipeline.decorators import stage
 from pipeline import Stage
+from pipeline.stage_result import StageResult
 
 
 @stage("preprocessed_frame")
@@ -21,7 +22,7 @@ class BlurGray(Stage, PreprocessedFrameMixin):
 
         self._preprocessed_frame = preprocessed_frame
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         Blurs a gray frame using a Gaussian blur.
         """
@@ -33,4 +34,4 @@ class BlurGray(Stage, PreprocessedFrameMixin):
             self._preprocessed_frame.processed_frame.get_frame_number(),
         )
 
-        return True
+        return StageResult(True, True)

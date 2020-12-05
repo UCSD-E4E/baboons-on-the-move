@@ -3,11 +3,12 @@ Displays the frame within a window for the user to see.
 Automatically sizes the window to the user's screen.
 """
 import tkinter as tk
-import cv2
 import os
+import cv2
 
 from pipeline import Stage
 from pipeline.decorators import last_stage
+from pipeline.stage_result import StageResult
 from baboon_tracking.models.frame import Frame
 
 
@@ -25,23 +26,22 @@ class ShowLastFrame(Stage):
 
         scale = 0.85
 
-        width = int(os.environ["WIDTH"])
-        height = int(os.environ["HEIGHT"])
+        width = os.getenv("WIDTH")
+        height = os.getenv("HEIGHT")
 
         if not width or not height:
-            width = int(root.winfo_screenwidth)
-            height = int(root.winfo_screenheight)
+            width = root.winfo_screenwidth()
+            height = root.winfo_screenheight()
 
-        width = int(width * scale)
-        height = int(height * scale)
+        width = int(int(width) * scale)
+        height = int(int(height) * scale)
 
         self.im_size = (width, height)
-
         self._dependent = dependent
 
         self._frame_attributes = None
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         Displays the frame within a window for the user to see.
         Automatically sizes the window to the user's screen.
@@ -67,4 +67,4 @@ class ShowLastFrame(Stage):
                 ),
             )
 
-        return True
+        return StageResult(True, True)
