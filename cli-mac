@@ -4,7 +4,7 @@ function BrewInstallCask {
     brew list --cask | grep $1 > /dev/null
     if [ $? -ne 0 ]
     then
-        brew cask install $1
+        brew install --cask $1
     fi
 }
 
@@ -16,16 +16,15 @@ BrewInstallCask vagrant
 MEMORY=`sysctl -a | grep '^hw\.m' | awk -F": " '/hw.memsize:/ { print $2 }'`
 VAGRANT_MEMORY=`expr $MEMORY / 1024 / 1024 \* 60 / 100`
 
-CPUS=`sysctl -a | grep '^machdep\.cpu\.core_count' | awk -F": " '/machdep.cpu.core_count:/ { print $2 }'`
+CPUS=`sysctl -a | grep '^machdep\.cpu\.thread_count' | awk -F": " '/machdep.cpu.thread_count:/ { print $2 }'`
 VAGRANT_CPUS=`expr $CPUS / 2`
 
 echo "vb:" > env.yml
 echo "  cpus: $VAGRANT_CPUS" >> env.yml
 echo "  memory: $VAGRANT_MEMORY" >> env.yml
 
-DIMENSIONS=`xdpyinfo | grep dimensions | sed -r 's/^[^0-9]*([0-9]+x[0-9]+).*$/\1/'`
-WIDTH=`$DIMENSIONS | awk -F"x" '{print $1}'`
-HEIGHT=`$DIMENSIONS | awk -F"x" '{print $2}'`
+WIDTH=`system_profiler SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $1 }'`
+HEIGHT=`system_profiler SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $2 }' | awk -F" " '{ print $ 1 }'`
 
 vagrant status | grep 'running' > /dev/null
 if [ $? -ne 0 ]
@@ -33,9 +32,9 @@ then
     vagrant up
 fi
 
-vagrant -Y ssh -- -t "export DISPLAY=`echo \$SSH_CLIENT | awk '{ print $1}'`:0.0; export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
+vagrant -Y ssh -- -t "export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
 
-ps | grep 'vagrant' > /dev/null
+ps -A | grep 'vagrant' > /dev/null
 if [ $? -ne 0 ]
 then
     vagrant suspend
