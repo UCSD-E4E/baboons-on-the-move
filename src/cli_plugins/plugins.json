@@ -91,6 +91,14 @@
                 "docs"
             ],
             "description": "Generates sphinx documentation"
+        },
+        {
+            "module": "test",
+            "class": "Test",
+            "subcommands": [
+                "test"
+            ],
+            "description": "Runs pytest unit and integration tests"
         }
     ]
 }
