@@ -65,4 +65,6 @@ Running `./cli lint` will run `pylint`, `pyright`, and `black` to check for lint
 Running `./cli run` will run the algorithm and display the time of each step.
 ### Shell
 Running `./cli shell` internally runs `./cli install` and then opens a shell in the virtual environment.
+### Docs
+Running `./cli docs` will generate sphinx docs and copy to the `docs` folder, where it can be hosted on github pages.
 

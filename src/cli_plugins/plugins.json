@@ -85,6 +85,14 @@
             "description": "Opens shell in virtual environment"
         },
         {
+            "module": "docs",
+            "class": "Docs",
+            "subcommands": [
+                "docs"
+            ],
+            "description": "Generates sphinx documentation"
+        },
+        {
             "module": "test",
             "class": "Test",
             "subcommands": [
