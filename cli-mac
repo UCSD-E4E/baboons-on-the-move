@@ -34,7 +34,8 @@ fi
 
 vagrant -Y ssh -- -t "export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
 
-ps -A | grep 'vagrant' > /dev/null
+# macOS ps -A includes the grep 'vagrant', we check to see if any of the lines do not include grep.
+ps -A | grep 'vagrant' | grep -v grep > /dev/null
 if [ $? -ne 0 ]
 then
     vagrant suspend
