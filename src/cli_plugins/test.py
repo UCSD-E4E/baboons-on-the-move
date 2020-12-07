@@ -17,3 +17,4 @@ class Test(CliPlugin):
 
     def execute(self, args: Namespace):
         pytest.main()
+        exit(pytest.ExitCode)
