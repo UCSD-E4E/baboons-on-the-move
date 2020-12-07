@@ -2,6 +2,7 @@
 Runs unit and integration tests
 """
 from argparse import ArgumentParser, Namespace
+import sys
 import pytest
 
 from cli_plugins.cli_plugin import CliPlugin
@@ -17,4 +18,4 @@ class Test(CliPlugin):
 
     def execute(self, args: Namespace):
         pytest.main()
-        exit(pytest.ExitCode)
+        sys.exit(pytest.ExitCode)
