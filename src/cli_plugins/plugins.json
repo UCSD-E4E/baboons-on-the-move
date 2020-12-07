@@ -86,7 +86,7 @@
         },
         {
             "module": "docs",
-            "function": "docs",
+            "class": "Docs",
             "subcommands": [
                 "docs"
             ],

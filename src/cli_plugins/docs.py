@@ -1,16 +1,25 @@
 """
 Generates sphinx documentation from source code
 """
+from argparse import ArgumentParser, Namespace
 import os
 import subprocess
-import sys
+
+from cli_plugins.cli_plugin import CliPlugin
 
 
-def docs():
+class Docs(CliPlugin):
     """
     Lints all the Python files.
     """
-    if os.getenv("CLI_ACTIVE"):
+
+    def __init__(self, parser: ArgumentParser):
+        CliPlugin.__init__(self, parser)
+
+    def execute(self, args: Namespace):
+        """
+        Lints all the Python files.
+        """
         subprocess.check_call(["make", "clean"], cwd="./docs/")
 
         packages = ["baboon_tracking", "pipeline", "scripts"]
@@ -26,11 +35,3 @@ def docs():
             )
 
         subprocess.check_call(["make", "html"], cwd="./docs/")
-
-    else:
-        os.environ["CLI_ACTIVE"] = "1"
-
-        subprocess.check_call(
-            ["poetry", "run", "python", "./cli.py", "docs"],
-            shell=(sys.platform == "win32"),
-        )
