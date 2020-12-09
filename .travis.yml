@@ -6,3 +6,6 @@ install:
 script:
   - python ./cli.py lint
   - python ./cli.py test
+  - python ./cli.py docs
+after_success:
+  - travis-sphinx deploy -b master,feature/integration-tests
