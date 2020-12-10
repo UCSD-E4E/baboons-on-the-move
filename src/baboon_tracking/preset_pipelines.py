@@ -12,7 +12,7 @@ from pipeline.factory import factory
 preset_pipelines = {}
 
 
-preset_pipelines['default'] = Serial(
+preset_pipelines["default"] = Serial(
     "BaboonTracker",
     factory(GetVideoFrame, "./data/input.mp4"),
     PreprocessFrame,
@@ -20,7 +20,7 @@ preset_pipelines['default'] = Serial(
     TestExit,
 )
 
-preset_pipelines['travis_test'] = Serial(
+preset_pipelines["travis_test"] = Serial(
     "BaboonTrackerTravisTest",
     factory(GetVideoFrame, "./data/input.mp4"),
     PreprocessFrame,
@@ -28,7 +28,7 @@ preset_pipelines['travis_test'] = Serial(
     TestExit,
 )
 
-preset_pipelines['headless'] = Serial(
+preset_pipelines["headless"] = Serial(
     "Headless",
     factory(GetVideoFrame, "./data/input.mp4"),
     PreprocessFrame,

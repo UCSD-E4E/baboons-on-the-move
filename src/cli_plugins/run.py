@@ -15,7 +15,13 @@ class Run(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-        parser.add_argument('-n', '--pipeline_name', type=str, choices=preset_pipelines.keys(), help='Preset pipeline to run')
-        
+        parser.add_argument(
+            "-n",
+            "--pipeline_name",
+            type=str,
+            choices=preset_pipelines.keys(),
+            help="Preset pipeline to run",
+        )
+
     def execute(self, args: Namespace):
         BaboonTracker().run()

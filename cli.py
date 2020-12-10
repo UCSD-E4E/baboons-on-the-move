@@ -70,10 +70,18 @@ def main():
             )
 
             try:
-                module = importlib.import_module("." + plugin["module"], "src.cli_plugins")
-            except ModuleNotFoundError as e:
-                print("While loading plugins, ran into error: " + str(e), file=sys.stderr)
-                print("Please run `./cli shell` to enter python environment", file=sys.stderr)
+                module = importlib.import_module(
+                    "." + plugin["module"], "src.cli_plugins"
+                )
+            except ModuleNotFoundError as err:
+                print(
+                    "While loading plugins, ran into error: " + str(err),
+                    file=sys.stderr,
+                )
+                print(
+                    "Please run `./cli shell` to enter python environment",
+                    file=sys.stderr,
+                )
                 sys.exit(1)
 
             class_type = getattr(module, plugin["class"])
