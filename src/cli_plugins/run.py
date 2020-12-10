@@ -20,8 +20,9 @@ class Run(CliPlugin):
             "--pipeline_name",
             type=str,
             choices=preset_pipelines.keys(),
+            default="default",
             help="Preset pipeline to run",
         )
 
     def execute(self, args: Namespace):
-        BaboonTracker().run()
+        BaboonTracker(args.pipeline_name).run()

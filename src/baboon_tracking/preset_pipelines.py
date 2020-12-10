@@ -24,14 +24,9 @@ preset_pipelines["travis_test"] = Serial(
     "BaboonTrackerTravisTest",
     factory(GetVideoFrame, "./data/input.mp4"),
     PreprocessFrame,
-    MotionDetector,
     TestExit,
 )
 
 preset_pipelines["headless"] = Serial(
-    "Headless",
-    factory(GetVideoFrame, "./data/input.mp4"),
-    PreprocessFrame,
-    MotionDetector,
-    TestExit,
+    "Headless", factory(GetVideoFrame, "./data/input.mp4"), PreprocessFrame, TestExit,
 )
