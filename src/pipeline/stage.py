@@ -6,11 +6,11 @@ from typing import Tuple
 import os
 import pathlib
 import time
+import urllib.request
 import zipfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
-import urllib.request
 
 from pipeline.models.time import Time
 from pipeline.stage_result import StageResult
