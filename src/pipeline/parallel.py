@@ -4,7 +4,7 @@ Executes child stages in parallel.
 from typing import Callable, List, Tuple
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 from pipeline.parent_stage import ParentStage
 from pipeline.stage_result import StageResult
