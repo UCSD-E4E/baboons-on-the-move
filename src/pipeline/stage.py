@@ -3,7 +3,11 @@ Provides a super class for stages of a pipeline.
 """
 from abc import ABC, abstractmethod
 from typing import Tuple
+import os
+import pathlib
 import time
+import urllib.request
+import zipfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -30,6 +34,27 @@ class Stage(ABC):
         draw.rectangle(
             ((0, 0), self._array2tuple(np.array(img.size) - np.array([1, 1]))),
             outline="black",
+        )
+
+    def _get_font(self, size: int):
+        pathlib.Path("./tools").mkdir(exist_ok=True)
+
+        url = "https://github.com/floriankarsten/space-grotesk/releases/download/2.0.0/SpaceGrotesk-2.0.0.zip"
+        font_archive = "tools/SpaceGrotesk.zip"
+        font_path = "tools/SpaceGrotesk"
+
+        if not os.path.exists(font_archive):
+            urllib.request.urlretrieve(url, font_archive)
+
+        if not os.path.exists(font_path):
+            archive = zipfile.ZipFile(font_archive, "r")
+
+            archive.extractall(font_path)
+            archive.close()
+
+        return ImageFont.truetype(
+            "tools/SpaceGrotesk/SpaceGrotesk-2.0.0/ttf/static/SpaceGrotesk-Regular.ttf",
+            size,
         )
 
     def after_execute(self):
@@ -72,7 +97,7 @@ class Stage(ABC):
 
         name = type(self).__name__
 
-        font = ImageFont.truetype("SpaceGrotesk-Regular.ttf", 24)
+        font = self._get_font(24)
 
         padding = np.array([10, 10])
         text_size = np.array(font.getsize(name))
