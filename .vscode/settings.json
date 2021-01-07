@@ -2,6 +2,5 @@
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
     "python.languageServer": "Pylance",
-    "python.linting.pylintEnabled": true,
-    "python.pythonPath": "/home/vagrant/.cache/pypoetry/virtualenvs/baboon-tracking-TwxRmgoz-py3.8/bin/python"
+    "python.linting.pylintEnabled": true
 }
