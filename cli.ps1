@@ -31,6 +31,20 @@ function Install-Package {
     }
 }
 
+function ConvertTo-LF {
+    param (
+        [Parameter(ValueFromPipeline = $True)]
+        $Path
+    )
+
+    PROCESS {
+        $Path = Resolve-Path $Path
+
+        $text = [IO.File]::ReadAllText($Path) -replace "`r`n", "`n"
+        [IO.File]::WriteAllText($Path, $text)
+    }
+}
+
 Push-Location $PSScriptRoot
 Add-Type -AssemblyName System.Windows.Forms
 
@@ -48,6 +62,7 @@ if (-not $?) {
 }
 
 "vagrant", "virtualbox", "vcxsrv" | Install-Package
+"cli", "cli-mac", "cli-linux" | ConvertTo-LF
 
 Import-Path
 

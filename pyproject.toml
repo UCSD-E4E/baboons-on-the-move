@@ -15,6 +15,10 @@ tqdm = "^4.48.2"
 pyAesCrypt = "^0.4.3"
 colorama = "^0.4.4"
 Rx = "^3.1.1"
+Sphinx = "^3.3.1"
+pandas = "^1.1.4"
+scikit-image = "^0.17.2"
+pytest = "^6.1.2"
 matplotlib = "^3.3.3"
 
 [tool.poetry.dev-dependencies]

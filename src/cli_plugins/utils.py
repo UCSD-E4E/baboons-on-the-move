@@ -18,12 +18,8 @@ def _get_node_executable(name: str):
     else:
         executable = None
 
-    if sys.platform == "win32":
-        directory = "node-v12.18.2-win-x64"
-    elif sys.platform == "darwin":
-        directory = "node-v12.18.2-darwin-x64/bin"
-    elif sys.platform == "linux" or sys.platform == "linux2":
-        directory = "node-v12.18.2-linux-x64/bin"
+    if sys.platform == "linux" or sys.platform == "linux2":
+        directory = "node-v14.15.1-linux-x64/bin"
     else:
         directory = None
 
@@ -64,5 +60,6 @@ def get_python_files():
         and os.path.realpath("./utils") not in f
         and os.path.realpath("./src/scripts") not in f
         and os.path.realpath("./test") not in f
+        and os.path.realpath("./docs") not in f
         and f != os.path.realpath("./src/main.py")
     ]
