@@ -22,16 +22,20 @@ class ShowLastFrame(Stage):
     def __init__(self, dependent: any):
         Stage.__init__(self)
 
-        root = tk.Tk()
-
         scale = 0.85
 
         width = os.getenv("WIDTH")
         height = os.getenv("HEIGHT")
 
         if not width or not height:
-            width = root.winfo_screenwidth()
-            height = root.winfo_screenheight()
+            if os.environ.get("DISPLAY", "") == "":
+                width = 0
+                height = 0
+            else:
+                root = tk.Tk()
+
+                width = root.winfo_screenwidth()
+                height = root.winfo_screenheight()
 
         width = int(int(width) * scale)
         height = int(int(height) * scale)
