@@ -17,6 +17,5 @@ class Test(CliPlugin):
         CliPlugin.__init__(self, parser)
 
     def execute(self, args: Namespace):
-        pytest.main()
-        if not pytest.ExitCode.OK:
-            sys.exit(1)
+        exit_code = pytest.main()
+        sys.exit(exit_code)
