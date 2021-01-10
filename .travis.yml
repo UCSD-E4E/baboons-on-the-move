@@ -3,6 +3,7 @@ python:
   - "3.8"
 install:
   - python ./cli.py decrypt
+  - base64 --decode $TOKEN > google_drive_token.pickle
 script:
   - python ./cli.py lint
   - python ./cli.py test
