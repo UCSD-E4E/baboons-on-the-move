@@ -1,3 +1,6 @@
+"""
+Detect blobs using the built in OpenCV blob detector.
+"""
 from typing import Dict
 import cv2
 import numpy as np
@@ -15,9 +18,16 @@ from pipeline.stage_result import StageResult
 @config(parameter_name="blob_det_params", key="blob_detect/params")
 @stage("moving_foreground")
 class DetectBlobs(Stage, BlobImageMixin, BaboonsMixin):
+    """
+    Detect blobs using the built in OpenCV blob detector.
+    """
+
     def __init__(
         self, blob_det_params: Dict[str, any], moving_foreground: MovingForegroundMixin,
     ) -> None:
+        BlobImageMixin.__init__(self)
+        BaboonsMixin.__init__(self)
+
         self._blob_det_params = cv2.SimpleBlobDetector_Params()
         for key in blob_det_params:
             setattr(self._blob_det_params, key, blob_det_params[key])

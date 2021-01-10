@@ -36,10 +36,11 @@ class Serial(ParentStage):
             if not result.continue_pipeline:
                 return StageResult(False, None)
 
+        should_continue = False
         if result is None:
-            return StageResult(True, False)
-        else:
-            return StageResult(True, result.next_stage)
+            should_continue = result.next_stage
+
+        return StageResult(True, should_continue)
 
     def flowchart(self):
         """
