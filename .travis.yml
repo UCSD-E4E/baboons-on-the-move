@@ -2,8 +2,7 @@ language: python
 python:
   - "3.8"
 install:
-  - echo noop
+  - python ./cli.py decrypt
 script:
   - python ./cli.py lint
-  - python ./cli.py decrypt
   - python ./cli.py test
