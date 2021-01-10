@@ -46,24 +46,46 @@ class Data(CliPlugin):
             "data", ci_folder["id"], drive["id"], service
         )
 
-        data_files = self._get_drive_folder_children(
-            data_folder["id"], drive["id"], service
+        self._download_files_from_drive(
+            data_folder["id"], drive["id"], "./data", service
         )
 
-        for data_file in tqdm(data_files, total=len(data_files)):
-            self._download_file_from_drive(
-                data_file["id"], "./data/" + data_file["name"], service
-            )
+    def _download_files_from_drive(
+        self, folder_id: str, drive_id: str, path: str, service
+    ):
+        data_files = self._get_drive_folder_children(folder_id, drive_id, service)
 
-    def _download_file_from_drive(self, identity: str, path: str, service):
+        for data_file in data_files:
+            if data_file["mimeType"] == "application/vnd.google-apps.folder":
+                folder_path = path + "/" + data_file["name"]
+                pathlib.Path(folder_path).mkdir(exist_ok=True)
+
+                self._download_files_from_drive(
+                    data_file["id"], drive_id, folder_path, service
+                )
+            else:
+                self._download_file_from_drive(
+                    data_file["id"],
+                    data_file["name"],
+                    path + "/" + data_file["name"],
+                    service,
+                )
+
+    def _download_file_from_drive(self, identity: str, name: str, path: str, service):
+        print('Downloading "' + name + '" to "' + path + '"')
+
         request = service.files().get_media(fileId=identity)
 
         with open(path, "wb") as f:
             downloader = MediaIoBaseDownload(f, request)
 
             done = False
-            while done is False:
-                _, done = downloader.next_chunk()
+            with tqdm() as pbar:
+                while done is False:
+                    progress, done = downloader.next_chunk()
+
+                    pbar.total = progress.total_size
+                    pbar.update(progress.resumable_progress)
 
     def _get_drive_file(self, name: str, parent_id: str, drive_id: str, service):
         page_token = None
@@ -121,7 +143,12 @@ class Data(CliPlugin):
 
             page_token = results["nextPageToken"]
 
-        return files
+        return [
+            service.files()
+            .get(fileId=file["id"], supportsTeamDrives=True, supportsAllDrives=True,)
+            .execute()
+            for file in files
+        ]
 
     def _load_google_drive_creds(self):
         creds = None
