@@ -1,38 +1,31 @@
-from typing import Tuple
+from typing import Dict
 import cv2
 import numpy as np
+from baboon_tracking.mixins.blob_image_mixin import BlobImageMixin
+from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
+from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.frame import Frame
 
 from pipeline import Stage
 from pipeline.decorators import config, stage
 from pipeline.stage_result import StageResult
 
 
-@config(parameter_name="blob_det_params", key="blob_det_params")
-@config(parameter_name="blur_kernel", key="blur_kernel")
-@config(parameter_name="erosion_kernel", key="erosion_kernel")
-@config(parameter_name="erosion_iterations", key="erosion_iterations")
-@config(parameter_name="dilation_kernel", key="dilation_kernel")
-@config(parameter_name="dilation_iterations", key="dilation_iterations")
+@config(parameter_name="blob_det_params", key="blob_detect/params")
 @stage("moving_foreground")
-class DetectBlobs(Stage):
+class DetectBlobs(Stage, BlobImageMixin, BaboonsMixin):
     def __init__(
-        self,
-        blob_det_params: float,
-        blur_kernel: Tuple[float],
-        erosion_kernel: Tuple[float],
-        erosion_iterations: Tuple[float],
-        dilation_kernel: Tuple[float],
-        dilation_iterations: Tuple[float],
-        moving_foreground: MovingForegroundMixin,
+        self, blob_det_params: Dict[str, any], moving_foreground: MovingForegroundMixin,
     ) -> None:
-        self._blob_det_params = blob_det_params
-        self._blur_kernel = blur_kernel
-        self._erosion_kernel = erosion_kernel
-        self._erosion_iterations = erosion_iterations
-        self._dilation_kernel = dilation_kernel
-        self._dilation_iterations = dilation_iterations
+        self._blob_det_params = cv2.SimpleBlobDetector_Params()
+        for key in blob_det_params:
+            setattr(self._blob_det_params, key, blob_det_params[key])
+
         self._moving_foregrouned = moving_foreground
+
+        # Create a detector with the parameters
+        self._detector = cv2.SimpleBlobDetector_create(self._blob_det_params)
 
         Stage.__init__(self)
 
@@ -41,39 +34,20 @@ class DetectBlobs(Stage):
         Detect and returns locations of blobs from foreground mask
         Returns list of coordinates
         """
+
         foreground_mask = self._moving_foregrouned.moving_foreground.get_frame()
+        keypoints = self._detector.detect(foreground_mask)
 
-        # Morphological operations
-        foreground_mask = self._remove_noise(foreground_mask)
+        self.blob_image = Frame(
+            cv2.drawKeypoints(
+                cv2.cvtColor(foreground_mask, cv2.COLOR_GRAY2BGR),
+                keypoints,
+                np.array([]),
+                (0, 255, 0),
+                cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
+            ),
+            self._moving_foregrouned.moving_foreground.get_frame_number(),
+        )
 
-        # Create a detector with the parameters
-        detector = cv2.SimpleBlobDetector_create(self._blob_det_params)
-
-        # DETECT BLOBS
-
-        # invert image (blob detection only works with white background)
-        foreground_mask = cv2.bitwise_not(foreground_mask)
-
-        # apply blur
-        foreground_mask = cv2.blur(foreground_mask, self._blur_kernel)
-
-        result = detector.detect(foreground_mask)
-
+        self.baboons = [Baboon((k.pt[0], k.pt[1]), k.size) for k in keypoints]
         return StageResult(True, True)
-
-    def _remove_noise(self, foreground_mask):
-        """
-        Uses OpenCV morphological transformations to make blobs more defined
-        Returns a foreground mask with more defined blobs
-        """
-        erosion_kernel = np.ones(self._erosion_kernel, np.uint8)
-        dilation_kernel = np.ones(self._dilation_kernel, np.uint8)
-
-        foreground_mask = cv2.erode(
-            foreground_mask, erosion_kernel, iterations=self._erosion_iterations,
-        )
-        foreground_mask = cv2.dilate(
-            foreground_mask, dilation_kernel, iterations=self._dilation_iterations,
-        )
-
-        return foreground_mask

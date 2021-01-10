@@ -24,6 +24,7 @@ class Serial(ParentStage):
         Executes all stages in this pipeline sequentially.
         """
 
+        result = None
         for stage in self.stages:
             stage.before_execute()
             result = stage.execute()
@@ -35,7 +36,10 @@ class Serial(ParentStage):
             if not result.continue_pipeline:
                 return StageResult(False, None)
 
-        return StageResult(True, True)
+        if result is None:
+            return StageResult(True, False)
+        else:
+            return StageResult(True, result.next_stage)
 
     def flowchart(self):
         """
