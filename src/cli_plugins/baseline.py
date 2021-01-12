@@ -15,7 +15,7 @@ from googleapiclient.http import MediaFileUpload
 import baseline
 
 from cli_plugins.cli_plugin import CliPlugin
-from cli_plugins.utils import (
+from cli_plugins.utils_import import (
     get_ci_data_folder,
     get_drive_file,
     get_team_drive,
