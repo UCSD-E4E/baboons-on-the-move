@@ -43,6 +43,7 @@ class TestBaboonTracker(unittest.TestCase):
             should_continue = True
             frame_counter = 1
             while should_continue:
+                print("Frame: " + str(frame_counter))
                 should_continue = baboon_tracker.step().continue_pipeline
 
                 if baboons_mixin.baboons is not None:
