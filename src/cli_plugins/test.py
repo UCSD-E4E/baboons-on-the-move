@@ -17,5 +17,5 @@ class Test(CliPlugin):
         CliPlugin.__init__(self, parser)
 
     def execute(self, args: Namespace):
-        exit_code = pytest.main()
+        exit_code = pytest.main(["-s"])
         sys.exit(exit_code)
