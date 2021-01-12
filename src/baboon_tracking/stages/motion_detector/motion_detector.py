@@ -45,7 +45,7 @@ class MotionDetector(Serial):
             ComputeMovingForeground,
             ApplyMasks,
             NoiseReduction,
-            SaveVideo,
+            # SaveVideo,
             DetectBlobs,
             ShowLastFrame,
         )
