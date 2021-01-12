@@ -30,6 +30,8 @@ class TestBaboonTracker(unittest.TestCase):
             baseline_folder = "./data/tests/baselines/" + f.readline()
 
         for file in files:
+            print('Testing "' + file + '"')
+
             baseline_file = join(baseline_folder, splitext(basename(file))[0] + ".csv")
             baboon_tracker = BaboonTracker(input_file=file)
             baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
