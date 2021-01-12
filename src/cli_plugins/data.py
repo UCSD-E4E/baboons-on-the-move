@@ -9,7 +9,7 @@ from googleapiclient.discovery import build
 from tqdm import tqdm
 
 from cli_plugins.cli_plugin import CliPlugin
-from cli_plugins.utils import (
+from cli_plugins.utils_import import (
     load_google_drive_creds,
     get_team_drive,
     get_ci_data_folder,
