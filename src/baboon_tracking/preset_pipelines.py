@@ -1,32 +1,34 @@
 """
 Provides an algorithm for extracting baboons from drone footage.
 """
+from typing import Dict
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
 from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
 from baboon_tracking.stages.test_exit import TestExit
 from pipeline import Serial
 from pipeline.factory import factory
+from pipeline.parent_stage import ParentStage
+from pipeline.stage import Stage
 
 
-preset_pipelines = {}
+preset_pipelines: Dict[str, Stage] = {}
 
 
-preset_pipelines["default"] = Serial(
-    "BaboonTracker",
-    factory(GetVideoFrame, "./data/input.mp4"),
-    PreprocessFrame,
-    MotionDetector,
-    TestExit,
-)
+def update_preset_pipelines(input_file="input.mp4"):
+    """
+    Updates the input information for the preset pipelines.
+    """
 
-preset_pipelines["travis_test"] = Serial(
-    "BaboonTrackerTravisTest",
-    factory(GetVideoFrame, "./data/input.mp4"),
-    PreprocessFrame,
-    TestExit,
-)
+    ParentStage.static_stages = []
 
-preset_pipelines["headless"] = Serial(
-    "Headless", factory(GetVideoFrame, "./data/input.mp4"), PreprocessFrame, TestExit,
-)
+    preset_pipelines["default"] = Serial(
+        "BaboonTracker",
+        factory(GetVideoFrame, "./data/" + input_file),
+        PreprocessFrame,
+        MotionDetector,
+        TestExit,
+    )
+
+
+update_preset_pipelines()
