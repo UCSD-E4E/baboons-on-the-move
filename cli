@@ -1,49 +1,11 @@
 #!/bin/bash
 
-# Check to see if pyenv is on the path.
-pyenv --version > /dev/null
-if [ $? -ne 0 ]
-then
-    # Install pyenv if not found.
-    curl https://pyenv.run | bash
+if [ "$(uname)" == "Darwin" ]; then
+    ./cli-mac $@ 
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    ./cli-linux $@
+elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
+    powershell.exe -File ./cli.ps1 -ArgumentList  $@
+elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW64_NT" ]; then
+    powershell.exe -File ./cli.ps1 -ArgumentList  $@
 fi
-
-# Check to see if pyenv has been added to the path.
-cat ~/.bashrc | grep 'export PATH="~/.pyenv/bin:$PATH"' > /dev/null
-if [ $? -ne 0 ]
-then
-    # Add pyenv to your path.
-    echo 'export PATH="~/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
-
-    # Update PATH
-    export PATH="~/.pyenv/bin:$PATH"
-    eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
-fi
-
-PYTHON_VERSION=3.8.3
-
-# Ensure Python is installed
-pyenv versions | grep $PYTHON_VERSION > /dev/null
-if [ $? -ne 0 ]
-then
-    # Install Python
-    pyenv install $PYTHON_VERSION
-fi
-pyenv local $PYTHON_VERSION
-
-# Ensure pipx
-pip list | grep pipx > /dev/null
-if [ $? -ne 0 ]
-then
-    # Install pipx
-    pip install pipx
-    pipx ensurepath
-
-    echo Please restart Bash.
-    exit
-fi
-
-python ./cli.py $@

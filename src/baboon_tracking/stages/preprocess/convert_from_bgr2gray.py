@@ -8,6 +8,7 @@ from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMix
 
 from pipeline import Stage
 from pipeline.decorators import stage
+from pipeline.stage_result import StageResult
 
 
 @stage("frame_mixin")
@@ -22,7 +23,7 @@ class ConvertFromBGR2Gray(Stage, PreprocessedFrameMixin):
 
         self._frame_mixin = frame_mixin
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         Converts a color image to a gray-scale image.
         """
@@ -31,4 +32,4 @@ class ConvertFromBGR2Gray(Stage, PreprocessedFrameMixin):
             cv2.cvtColor(self._frame_mixin.frame.get_frame(), cv2.COLOR_BGR2GRAY),
             self._frame_mixin.frame.get_frame_number(),
         )
-        return True
+        return StageResult(True, True)

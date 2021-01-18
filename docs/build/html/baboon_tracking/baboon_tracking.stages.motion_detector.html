@@ -1,0 +1,218 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>baboon_tracking.stages.motion_detector package &#8212; baboon-tracking 0.0.1 documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="baboon_tracking.stages.preprocess package" href="baboon_tracking.stages.preprocess.html" />
+    <link rel="prev" title="baboon_tracking.stages package" href="baboon_tracking.stages.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="baboon-tracking-stages-motion-detector-package">
+<h1>baboon_tracking.stages.motion_detector package<a class="headerlink" href="#baboon-tracking-stages-motion-detector-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-baboon_tracking.stages.motion_detector.motion_detector">
+<span id="baboon-tracking-stages-motion-detector-motion-detector-module"></span><h2>baboon_tracking.stages.motion_detector.motion_detector module<a class="headerlink" href="#module-baboon_tracking.stages.motion_detector.motion_detector" title="Permalink to this headline">¶</a></h2>
+<p>Implements a motion tracker pipeline.</p>
+<dl class="py class">
+<dt id="baboon_tracking.stages.motion_detector.motion_detector.MotionDetector">
+<em class="property">class </em><code class="sig-prename descclassname">baboon_tracking.stages.motion_detector.motion_detector.</code><code class="sig-name descname">MotionDetector</code><a class="headerlink" href="#baboon_tracking.stages.motion_detector.motion_detector.MotionDetector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../pipeline/pipeline.html#pipeline.serial.Serial" title="pipeline.serial.Serial"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.serial.Serial</span></code></a></p>
+<p>Implements a motion tracker pipeline.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-baboon_tracking.stages.motion_detector.quantize_history_frames">
+<span id="baboon-tracking-stages-motion-detector-quantize-history-frames-module"></span><h2>baboon_tracking.stages.motion_detector.quantize_history_frames module<a class="headerlink" href="#module-baboon_tracking.stages.motion_detector.quantize_history_frames" title="Permalink to this headline">¶</a></h2>
+<p>Quantizes the shifted history frame.</p>
+<dl class="py class">
+<dt id="baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames">
+<em class="property">class </em><code class="sig-prename descclassname">baboon_tracking.stages.motion_detector.quantize_history_frames.</code><code class="sig-name descname">QuantizeHistoryFrames</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">scale_factor</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">shifted_history_frames</span><span class="p">:</span> <span class="n"><a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.shifted_history_frames_mixin.ShiftedHistoryFramesMixin" title="baboon_tracking.mixins.shifted_history_frames_mixin.ShiftedHistoryFramesMixin">baboon_tracking.mixins.shifted_history_frames_mixin.ShiftedHistoryFramesMixin</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage.Stage" title="pipeline.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.stage.Stage</span></code></a>, <a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.quantized_frames_mixin.QuantizedFramesMixin" title="baboon_tracking.mixins.quantized_frames_mixin.QuantizedFramesMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">baboon_tracking.mixins.quantized_frames_mixin.QuantizedFramesMixin</span></code></a></p>
+<p>Quantizes the shifted history frame.</p>
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames.config">
+<code class="sig-name descname">config</code><em class="property"> = {'scale_factor': 'quantize_frames/scale_factor'}</em><a class="headerlink" href="#baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage_result.StageResult" title="pipeline.stage_result.StageResult">pipeline.stage_result.StageResult</a><a class="headerlink" href="#baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quantizes the shifted history frame.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames.stages">
+<code class="sig-name descname">stages</code><em class="property"> = ['shifted_history_frames']</em><a class="headerlink" href="#baboon_tracking.stages.motion_detector.quantize_history_frames.QuantizeHistoryFrames.stages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-baboon_tracking.stages.motion_detector.shift_history_frames">
+<span id="baboon-tracking-stages-motion-detector-shift-history-frames-module"></span><h2>baboon_tracking.stages.motion_detector.shift_history_frames module<a class="headerlink" href="#module-baboon_tracking.stages.motion_detector.shift_history_frames" title="Permalink to this headline">¶</a></h2>
+<p>Implements a stage which shifts history frames.</p>
+<dl class="py class">
+<dt id="baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames">
+<em class="property">class </em><code class="sig-prename descclassname">baboon_tracking.stages.motion_detector.shift_history_frames.</code><code class="sig-name descname">ShiftHistoryFrames</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">max_features</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">good_match_percent</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">preprocessed_frame</span><span class="p">:</span> <span class="n"><a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin" title="baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin">baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin</a></span></em>, <em class="sig-param"><span class="n">history_frames</span><span class="p">:</span> <span class="n"><a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.history_frames_mixin.HistoryFramesMixin" title="baboon_tracking.mixins.history_frames_mixin.HistoryFramesMixin">baboon_tracking.mixins.history_frames_mixin.HistoryFramesMixin</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage.Stage" title="pipeline.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.stage.Stage</span></code></a>, <a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.shifted_history_frames_mixin.ShiftedHistoryFramesMixin" title="baboon_tracking.mixins.shifted_history_frames_mixin.ShiftedHistoryFramesMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">baboon_tracking.mixins.shifted_history_frames_mixin.ShiftedHistoryFramesMixin</span></code></a></p>
+<p>Implements a stage which shifts history frames.</p>
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames.config">
+<code class="sig-name descname">config</code><em class="property"> = {'good_match_percent': 'registration/good_match_percent', 'max_features': 'registration/max_features'}</em><a class="headerlink" href="#baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage_result.StageResult" title="pipeline.stage_result.StageResult">pipeline.stage_result.StageResult</a><a class="headerlink" href="#baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Registers the history frame.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames.stages">
+<code class="sig-name descname">stages</code><em class="property"> = ['history_frames', 'preprocessed_frame']</em><a class="headerlink" href="#baboon_tracking.stages.motion_detector.shift_history_frames.ShiftHistoryFrames.stages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-baboon_tracking.stages.motion_detector.store_history_frame">
+<span id="baboon-tracking-stages-motion-detector-store-history-frame-module"></span><h2>baboon_tracking.stages.motion_detector.store_history_frame module<a class="headerlink" href="#module-baboon_tracking.stages.motion_detector.store_history_frame" title="Permalink to this headline">¶</a></h2>
+<p>Implements a storage of historical frame step for motion detection.</p>
+<dl class="py class">
+<dt id="baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame">
+<em class="property">class </em><code class="sig-prename descclassname">baboon_tracking.stages.motion_detector.store_history_frame.</code><code class="sig-name descname">StoreHistoryFrame</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">history_frame_count</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">preprocessed_frame</span><span class="p">:</span> <span class="n"><a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin" title="baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin">baboon_tracking.mixins.preprocessed_frame_mixin.PreprocessedFrameMixin</a></span></em><span class="sig-paren">)</span><a class="headerlink" href="#baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage.Stage" title="pipeline.stage.Stage"><code class="xref py py-class docutils literal notranslate"><span class="pre">pipeline.stage.Stage</span></code></a>, <a class="reference internal" href="baboon_tracking.mixins.html#baboon_tracking.mixins.history_frames_mixin.HistoryFramesMixin" title="baboon_tracking.mixins.history_frames_mixin.HistoryFramesMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">baboon_tracking.mixins.history_frames_mixin.HistoryFramesMixin</span></code></a></p>
+<p>Implements a storage of historical frame step for motion detection.</p>
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame.config">
+<code class="sig-name descname">config</code><em class="property"> = {'history_frame_count': 'history_frames'}</em><a class="headerlink" href="#baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame.config" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame.execute">
+<code class="sig-name descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="../pipeline/pipeline.html#pipeline.stage_result.StageResult" title="pipeline.stage_result.StageResult">pipeline.stage_result.StageResult</a><a class="headerlink" href="#baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements a storage of historical frame step for motion detection.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame.stages">
+<code class="sig-name descname">stages</code><em class="property"> = ['preprocessed_frame']</em><a class="headerlink" href="#baboon_tracking.stages.motion_detector.store_history_frame.StoreHistoryFrame.stages" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-baboon_tracking.stages.motion_detector">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-baboon_tracking.stages.motion_detector" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">baboon-tracking</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">baboon_tracking</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="baboon_tracking.html">baboon_tracking package</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline/modules.html">pipeline</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../scripts/modules.html">scripts</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+  <li><a href="modules.html">baboon_tracking</a><ul>
+  <li><a href="baboon_tracking.html">baboon_tracking package</a><ul>
+  <li><a href="baboon_tracking.stages.html">baboon_tracking.stages package</a><ul>
+      <li>Previous: <a href="baboon_tracking.stages.html" title="previous chapter">baboon_tracking.stages package</a></li>
+      <li>Next: <a href="baboon_tracking.stages.preprocess.html" title="next chapter">baboon_tracking.stages.preprocess package</a></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2020, ucsd-e4e.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/baboon_tracking/baboon_tracking.stages.motion_detector.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

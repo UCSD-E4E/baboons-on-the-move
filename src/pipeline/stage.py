@@ -3,12 +3,17 @@ Provides a super class for stages of a pipeline.
 """
 from abc import ABC, abstractmethod
 from typing import Tuple
+import os
+import pathlib
 import time
+import urllib.request
+import zipfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
 from pipeline.models.time import Time
+from pipeline.stage_result import StageResult
 
 
 class Stage(ABC):
@@ -31,6 +36,27 @@ class Stage(ABC):
             outline="black",
         )
 
+    def _get_font(self, size: int):
+        pathlib.Path("./tools").mkdir(exist_ok=True)
+
+        url = "https://github.com/floriankarsten/space-grotesk/releases/download/2.0.0/SpaceGrotesk-2.0.0.zip"
+        font_archive = "tools/SpaceGrotesk.zip"
+        font_path = "tools/SpaceGrotesk"
+
+        if not os.path.exists(font_archive):
+            urllib.request.urlretrieve(url, font_archive)
+
+        if not os.path.exists(font_path):
+            archive = zipfile.ZipFile(font_archive, "r")
+
+            archive.extractall(font_path)
+            archive.close()
+
+        return ImageFont.truetype(
+            "tools/SpaceGrotesk/SpaceGrotesk-2.0.0/ttf/static/SpaceGrotesk-Regular.ttf",
+            size,
+        )
+
     def after_execute(self):
         """
         Executed after the execute method.
@@ -47,9 +73,14 @@ class Stage(ABC):
         self._executions += 1
 
     @abstractmethod
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """
         When implemented in a child class, processes the provided state and returns a new state.
+        """
+
+    def on_destroy(self) -> None:
+        """
+        Called when the application is closed, just before the pipeline is destroyed.
         """
 
     def get_time(self) -> Time:
@@ -66,7 +97,7 @@ class Stage(ABC):
 
         name = type(self).__name__
 
-        font = ImageFont.truetype("SpaceGrotesk-Regular.ttf", 24)
+        font = self._get_font(24)
 
         padding = np.array([10, 10])
         text_size = np.array(font.getsize(name))

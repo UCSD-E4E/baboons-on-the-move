@@ -8,6 +8,7 @@ from baboon_tracking.models.frame import Frame
 from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
 from pipeline.decorators import config, stage
 from pipeline.stage import Stage
+from pipeline.stage_result import StageResult
 
 
 @config(parameter_name="scale_factor", key="quantize_frames/scale_factor")
@@ -35,14 +36,11 @@ class QuantizeHistoryFrames(Stage, QuantizedFramesMixin):
             .astype(np.int32)
         )
 
-    def execute(self) -> bool:
+    def execute(self) -> StageResult:
         """Quantizes the shifted history frame."""
-        if not self._shifted_history_frames.shifted_history_frames:
-            return True
-
         self.quantized_frames = [
             self._quantize_frame(f)
             for f in self._shifted_history_frames.shifted_history_frames
         ]
 
-        return True
+        return StageResult(True, True)

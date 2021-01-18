@@ -2,7 +2,7 @@
 extension-pkg-whitelist=cv2
 
 [MESSAGES CONTROL]
-disable=bad-continuation,too-few-public-methods,no-self-use,too-many-locals
+disable=bad-continuation,too-few-public-methods,no-self-use,too-many-locals,duplicate-code,line-too-long, too-many-arguments
 
 [OPTIONS]
 good-names=f,id,i

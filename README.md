@@ -15,17 +15,25 @@ This repository contains the state-of-the-art aerial drone background tracking a
     - [Decrypt](#decrypt)
     - [Encrypt](#encrypt)
     - [Format](#format)
-    - [Install](#install)
     - [Lint](#lint)
     - [Run](#run)
     - [Shell](#shell)
 
 # Contributing
 ## System Requirements
-This baboon tracking project should be able to run anywhere where Python 3.x is supported.
+This project only officially runs on Ubuntu 20.04.  Other operating systems are compatibile through the use of Vagrant.
 
-### Ubuntu
-To run the project on Ubuntu please ensure you run the following command.
+### Windows
+To run the project on Windows, please ensure you run the following command in an admin PowerShell
+```
+Set-ExecutionPolicy Unrestricted
+```
+
+### macOS
+Please ensure you have HomeBrew installed.
+
+### Ubuntu 20.04
+To run the project on Ubuntu, please ensure you run the following command.
 ```
 sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 ```
@@ -51,12 +59,12 @@ Running `./cli decrypt` will ask for a password for decrypting all files in the 
 Running `./cli encrypt` will ask for a password for encrypting all files in the `decrypted` folder.  It will use the `ENCRYPTION_KEY` environment variable as the password if supplied.
 ### Format
 Running `./cli format` will use `black` to automatically format all of the Python scripts.
-### Install
-Running `./cli install` will setup up the enviornment.
 ### Lint
 Running `./cli lint` will run `pylint`, `pyright`, and `black` to check for lint errors.
 ### Run
 Running `./cli run` will run the algorithm and display the time of each step.
 ### Shell
 Running `./cli shell` internally runs `./cli install` and then opens a shell in the virtual environment.
+### Docs
+Running `./cli docs` will generate sphinx docs and copy to the `docs` folder, where it can be hosted on github pages.
 

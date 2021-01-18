@@ -1,18 +1,104 @@
-function Set-ConsoleColor {
-    param (
-        [Parameter(Position=0)]
-        [string]$Color
+function Test-Administrator {  
+    $user = [Security.Principal.WindowsIdentity]::GetCurrent();
+    (New-Object Security.Principal.WindowsPrincipal $user).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)  
+}
+
+function Restart-ScriptAdministrator {
+    Start-Process powershell.exe -Verb runAs -ArgumentList "-File `"$PSCommandPath`"" -Wait -WorkingDirectory $PWD.Path
+}
+
+function Import-Path {
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User") + ";$env:APPDATA\Python\Python38\Scripts;$env:USERPROFILE\.local\bin"
+}
+
+function Install-Package {
+    param(
+        [Parameter(ValueFromPipeline = $True)]
+        $PackageName
     )
 
-    if (($IsWindows -or $null -eq $IsWindows) -and $env:TERM_PROGRAM -ne 'vscode' -and $null -eq $env:WT_PROFILE_ID) {
-        cmd /c color $Color
+    PROCESS {
+        if ($null -eq (choco list --local-only | Where-Object { $_.Contains($PackageName) })) {
+            if (Test-Administrator) {
+                # Install the package
+                choco install $PackageName -y
+            }
+            else {
+                Restart-ScriptAdministrator
+                Import-Path
+            }
+        }
     }
 }
 
-Set-ConsoleColor 09
+function ConvertTo-LF {
+    param (
+        [Parameter(ValueFromPipeline = $True)]
+        $Path
+    )
 
-python ./cli.py $args[0]
+    PROCESS {
+        $Path = Resolve-Path $Path
 
-if ($args[0] -eq "shell") {
-    Set-ConsoleColor 5f
+        $text = [IO.File]::ReadAllText($Path) -replace "`r`n", "`n"
+        [IO.File]::WriteAllText($Path, $text)
+    }
+}
+
+Push-Location $PSScriptRoot
+Add-Type -AssemblyName System.Windows.Forms
+
+where.exe choco 1> $null 2>&1
+if (-not $?) {
+    if (Test-Administrator) {
+        # Install Chocolatey
+        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; Invoke-Expression ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+    }
+    else {
+        # Restart PowerShell as Admin
+        Restart-ScriptAdministrator
+        Import-Path
+    }
+}
+
+"vagrant", "virtualbox", "vcxsrv" | Install-Package
+"cli", "cli-mac", "cli-linux" | ConvertTo-LF
+
+Import-Path
+
+# Start XServer
+if ($null -eq (Get-Process | Where-Object { 'vcxsrv' -eq $_.Name } )) {
+    & "C:\Program Files\VcXsrv\vcxsrv.exe" :0 -multiwindow -clipboard -wgl
+}
+
+$memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object -Property capacity -Sum).Sum / 1mb
+$vagrantMemory = [System.Math]::Ceiling($memory * 0.6)
+
+$cpus = (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors
+$vagrantCpus = $cpus / 2
+
+$vagrantCustomFile = @"
+vb:
+  cpus: CPUS
+  memory: RAM
+"@
+$vagrantCustomFile = $vagrantCustomFile.Replace('CPUS', "$vagrantCpus")
+$vagrantCustomFile = $vagrantCustomFile.Replace('RAM', "$vagrantMemory")
+
+Set-Content -Path ./env.yml -Value $vagrantCustomFile
+
+$virtualBoxIpAddress = ((Get-NetIPAddress -InterfaceIndex (Get-NetAdapter | Where-Object { $_.InterfaceDescription.Contains("VirtualBox") }).ifIndex) | Where-Object { $_.AddressFamily -eq "IPv4" }).IPAddress
+
+$screens = [System.Windows.Forms.Screen]::AllScreens
+$pixels = $screens | ForEach-Object { $_.WorkingArea.Width * $_.WorkingArea.Height } | Sort-Object -Descending | Select-Object -First 1
+$smallestScreen = $screens | Where-Object { $pixels -eq ($_.WorkingArea.Width * $_.WorkingArea.Height) } | Select-Object -First 1
+
+if ($null -eq (vagrant status | Where-Object { $_.Contains("running") })) {
+    vagrant up
+}
+
+vagrant -Y ssh -- -t "export DISPLAY=$($virtualBoxIpAddress):0.0; export WIDTH=$($smallestScreen.WorkingArea.Width); export HEIGHT=$($smallestScreen.WorkingArea.Height); cd /baboon-tracking; ./cli $($args[0])"
+
+if ($null -eq (Get-Process | Where-Object { 'vagrant' -eq $_.Name } )) {
+    vagrant suspend
 }
