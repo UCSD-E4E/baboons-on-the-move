@@ -51,24 +51,26 @@ class ShowLastFrame(Stage):
         Automatically sizes the window to the user's screen.
         """
 
-        # This searches the previous object for frame types.
-        if not self._frame_attributes:
-            self._frame_attributes = [
-                a
-                for a in dir(self._dependent)
-                if isinstance(getattr(self._dependent, a), Frame)
-            ]
+        if os.environ.get("DISPLAY", "") != "":
+            # This searches the previous object for frame types.
+            if not self._frame_attributes:
+                self._frame_attributes = [
+                    a
+                    for a in dir(self._dependent)
+                    if isinstance(getattr(self._dependent, a), Frame)
+                ]
 
-        # Display one cv2.imshow for each frame object.
-        for frame_attribute in self._frame_attributes:
-            cv2.imshow(
-                "{stage_name}.{frame_attribute}".format(
-                    stage_name=type(self._dependent).__name__,
-                    frame_attribute=frame_attribute,
-                ),
-                cv2.resize(
-                    getattr(self._dependent, frame_attribute).get_frame(), self.im_size
-                ),
-            )
+            # Display one cv2.imshow for each frame object.
+            for frame_attribute in self._frame_attributes:
+                cv2.imshow(
+                    "{stage_name}.{frame_attribute}".format(
+                        stage_name=type(self._dependent).__name__,
+                        frame_attribute=frame_attribute,
+                    ),
+                    cv2.resize(
+                        getattr(self._dependent, frame_attribute).get_frame(),
+                        self.im_size,
+                    ),
+                )
 
         return StageResult(True, True)
