@@ -2,7 +2,9 @@ language: python
 python:
   - "3.8"
 install:
-  - echo noop
+  - python ./cli.py decrypt
+  - echo $TOKEN | base64 --decode > google_drive_token.pickle
+  - python ./cli.py data
 script:
   - python ./cli.py lint
   - python ./cli.py test

@@ -1,6 +1,14 @@
 {
     "plugins": [
         {
+            "module": "baseline",
+            "class": "Baseline",
+            "subcommands": [
+                "baseline"
+            ],
+            "description": "Updates the baseline used by the test cases"
+        },
+        {
             "module": "chart",
             "class": "Chart",
             "subcommands": [
