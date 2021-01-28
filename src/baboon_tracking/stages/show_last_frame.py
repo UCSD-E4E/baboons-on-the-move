@@ -6,20 +6,22 @@ import tkinter as tk
 import os
 import cv2
 
+from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from pipeline import Stage
-from pipeline.decorators import last_stage
+from pipeline.decorators import last_stage, stage
 from pipeline.stage_result import StageResult
 from baboon_tracking.models.frame import Frame
 
 
 @last_stage("dependent")
+@stage("capture")
 class ShowLastFrame(Stage):
     """
     Displays the frame within a window for the user to see.
     Automatically sizes the window to the user's screen.
     """
 
-    def __init__(self, dependent: any):
+    def __init__(self, dependent: any, capture: CaptureMixin):
         Stage.__init__(self)
 
         scale = 0.85
@@ -37,8 +39,19 @@ class ShowLastFrame(Stage):
                 width = root.winfo_screenwidth()
                 height = root.winfo_screenheight()
 
-        width = int(int(width) * scale)
-        height = int(int(height) * scale)
+        width = int(width)
+        height = int(height)
+
+        width_scale = width / capture.frame_width
+        height_scale = height / capture.frame_height
+
+        if width_scale < height_scale:
+            height = capture.frame_height * width_scale
+        else:
+            width = capture.frame_width * height_scale
+
+        width = int(width * scale)
+        height = int(height * scale)
 
         self.im_size = (width, height)
         self._dependent = dependent
