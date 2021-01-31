@@ -24,36 +24,8 @@ class ShowLastFrame(Stage):
     def __init__(self, dependent: any, capture: CaptureMixin):
         Stage.__init__(self)
 
-        scale = 0.85
-
-        width = os.getenv("WIDTH")
-        height = os.getenv("HEIGHT")
-
-        if not width or not height:
-            if os.environ.get("DISPLAY", "") == "":
-                width = 0
-                height = 0
-            else:
-                root = tk.Tk()
-
-                width = root.winfo_screenwidth()
-                height = root.winfo_screenheight()
-
-        width = int(width)
-        height = int(height)
-
-        width_scale = width / capture.frame_width
-        height_scale = height / capture.frame_height
-
-        if width_scale < height_scale:
-            height = capture.frame_height * width_scale
-        else:
-            width = capture.frame_width * height_scale
-
-        width = int(width * scale)
-        height = int(height * scale)
-
-        self.im_size = (width, height)
+        self.im_size = None
+        self._capture = capture
         self._dependent = dependent
 
         self._frame_attributes = None
@@ -63,6 +35,39 @@ class ShowLastFrame(Stage):
         Displays the frame within a window for the user to see.
         Automatically sizes the window to the user's screen.
         """
+
+        if self.im_size is None:
+            scale = 0.85
+
+            width = os.getenv("WIDTH")
+            height = os.getenv("HEIGHT")
+
+            if not width or not height:
+                if os.environ.get("DISPLAY", "") == "":
+                    width = 0
+                    height = 0
+                else:
+                    root = tk.Tk()
+
+                    width = root.winfo_screenwidth()
+                    height = root.winfo_screenheight()
+
+            width = int(width)
+            height = int(height)
+
+            width_scale = width / self._capture.frame_width
+            height_scale = height / self._capture.frame_height
+
+            if width_scale < height_scale:
+                height = self._capture.frame_height * width_scale
+            else:
+                width = self._capture.frame_width * height_scale
+
+            width = int(width * scale)
+            height = int(height * scale)
+
+            self.im_size = (width, height)
+
 
         if os.environ.get("DISPLAY", "") != "":
             # This searches the previous object for frame types.
