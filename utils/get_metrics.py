@@ -97,12 +97,14 @@ def test_metrics():
                     (b.centroid[0], b.centroid[1], b.diameter)
                     for b in baboons_mixin.baboons
             ]
-        if baboon_labels[frame_counter] is not None:
+        if frame_counter in baboon_labels:
             labeled_baboons = baboon_labels[frame_counter]
         
-        found_mask = create_mask(new_found_baboons)
-        label_mask = create_mask(labeled_baboons)
-        metrics.append(categorize_observations(found_mask, label_mask))
+            found_mask = create_mask(new_found_baboons)
+            label_mask = create_mask(labeled_baboons)
+            metrics.append(categorize_observations(found_mask, label_mask))
+        else:
+            should_continue = False
 
         frame_counter += 1
 
