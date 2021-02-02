@@ -19,11 +19,10 @@ class SaveVideo(ShowLastFrame):
     """
 
     def __init__(self, dependent: any, capture: CaptureMixin) -> None:
-        ShowLastFrame.__init__(self, dependent)
+        ShowLastFrame.__init__(self, dependent, capture)
 
         pathlib.Path("./output").mkdir(exist_ok=True)
 
-        self._capture = capture
         self._frame_video_writers = None
 
     def execute(self) -> StageResult:
