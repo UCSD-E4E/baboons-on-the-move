@@ -68,7 +68,6 @@ class ShowLastFrame(Stage):
 
             self.im_size = (width, height)
 
-
         if os.environ.get("DISPLAY", "") != "":
             # This searches the previous object for frame types.
             if not self._frame_attributes:
