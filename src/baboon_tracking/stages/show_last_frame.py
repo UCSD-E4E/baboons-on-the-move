@@ -7,10 +7,10 @@ import os
 import cv2
 
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
+from baboon_tracking.models.frame import Frame
 from pipeline import Stage
 from pipeline.decorators import last_stage, stage
 from pipeline.stage_result import StageResult
-from baboon_tracking.models.frame import Frame
 
 
 @last_stage("dependent")
