@@ -30,11 +30,9 @@ class QuantizeHistoryFrames(Stage, QuantizedFramesMixin):
         Normalize pixel values from 0-255 to values from 0-self._scale_factor
         Returns quantized frame
         """
-        return (
-            np.floor(frame.get_frame().astype(np.float32) * self._scale_factor / 255.0)
-            .astype(np.uint8)
-            .astype(np.int32)
-        )
+        return np.floor(
+            frame.get_frame().astype(np.float32) * self._scale_factor / 255.0
+        ).astype(np.int32)
 
     def execute(self) -> StageResult:
         """Quantizes the shifted history frame."""

@@ -33,7 +33,7 @@ class UnionIntersections(Stage, UnionedFramesMixin):
         Union all frame intersections to produce acting background for all frames
         Returns the single union frame produced by unioning all frames in input
         """
-        union = np.zeros(frames[0].shape).astype(np.uint8)
+        union = np.zeros(frames[0].shape, dtype=np.uint8)
 
         f_copy = frames.copy()
         f_copy.reverse()
