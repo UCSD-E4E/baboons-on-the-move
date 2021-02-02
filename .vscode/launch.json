@@ -8,7 +8,7 @@
             "name": "Python: cli",
             "type": "python",
             "request": "launch",
-            "program": "cli.py",
+            "program": "utils/get_metrics.py",
             "console": "integratedTerminal",
             "args": [
                 "baseline"
