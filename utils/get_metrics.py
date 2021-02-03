@@ -140,27 +140,32 @@ def test_metrics():
                 (x, y, diameter) for x, y, diameter in baboon_labels[frame_counter]
             ]
 
+            matched_baboons = []
             for new_found_baboon in new_found_baboons:
 
-                baboon_in_labels = any(
-                    [
-                        check_if_same_region(lb, new_found_baboon)
-                        for lb in labeled_baboons
-                    ]
-                )
+                baboon_in_labels = [
+                    lb
+                    for lb in labeled_baboons
+                    if check_if_same_region(lb, new_found_baboon)
+                ]
 
+                matched_baboons += baboon_in_labels
                 if baboon_in_labels:
                     true_positive += 1
                 else:
                     false_positive += 1
 
-                # exit()
+            false_negative = len(
+                [lb for lb in labeled_baboons if lb not in matched_baboons]
+            )
+
+            metrics.append((true_positive, false_negative, false_positive))
+
+            # exit()
 
             # found_mask = create_mask(new_found_baboons)
             # label_mask = create_mask(labeled_baboons)
             # metrics.append(categorize_observations(found_mask, label_mask))
-
-            print(true_positive)
         else:
             should_continue = False
 
