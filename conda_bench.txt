@@ -1,0 +1,126 @@
+Installing dependencies from lock file
+
+No dependencies to install or update
+
+Installing the current project: baboon-tracking (0.1.0)
+Installing dependencies from lock file
+
+No dependencies to install or update
+
+Installing the current project: baboon-tracking (0.1.0)
+test1.mp4
+Average Runtime per stage:
+  Serial: 1015.93 ms
+    GetVideoFrame: 13.69 ms
+    PreprocessFrame: 7.95 ms
+      ConvertFromBGR2Gray: 1.73 ms
+      BlurGray: 1.71 ms
+      ShowLastFrame: 4.5 ms
+    MotionDetector: 987.67 ms
+      StoreHistoryFrame: 0.02 ms
+      ComputeTransformationMatrices: 171.15 ms
+      TransformedFrames: 156.83 ms
+        ShiftHistoryFrames: 76.68 ms
+        ComputeShiftedMasks: 80.15 ms
+      QuantizeHistoryFrames: 98.68 ms
+      GenerateWeights: 103.19 ms
+      GenerateMaskSubcomponents: 361.21 ms
+        GenerateHistoryOfDissimilarity: 168.93 ms
+        Foreground: 192.28 ms
+          GroupFrames: 0.46 ms
+          IntersectFrames: 98.83 ms
+          UnionIntersections: 78.41 ms
+          SubtractBackground: 14.57 ms
+      ComputeMovingForeground: 32.66 ms
+      ApplyMasks: 7.79 ms
+      NoiseReduction: 119.85 ms
+      DetectBlobs: 41.55 ms
+      ShowLastFrame: 2.55 ms
+    TestExit: 26.4 ms
+test2.mp4
+Average Runtime per stage:
+  Serial: 988.55 ms
+    GetVideoFrame: 12.99 ms
+    PreprocessFrame: 5.02 ms
+      ConvertFromBGR2Gray: 1.59 ms
+      BlurGray: 1.66 ms
+      ShowLastFrame: 1.77 ms
+    MotionDetector: 963.59 ms
+      StoreHistoryFrame: 0.02 ms
+      ComputeTransformationMatrices: 168.36 ms
+      TransformedFrames: 152.72 ms
+        ShiftHistoryFrames: 74.42 ms
+        ComputeShiftedMasks: 78.29 ms
+      QuantizeHistoryFrames: 97.16 ms
+      GenerateWeights: 97.93 ms
+      GenerateMaskSubcomponents: 350.4 ms
+        GenerateHistoryOfDissimilarity: 162.15 ms
+        Foreground: 188.25 ms
+          GroupFrames: 0.32 ms
+          IntersectFrames: 97.19 ms
+          UnionIntersections: 76.9 ms
+          SubtractBackground: 13.82 ms
+      ComputeMovingForeground: 32.12 ms
+      ApplyMasks: 7.55 ms
+      NoiseReduction: 118.55 ms
+      DetectBlobs: 41.23 ms
+      ShowLastFrame: 2.54 ms
+    TestExit: 26.26 ms
+test3.mp4
+Average Runtime per stage:
+  Serial: 1036.13 ms
+    GetVideoFrame: 8.72 ms
+    PreprocessFrame: 4.69 ms
+      ConvertFromBGR2Gray: 1.59 ms
+      BlurGray: 1.6 ms
+      ShowLastFrame: 1.5 ms
+    MotionDetector: 1009.76 ms
+      StoreHistoryFrame: 0.02 ms
+      ComputeTransformationMatrices: 170.34 ms
+      TransformedFrames: 152.85 ms
+        ShiftHistoryFrames: 74.68 ms
+        ComputeShiftedMasks: 78.16 ms
+      QuantizeHistoryFrames: 96.69 ms
+      GenerateWeights: 98.74 ms
+      GenerateMaskSubcomponents: 357.84 ms
+        GenerateHistoryOfDissimilarity: 165.47 ms
+        Foreground: 192.37 ms
+          GroupFrames: 0.43 ms
+          IntersectFrames: 97.95 ms
+          UnionIntersections: 78.81 ms
+          SubtractBackground: 15.17 ms
+      ComputeMovingForeground: 32.27 ms
+      ApplyMasks: 7.63 ms
+      NoiseReduction: 120.05 ms
+      DetectBlobs: 41.72 ms
+      ShowLastFrame: 2.38 ms
+    TestExit: 26.42 ms
+test4.mp4
+Average Runtime per stage:
+  Serial: 1139.55 ms
+    GetVideoFrame: 9.62 ms
+    PreprocessFrame: 4.71 ms
+      ConvertFromBGR2Gray: 1.65 ms
+      BlurGray: 1.62 ms
+      ShowLastFrame: 1.44 ms
+    MotionDetector: 1109.98 ms
+      StoreHistoryFrame: 0.03 ms
+      ComputeTransformationMatrices: 117.79 ms
+      TransformedFrames: 153.03 ms
+        ShiftHistoryFrames: 74.88 ms
+        ComputeShiftedMasks: 78.14 ms
+      QuantizeHistoryFrames: 96.81 ms
+      GenerateWeights: 100.06 ms
+      GenerateMaskSubcomponents: 432.09 ms
+        GenerateHistoryOfDissimilarity: 176.7 ms
+        Foreground: 255.38 ms
+          GroupFrames: 0.47 ms
+          IntersectFrames: 107.59 ms
+          UnionIntersections: 118.86 ms
+          SubtractBackground: 28.45 ms
+      ComputeMovingForeground: 32.43 ms
+      ApplyMasks: 7.85 ms
+      NoiseReduction: 133.86 ms
+      DetectBlobs: 95.78 ms
+      ShowLastFrame: 2.25 ms
+    TestExit: 26.26 ms
