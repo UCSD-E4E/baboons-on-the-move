@@ -9,7 +9,7 @@ import pandas as pd
 
 from baboon_tracking import BaboonTracker
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
-import import_xml
+import library.import_xml as import_xml
 
 # constants that define screen size
 FRAME_WIDTH = 2160
@@ -48,7 +48,7 @@ def check_if_same_region(region_1, region_2):
 # test function, hard coded to pull from input.mp4 and input.xml
 def test_metrics():
     print("testing on input")
-    baboon_labels = import_xml.listCentroidsFromXML("./data/input.xml")
+    baboon_labels = import_xml.list_centroids_from_xml("./data/input.xml")
 
     baboon_tracker = BaboonTracker(input_file="input.mp4")
     print("tracker opened")
