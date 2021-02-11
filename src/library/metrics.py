@@ -1,3 +1,6 @@
+"""
+Module for calculating metrics.
+"""
 import numpy as np
 
 from baboon_tracking import BaboonTracker
@@ -7,6 +10,9 @@ from library.region import check_if_same_region
 
 
 def get_metrics():
+    """
+    Gets the metrics for the specified video.
+    """
     print("testing on input")
     baboon_labels = get_centroids_from_xml("./data/input.xml")
 
