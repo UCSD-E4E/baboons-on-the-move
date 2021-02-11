@@ -5,7 +5,7 @@ from xml.etree import ElementTree as ET
 import argparse
 
 
-def load_xml(xml_path: str):
+def _load_xml(xml_path: str):
     """
     loads XML data into python using etree package
     copied from /src/scripts/generate_velocities.py
@@ -15,7 +15,7 @@ def load_xml(xml_path: str):
     return root
 
 
-def get_centroid(box_element: ET.Element):
+def _get_centroid(box_element: ET.Element):
     """
     returns centroid to be the point between top left and bottom right points
     copied then modified from /src/scripts/generate_velocities.py
@@ -30,12 +30,12 @@ def get_centroid(box_element: ET.Element):
     return centroid_x, centroid_y, diameter
 
 
-def list_centroids_from_xml(xml_path: str):
+def get_centroids_from_xml(xml_path: str):
     """
     loads the specified XML and then calculates the centroids of the boxes.
     """
 
-    xml = load_xml(xml_path)
+    xml = _load_xml(xml_path)
     # uses a dict for simplicity, can be converted into array if needed.
     # key is frame, value is list of centroids
     video_frames = {}
@@ -48,7 +48,7 @@ def list_centroids_from_xml(xml_path: str):
             if video_frames.get(frame) is None:
                 video_frames[frame] = []
 
-            centroid = get_centroid(box)
+            centroid = _get_centroid(box)
             centroidx = centroid[0]
             centroidy = centroid[1]
             diameter = centroid[2]
@@ -64,5 +64,5 @@ if __name__ == "__main__":
         "XML_file_path", metavar="path", type=str, help="path to the XML file"
     )
     args = parser.parse_args()
-    centroidsByFrame = list_centroids_from_xml(args.XML_file_path)
+    centroidsByFrame = get_centroids_from_xml(args.XML_file_path)
     print(centroidsByFrame)
