@@ -5,4 +5,4 @@ extension-pkg-whitelist=cv2
 disable=bad-continuation,too-few-public-methods,no-self-use,too-many-locals,duplicate-code,line-too-long, too-many-arguments
 
 [OPTIONS]
-good-names=f,id,i
+good-names=f,id,i, x, y

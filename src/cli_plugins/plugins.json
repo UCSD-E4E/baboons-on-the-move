@@ -9,6 +9,14 @@
             "description": "Updates the baseline used by the test cases"
         },
         {
+            "module": "calculate_metrics",
+            "class": "CalculateMetrics",
+            "subcommands": [
+                "calc-metrics"
+            ],
+            "description": "Calculates metrics for the current algorithm"
+        },
+        {
             "module": "chart",
             "class": "Chart",
             "subcommands": [

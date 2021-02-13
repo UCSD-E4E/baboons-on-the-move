@@ -2,5 +2,5 @@
     "editor.formatOnSave": true,
     "python.formatting.provider": "black",
     "python.languageServer": "Pylance",
-    "python.linting.pylintEnabled": true
+    "python.linting.pylintEnabled": true,
 }
