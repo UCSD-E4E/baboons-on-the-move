@@ -3,5 +3,4 @@
     "python.formatting.provider": "black",
     "python.languageServer": "Pylance",
     "python.linting.pylintEnabled": true,
-    "python.pythonPath": "/home/chris/.cache/pypoetry/virtualenvs/baboon-tracking-oJ1K9Pla-py3.8/bin/python"
 }
