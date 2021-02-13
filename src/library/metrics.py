@@ -1,6 +1,9 @@
 """
 Module for calculating metrics.
 """
+from dataclasses import dataclass
+from typing import List
+
 import numpy as np
 
 from baboon_tracking import BaboonTracker
@@ -9,7 +12,16 @@ from library.labeled_data import get_centroids_from_xml
 from library.region import check_if_same_region
 
 
-def get_metrics():
+@dataclass
+class Metric:
+    """Class for keeping track of a metric."""
+
+    true_positive: int = 0
+    false_negative: int = 0
+    false_positive: int = 0
+
+
+def get_metrics() -> List[Metric]:
     """
     Gets the metrics for the specified video.
     """
@@ -22,7 +34,7 @@ def get_metrics():
 
     should_continue = True
     frame_counter = 0
-    metrics = []
+    metrics: List[Metric] = []
     while should_continue:
         print("frame: " + str(frame_counter))
 
@@ -61,7 +73,7 @@ def get_metrics():
 
             false_negative = len(labeled_baboons)
 
-            metrics.append((true_positive, false_negative, false_positive))
+            metrics.append(Metric(true_positive, false_negative, false_positive))
 
             # exit()
 
