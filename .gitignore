@@ -222,3 +222,5 @@ output
 
 # Vagrant Customfile
 env.yml
+
+.vscode/settings.json
