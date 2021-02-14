@@ -19,7 +19,7 @@ def get_region_mask(mask_size: Tuple[int, int], region: Tuple[int, int, int]):
     x = int(x)
     y = int(y)
     radius = int(radius / 2)
-    mask = cv2.circle(mask, (y, x), radius, (255, 255, 255), thickness=cv2.FILLED)
+    mask = cv2.circle(mask, (x, y), radius, (255, 255, 255), thickness=cv2.FILLED)
 
     return mask[:, :, 0].squeeze() == 255
 
