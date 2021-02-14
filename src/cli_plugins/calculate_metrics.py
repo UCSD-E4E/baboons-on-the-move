@@ -49,5 +49,8 @@ class CalculateMetrics(CliPlugin):
             ]
         )
 
+        latest_ref = video_ref.child("latest")
+        latest_ref.set(time)
+
         # data_frame = pd.DataFrame(get_metrics())
         # data_frame.to_csv("input_metrics.csv")
