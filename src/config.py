@@ -7,11 +7,11 @@ from datetime import datetime
 from random import gauss
 from typing import Dict
 
-import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import db
 from numpy.core.numeric import Inf
-
 import yaml
+
+from library.firebase import initialize_app
 
 
 CONFIG_STORE = None
@@ -71,13 +71,7 @@ def step_config(config: Dict) -> Dict:
 
 
 def get_latest_config() -> Dict:
-    cred = credentials.Certificate("decrypted/firebase-key.json")
-    firebase_admin.initialize_app(
-        cred,
-        {
-            "databaseURL": "https://baboon-cli-1598770091002-default-rtdb.firebaseio.com/"
-        },
-    )
+    initialize_app()
 
     ref = db.reference("optimize")
     video_ref = ref.child("input")
@@ -98,13 +92,7 @@ def get_latest_config() -> Dict:
 
 
 def save_cloud_config(config: Dict, loss: float, set_latest: bool):
-    cred = credentials.Certificate("decrypted/firebase-key.json")
-    firebase_admin.initialize_app(
-        cred,
-        {
-            "databaseURL": "https://baboon-cli-1598770091002-default-rtdb.firebaseio.com/"
-        },
-    )
+    initialize_app()
 
     time = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
