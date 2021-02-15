@@ -1,7 +1,7 @@
 """
 Provides an algorithm for extracting baboons from drone footage.
 """
-from typing import Callable
+from typing import Callable, Dict
 from baboon_tracking.preset_pipelines import preset_pipelines, update_preset_pipelines
 from pipeline.parent_stage import ParentStage
 from pipeline.stage_result import StageResult
@@ -12,7 +12,9 @@ class BaboonTracker:
     An algorithm that attempts to extract baboons from drone footage.
     """
 
-    def __init__(self, pipeline_name="default", input_file="input.mp4"):
+    def __init__(
+        self, pipeline_name="default", input_file="input.mp4",
+    ):
         update_preset_pipelines(input_file=input_file)
         self._pipeline = preset_pipelines[pipeline_name]
 

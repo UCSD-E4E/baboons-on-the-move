@@ -18,5 +18,5 @@ class TransformedFrames(Parallel):
 
     def __init__(self):
         Parallel.__init__(
-            self, "TransformedFrames", ShiftHistoryFrames, ComputeShiftedMasks
+            self, "TransformedFrames", ShiftHistoryFrames, ComputeShiftedMasks,
         )

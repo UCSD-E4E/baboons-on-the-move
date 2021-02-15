@@ -85,6 +85,14 @@
             "description": "Checks code for error using pylint, pyright, and black"
         },
         {
+            "module": "optimize",
+            "class": "Optimize",
+            "subcommands": [
+                "optimize"
+            ],
+            "description": "Optimize parameters."
+        },
+        {
             "module": "run",
             "class": "Run",
             "subcommands": [
