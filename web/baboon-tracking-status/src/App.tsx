@@ -3,6 +3,10 @@ import './App.css';
 import Metrics from './Metrics';
 
 class App extends React.Component<{}, {}> {
+  componentDidMount() {
+    document.title = "Baboons on the Move Status";
+  }
+
   render() {
     return (
       <div>
