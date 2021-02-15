@@ -3,6 +3,7 @@ import { Line } from 'react-chartjs-2';
 import firebase from 'firebase';
 
 interface IState {
+    averageErrorRate?: number;
     csv?: string;
     data?: {};
 }
@@ -48,7 +49,10 @@ class Metrics extends React.Component<{}, IState> {
             .concat(metrics.map((m, idx) => `${idx}, ${m.true_positive}, ${m.false_negative}, ${m.false_positive}`))
             .join("\n"));
 
+        let averageErrorRate = Math.round(chartData.map(x => x.y).reduce((a, b) => a + b) * 10000 / chartData.length) / 100;
+
         this.setState({
+            averageErrorRate: averageErrorRate,
             csv: csv,
             data: {
                 datasets: [{
@@ -95,6 +99,7 @@ class Metrics extends React.Component<{}, IState> {
                     }
                 }} />
 
+                <p>Average Error Rate: {this.state.averageErrorRate}%</p>
                 <a download='Data.csv' href={`data:text/csv;base64,${this.state.csv}`}>Download CSV</a>
             </div>
         );
