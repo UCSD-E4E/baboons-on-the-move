@@ -8,6 +8,7 @@ interface IState {
     errorRateData?: {};
     learningData?: {};
     learningCSV?: {};
+    learningPercentImprovement?: number;
 }
 
 class Metrics extends React.Component<{}, IState> {
@@ -83,9 +84,14 @@ class Metrics extends React.Component<{}, IState> {
 
             return {
                 x: idx + 1,
-                y: value
+                y: value as number
             };
         });
+
+        let percentImprovement: number = 0;
+        if (data.length > 1) {
+            percentImprovement = Math.round((data[0].y - data.slice(-1)[0].y) * 10000 / data[0].y) / 100;
+        }
 
         const csv = btoa(["Iteration, Loss"]
             .concat(data.map(d => `${d.x}, ${d.y}`))
@@ -93,7 +99,8 @@ class Metrics extends React.Component<{}, IState> {
 
         return {
             csv: csv,
-            data: data
+            data: data,
+            percentImprovement: percentImprovement
         };
     }
 
@@ -117,7 +124,8 @@ class Metrics extends React.Component<{}, IState> {
                     data: learningData.data
                 }],
             },
-            learningCSV: learningData.csv
+            learningCSV: learningData.csv,
+            learningPercentImprovement: learningData.percentImprovement
         });
     }
 
@@ -184,6 +192,7 @@ class Metrics extends React.Component<{}, IState> {
                         }]
                     }
                 }} />
+                <p>Percent Improvement: {this.state.learningPercentImprovement}%</p>
                 <a download='Learning.csv' href={`data:text/csv;base64,${this.state.learningCSV}`}>Download CSV</a>
             </div>
         );
