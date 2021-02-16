@@ -17,7 +17,7 @@ class Optimize(CliPlugin):
         prev_loss = Inf
         loss = -Inf
 
-        while abs(prev_loss - loss) > LOSS_THRESH:
+        while True:
             config, prev_loss, pulled_from_cloud = get_latest_config()
             if pulled_from_cloud:
                 config = step_config(config)
@@ -27,5 +27,10 @@ class Optimize(CliPlugin):
             better = loss < prev_loss
             save_cloud_config(config, loss, better)
 
+            should_stop = abs(prev_loss - loss) > LOSS_THRESH
+
             if better:
                 prev_loss = loss
+
+            if should_stop:
+                break
