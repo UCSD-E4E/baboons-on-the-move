@@ -1,12 +1,10 @@
 """
 Provides an algorithm for extracting baboons from drone footage.
 """
-from baboon_tracking.stages.get_video_frame import GetVideoFrame
-from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
-from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
-from baboon_tracking.stages.test_exit import TestExit
-from pipeline import Serial
-from pipeline.factory import factory
+from typing import Callable
+from baboon_tracking.preset_pipelines import preset_pipelines, update_preset_pipelines
+from pipeline.parent_stage import ParentStage
+from pipeline.stage_result import StageResult
 
 
 class BaboonTracker:
@@ -14,14 +12,19 @@ class BaboonTracker:
     An algorithm that attempts to extract baboons from drone footage.
     """
 
-    def __init__(self):
-        self._pipeline = Serial(
-            "BaboonTracker",
-            factory(GetVideoFrame, "./data/input.mp4"),
-            PreprocessFrame,
-            MotionDetector,
-            TestExit,
-        )
+    def __init__(self, pipeline_name="default", input_file="input.mp4"):
+        update_preset_pipelines(input_file=input_file)
+        self._pipeline = preset_pipelines[pipeline_name]
+
+    def step(self) -> StageResult:
+        """
+        Runs one step of the algorithm.
+        """
+        self._pipeline.before_execute()
+        result = self._pipeline.execute()
+        self._pipeline.after_execute()
+
+        return result
 
     def run(self):
         """
@@ -29,9 +32,7 @@ class BaboonTracker:
         """
 
         while True:
-            self._pipeline.before_execute()
-            result = self._pipeline.execute()
-            self._pipeline.after_execute()
+            result = self.step()
 
             if not result.continue_pipeline:
                 print("Average Runtime per stage:")
@@ -40,6 +41,16 @@ class BaboonTracker:
                 self._pipeline.on_destroy()
 
                 return
+
+    def get(self, stage_type: Callable):
+        """
+        Get a type from the pipeline.
+        """
+        candidate_stages = [
+            s for s in ParentStage.static_stages if isinstance(s, stage_type)
+        ]
+
+        return candidate_stages[-1]
 
     def flowchart(self):
         """

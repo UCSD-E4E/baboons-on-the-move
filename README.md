@@ -21,7 +21,7 @@ This repository contains the state-of-the-art aerial drone background tracking a
 
 # Contributing
 ## System Requirements
-This project only officially runs on Ubuntu 20.04.  Other operating systems are compatibile through the use of Vagrant.
+This project only officially runs on Ubuntu 20.04.  Other operating systems are compatible through the use of Vagrant.
 
 ### Windows
 To run the project on Windows, please ensure you run the following command in an admin PowerShell
@@ -65,4 +65,6 @@ Running `./cli lint` will run `pylint`, `pyright`, and `black` to check for lint
 Running `./cli run` will run the algorithm and display the time of each step.
 ### Shell
 Running `./cli shell` internally runs `./cli install` and then opens a shell in the virtual environment.
+### Docs
+Running `./cli docs` will generate sphinx docs and copy to the `docs` folder, where it can be hosted on github pages.
 

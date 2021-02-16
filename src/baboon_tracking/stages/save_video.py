@@ -1,6 +1,8 @@
 """
 Save the frames from the previous step to the output folder.
 """
+import pathlib
+
 import cv2
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.stages.show_last_frame import ShowLastFrame
@@ -17,8 +19,9 @@ class SaveVideo(ShowLastFrame):
     """
 
     def __init__(self, dependent: any, capture: CaptureMixin) -> None:
-        ShowLastFrame.__init__(self, dependent)
-        self._capture = capture
+        ShowLastFrame.__init__(self, dependent, capture)
+
+        pathlib.Path("./output").mkdir(exist_ok=True)
 
         self._frame_video_writers = None
 

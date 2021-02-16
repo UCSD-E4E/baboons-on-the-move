@@ -2,6 +2,7 @@
 Generate the history of dissimilarity
 """
 
+import cv2
 import numpy as np
 from baboon_tracking.mixins.history_of_dissimilarity_mixin import (
     HistoryOfDissimilarityMixin,
@@ -49,19 +50,17 @@ class GenerateHistoryOfDissimilarity(Stage, HistoryOfDissimilarityMixin):
         Calculate history of dissimilarity according to figure 10 of paper
         Returns frame representing history of dissimilarity
         """
-        dissimilarity = np.zeros(frames[0].get_frame().shape).astype(np.uint32)
+        dissimilarity = np.zeros(frames[0].get_frame().shape, dtype=np.uint32)
 
         for i, _ in enumerate(frames):
             if i == 0:
                 continue
 
-            mask = (np.abs(q_frames[i] - q_frames[i - 1]) > 1).astype(np.uint32)
-            dissimilarity = dissimilarity + np.multiply(
-                np.abs(
-                    frames[i].get_frame().astype(np.int32)
-                    - frames[i - 1].get_frame().astype(np.int32)
-                ),
-                mask,
+            mask = np.abs(q_frames[i] - q_frames[i - 1]) <= 1
+            dissimilarity_part = cv2.absdiff(
+                frames[i].get_frame(), frames[i - 1].get_frame()
             )
+            dissimilarity_part[mask] = 0
+            dissimilarity += dissimilarity_part
 
         return (dissimilarity / len(frames)).astype(np.uint8)

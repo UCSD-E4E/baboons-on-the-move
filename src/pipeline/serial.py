@@ -5,7 +5,7 @@ Implements a serial pipeline.
 from typing import Callable, List, Tuple
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 from pipeline.parent_stage import ParentStage
 from pipeline.stage_result import StageResult
@@ -24,6 +24,7 @@ class Serial(ParentStage):
         Executes all stages in this pipeline sequentially.
         """
 
+        result = None
         for stage in self.stages:
             stage.before_execute()
             result = stage.execute()
@@ -35,14 +36,18 @@ class Serial(ParentStage):
             if not result.continue_pipeline:
                 return StageResult(False, None)
 
-        return StageResult(True, True)
+        should_continue = False
+        if result is not None:
+            should_continue = result.next_stage
+
+        return StageResult(True, should_continue)
 
     def flowchart(self):
         """
         Generates a chart that represents this pipeline.
         """
 
-        font = ImageFont.truetype("SpaceGrotesk-Regular.ttf", 16)
+        font = self._get_font(16)
         padding = np.array([10, 10])
 
         subcharts: List[Tuple[Image.Image, Tuple[int, int], Tuple[int, int]]] = [

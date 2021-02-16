@@ -15,14 +15,18 @@ tqdm = "^4.48.2"
 pyAesCrypt = "^0.4.3"
 colorama = "^0.4.4"
 Rx = "^3.1.1"
+Sphinx = "^3.3.1"
+pandas = "^1.1.4"
+scikit-image = "^0.17.2"
 pytest = "^6.1.2"
 matplotlib = "^3.3.3"
-
-[tool.poetry.dev-dependencies]
-pylint = "^2.5.3"
 google-api-python-client = "^1.12.5"
 google-auth-httplib2 = "^0.0.3"
 google-auth-oauthlib = "^0.4.1"
+firebase-admin = "^4.5.1"
+
+[tool.poetry.dev-dependencies]
+pylint = "^2.5.3"
 black = {version = "^19.10b0", allow-prereleases = true}
 
 [build-system]

@@ -38,7 +38,10 @@ function ConvertTo-LF {
     )
 
     PROCESS {
-        (Get-Content $Path -Raw).Replace("`r`n", "`n") | Set-Content $Path -Force
+        $Path = Resolve-Path $Path
+
+        $text = [IO.File]::ReadAllText($Path) -replace "`r`n", "`n"
+        [IO.File]::WriteAllText($Path, $text)
     }
 }
 

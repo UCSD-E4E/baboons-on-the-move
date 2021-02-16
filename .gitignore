@@ -59,6 +59,7 @@ __pycache__/
 .Python
 build/
 develop-eggs/
+!docs/build
 dist/
 downloads/
 eggs/
@@ -221,3 +222,6 @@ output
 
 # Vagrant Customfile
 env.yml
+
+.vscode/settings.json
+!web/baboon-tracking-status/build
