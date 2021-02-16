@@ -3,12 +3,14 @@ import { Line } from 'react-chartjs-2';
 import firebase from 'firebase';
 
 interface IState {
+    errorRateLastUpdated?: number;
     averageErrorRate?: number;
     errorRateCSV?: string;
     errorRateData?: {};
     learningData?: {};
     learningCSV?: {};
     learningPercentImprovement?: number;
+    learningLatestUpdate?: number;
 }
 
 class Metrics extends React.Component<{}, IState> {
@@ -37,13 +39,29 @@ class Metrics extends React.Component<{}, IState> {
         return firebase.database();
     }
 
+    private parseDate(dateString: string): number {
+        const [datePart, timePart] = dateString.split('-');
+        const year = parseInt(datePart.substr(0, 4));
+        const month = parseInt(datePart.substr(4, 2)) - 1;
+        const day = parseInt(datePart.substr(6, 2));
+
+        const hour = parseInt(timePart.substr(0, 2));
+        const minute = parseInt(timePart.substr(2, 2));
+        const second = parseInt(timePart.substr(4, 2));
+
+        return Date.UTC(year, month, day, hour, minute, second);
+    }
+
     async getChartData() {
         const database = this.getFirebaseDatabase();
 
         const metricsRef = database.ref("metrics")
         const inputRef = metricsRef.child("input");
         const latestRef = inputRef.child("latest");
-        const latestMetricRef = inputRef.child((await latestRef.get()).val());
+
+        const latest: string = (await latestRef.get()).val();
+        const latestMetricRef = inputRef.child(latest);
+        const latestUpdate = this.parseDate(latest);
 
         const metrics: any[] = (await latestMetricRef.get()).val()
 
@@ -66,7 +84,8 @@ class Metrics extends React.Component<{}, IState> {
         return {
             data: chartData,
             csv: csv,
-            averageErrorRate: averageErrorRate
+            averageErrorRate: averageErrorRate,
+            latestUpdate: latestUpdate
         }
     }
 
@@ -75,7 +94,11 @@ class Metrics extends React.Component<{}, IState> {
 
         const optimizeRef = database.ref("optimize");
         const inputRef = optimizeRef.child("input");
+        const latestRef = inputRef.child("latest");
         const lossesRef = inputRef.child("losses");
+
+        const latest: string = (await latestRef.get()).val();
+        const latestUpdate = this.parseDate(latest);
 
         const losses = (await lossesRef.get()).val();
 
@@ -100,7 +123,8 @@ class Metrics extends React.Component<{}, IState> {
         return {
             csv: csv,
             data: data,
-            percentImprovement: percentImprovement
+            percentImprovement: percentImprovement,
+            latestUpdate: latestUpdate
         };
     }
 
@@ -118,6 +142,7 @@ class Metrics extends React.Component<{}, IState> {
                     pointRadius: 0
                 }],
             },
+            errorRateLastUpdated: chartData.latestUpdate,
             learningData: {
                 datasets: [{
                     label: 'Loss',
@@ -125,11 +150,15 @@ class Metrics extends React.Component<{}, IState> {
                 }],
             },
             learningCSV: learningData.csv,
-            learningPercentImprovement: learningData.percentImprovement
+            learningPercentImprovement: learningData.percentImprovement,
+            learningLatestUpdate: learningData.latestUpdate
         });
     }
 
     render() {
+        const errorRateLastUpdate = new Date(this.state.errorRateLastUpdated || 0);
+        const learningLatestUpdate = new Date(this.state.learningLatestUpdate || 0);
+
         return (
             <div>
                 <Line data={this.state.errorRateData} options={{
@@ -164,6 +193,7 @@ class Metrics extends React.Component<{}, IState> {
                     }
                 }} />
 
+                <p>Last Updated: {`${errorRateLastUpdate.toLocaleDateString()} ${errorRateLastUpdate.toLocaleTimeString()}`}</p>
                 <p>Average Error Rate: {this.state.averageErrorRate}%</p>
                 <a download='ErrorRate.csv' href={`data:text/csv;base64,${this.state.errorRateCSV}`}>Download CSV</a>
 
@@ -192,6 +222,7 @@ class Metrics extends React.Component<{}, IState> {
                         }]
                     }
                 }} />
+                <p>Last Updated: {`${learningLatestUpdate.toLocaleDateString()} ${learningLatestUpdate.toLocaleTimeString()}`}</p>
                 <p>Percent Improvement: {this.state.learningPercentImprovement}%</p>
                 <a download='Learning.csv' href={`data:text/csv;base64,${this.state.learningCSV}`}>Download CSV</a>
             </div>
