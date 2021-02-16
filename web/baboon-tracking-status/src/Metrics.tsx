@@ -96,11 +96,12 @@ class Metrics extends React.Component<{}, IState> {
         const inputRef = optimizeRef.child("input");
         const latestRef = inputRef.child("latest");
         const lossesRef = inputRef.child("losses");
-
         const latest: string = (await latestRef.get()).val();
-        const latestUpdate = this.parseDate(latest);
 
         const losses = (await lossesRef.get()).val();
+
+        const [latestUpdateString,] = Object.entries(losses).slice(-1)[0];
+        const latestUpdate = this.parseDate(latestUpdateString);
 
         const data = Object.entries(losses).map((l, idx) => {
             const [, value] = l;
@@ -111,9 +112,24 @@ class Metrics extends React.Component<{}, IState> {
             };
         });
 
+        const dataPointBackgroundColor = Object.entries(losses).map(l => {
+            const [key,] = l;
+
+            return key === latest ? "#90cd8a" : "rgba(0, 0, 0, 0.1)";
+        })
+
         let percentImprovement: number = 0;
         if (data.length > 1) {
-            percentImprovement = Math.round((data[0].y - data.slice(-1)[0].y) * 10000 / data[0].y) / 100;
+            const best = Object.entries(losses).filter(l => {
+                const [key,] = l;
+
+                return key === latest;
+            }).map(l => {
+                const [, value] = l;
+
+                return value as number;
+            })[0];
+            percentImprovement = Math.round((data[0].y - best) * 10000 / data[0].y) / 100;
         }
 
         const csv = btoa(["Iteration, Loss"]
@@ -124,7 +140,8 @@ class Metrics extends React.Component<{}, IState> {
             csv: csv,
             data: data,
             percentImprovement: percentImprovement,
-            latestUpdate: latestUpdate
+            latestUpdate: latestUpdate,
+            dataPointBackgroundColor: dataPointBackgroundColor
         };
     }
 
@@ -146,7 +163,8 @@ class Metrics extends React.Component<{}, IState> {
             learningData: {
                 datasets: [{
                     label: 'Loss',
-                    data: learningData.data
+                    data: learningData.data,
+                    pointBackgroundColor: learningData.dataPointBackgroundColor
                 }],
             },
             learningCSV: learningData.csv,
