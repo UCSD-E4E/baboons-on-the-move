@@ -27,7 +27,7 @@ class Optimize(CliPlugin):
             better = loss < prev_loss
             save_cloud_config(config, loss, better)
 
-            should_stop = abs(prev_loss - loss) > LOSS_THRESH
+            should_stop = abs(prev_loss - loss) < LOSS_THRESH
 
             if better:
                 prev_loss = loss

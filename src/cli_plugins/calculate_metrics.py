@@ -9,6 +9,7 @@ from firebase_admin import db
 from cli_plugins.cli_plugin import CliPlugin
 from library.firebase import initialize_app
 from library.metrics import get_metrics
+from config import get_latest_config, set_config
 
 
 class CalculateMetrics(CliPlugin):
@@ -25,6 +26,8 @@ class CalculateMetrics(CliPlugin):
         """
 
         initialize_app()
+        config, _, _ = get_latest_config()
+        set_config(config)
 
         time = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 

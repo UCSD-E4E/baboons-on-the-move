@@ -5,7 +5,7 @@ Handles reading from /config.yml
 import os
 from datetime import datetime
 from random import gauss
-from typing import Dict
+from typing import Dict, Tuple
 
 from firebase_admin import db
 from numpy.core.numeric import Inf
@@ -70,7 +70,7 @@ def step_config(config: Dict) -> Dict:
     return config
 
 
-def get_latest_config() -> Dict:
+def get_latest_config() -> Tuple[Dict, float, bool]:
     initialize_app()
 
     ref = db.reference("optimize")
