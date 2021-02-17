@@ -107,7 +107,7 @@ class Metrics extends React.Component<{}, IState> {
             const [, value] = l;
 
             return {
-                x: idx + 1,
+                x: idx,
                 y: value as number
             };
         });
