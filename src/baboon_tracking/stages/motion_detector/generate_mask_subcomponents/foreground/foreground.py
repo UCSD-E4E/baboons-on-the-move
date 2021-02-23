@@ -2,9 +2,11 @@
 Calculate the foreground of the current frame.
 """
 
-from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foreground.group_frames import (
-    GroupFrames,
+from baboon_tracking.mixins.unioned_frames_mixin import UnionedFramesMixin
+from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foreground.foreground_fast import (
+    ForegroundFast,
 )
+from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foreground.group_frames import GroupFrames
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foreground.intersect_frames import (
     IntersectFrames,
 )
@@ -26,8 +28,5 @@ class Foreground(Serial):
         Serial.__init__(
             self,
             "Foreground",
-            GroupFrames,
-            IntersectFrames,
-            UnionIntersections,
-            SubtractBackground,
+            ForegroundFast,
         )
