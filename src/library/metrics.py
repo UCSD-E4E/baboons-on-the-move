@@ -21,6 +21,17 @@ class Metric:
     false_positive: int = 0
 
 
+def calculate_loss(metrics: List[Metric]):
+    """
+    Calculate a single number that represents the loss encurred by a set of metrics.
+    """
+
+    false_positive = np.array([m.false_positive for m in metrics], dtype=np.float) * 1.2
+    false_negative = np.array([m.false_negative for m in metrics], dtype=np.float) * 1.0
+
+    return np.sum(false_positive + false_negative)
+
+
 def get_metrics() -> List[Metric]:
     """
     Gets the metrics for the specified video.
@@ -85,4 +96,4 @@ def get_metrics() -> List[Metric]:
 
         frame_counter += 1
 
-    return np.array(metrics)
+    return metrics

@@ -1,0 +1,95 @@
+input:
+  type: string
+  skip_learn: true
+output:
+  type: string
+  skip_learn: true
+mask_output:
+  type: string
+  skip_learn: true
+
+history_frames:
+  type: int32
+  min: 1
+  std: 0.5
+
+preprocess:
+  kernel_size:
+    type: int32
+    min: 1
+    odd: true
+    std: 1
+
+noise_reduction:
+  erode_kernel_size:
+    type: int32
+    min: 0
+    std: 0.5
+  dilate_kernel_size:
+    type: int32
+    min: 0
+    std: 1
+  combine_kernel_size:
+    type: int32
+    min: 0
+    std: 0.5
+
+registration:
+  max_features:
+    type: int32
+    min: 0
+    std: 5
+  good_match_percent:
+    type: float
+    min: 0
+    max: 1
+    std: 0.1
+
+quantize_frames:
+  scale_factor:
+    type: int32
+    min: 0
+    std: 2
+
+blob_detect:
+  params:
+    minDistBetweenBlobs:
+      type: int32
+      min: 0
+      std: 0.1
+    filterByColor:
+      type: bool
+      skip_learn: true
+    blobColor:
+      type: int32
+      min: 0
+      max: 255
+      skip_learn: true
+    filterByArea:
+      type: bool
+      skip_learn: true
+    minArea:
+      type: int32
+      min: 0
+      std: 0.1
+    maxArea:
+      type: int32
+      min: 0
+      std: 10
+    filterByCircularity:
+      type: bool
+      skip_learn: true
+    filterByConvexity:
+      type: bool
+      skip_learn: true
+    filterByInertia:
+      type: bool
+      skip_learn: true
+    minInertiaRatio:
+      type: float
+      min: 0
+      std: 0.001
+    maxInertiaRatio:
+      type: float
+      min: 0
+      std: 0.1

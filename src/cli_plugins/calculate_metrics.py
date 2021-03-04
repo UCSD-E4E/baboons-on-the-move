@@ -4,11 +4,12 @@ Plugin for calculating metrics.
 from argparse import ArgumentParser, Namespace
 from datetime import datetime
 
-import firebase_admin
-from firebase_admin import credentials, db
+from firebase_admin import db
 
 from cli_plugins.cli_plugin import CliPlugin
+from library.firebase import initialize_app
 from library.metrics import get_metrics
+from config import get_latest_config, set_config
 
 
 class CalculateMetrics(CliPlugin):
@@ -24,13 +25,9 @@ class CalculateMetrics(CliPlugin):
         Calculate metrics for the specified video and output to Firebase.
         """
 
-        cred = credentials.Certificate("decrypted/firebase-key.json")
-        firebase_admin.initialize_app(
-            cred,
-            {
-                "databaseURL": "https://baboon-cli-1598770091002-default-rtdb.firebaseio.com/"
-            },
-        )
+        initialize_app()
+        config, _, _ = get_latest_config()
+        set_config(config)
 
         time = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 

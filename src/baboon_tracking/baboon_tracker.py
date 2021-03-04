@@ -12,7 +12,9 @@ class BaboonTracker:
     An algorithm that attempts to extract baboons from drone footage.
     """
 
-    def __init__(self, pipeline_name="default", input_file="input.mp4"):
+    def __init__(
+        self, pipeline_name="default", input_file="input.mp4",
+    ):
         update_preset_pipelines(input_file=input_file)
         self._pipeline = preset_pipelines[pipeline_name]
 

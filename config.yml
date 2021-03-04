@@ -4,6 +4,14 @@ mask_output: './output/mask.mp4'
 
 history_frames: 8
 
+preprocess:
+    kernel_size: 5
+
+noise_reduction:
+    erode_kernel_size: 6
+    dilate_kernel_size: 30
+    combine_kernel_size: 12
+
 registration:
     max_features: 500
     good_match_percent: 0.15
