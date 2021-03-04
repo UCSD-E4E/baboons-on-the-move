@@ -43,6 +43,14 @@
             "description": "Download data from team Google Drive"
         },
         {
+            "module": "download_parameters",
+            "class": "DownloadParameters",
+            "subcommands": [
+                "download-params"
+            ],
+            "description": "Download latest parameters from the cloud."
+        },
+        {
             "module": "encrypt_decrypt",
             "class": "Decrypt",
             "subcommands": [

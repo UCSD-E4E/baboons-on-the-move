@@ -109,3 +109,8 @@ def save_cloud_config(config: Dict, loss: float, set_latest: bool):
 
     if set_latest:
         latest_ref.set(time)
+
+
+def save_config(config: Dict):
+    with open("./config.yml", "w") as f:
+        yaml.dump(config, f)
