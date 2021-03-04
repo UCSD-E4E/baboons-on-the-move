@@ -27,17 +27,16 @@ echo "  memory: $VAGRANT_MEMORY" >> env.yml
 WIDTH=`system_profiler SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $1 }'`
 HEIGHT=`system_profiler SPDisplaysDataType | grep Resolution | awk -F": " '/Resolution:/ { print $2 }' | awk -F" x " '{ print $2 }' | awk -F" " '{ print $ 1 }'`
 
-VIRTUALBOX_IP_Address=`ifconfig vboxnet0 | awk '$1 == "inet" {print $2}'`
-
 vagrant status | grep 'running' > /dev/null
 if [ $? -ne 0 ]
 then
     vagrant up
 fi
 
-vagrant -Y ssh -- -t "export DISPLAY=$VIRTUALBOX_IP_Address:0.0; export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
+vagrant -Y ssh -- -X -t "export WIDTH=$WIDTH; export HEIGHT=$HEIGHT; cd /baboon-tracking; ./cli $@"
 
-ps | grep 'vagrant' > /dev/null
+# macOS ps -A includes the grep 'vagrant', we check to see if any of the lines do not include grep.
+ps -A | grep 'vagrant' | grep -v grep > /dev/null
 if [ $? -ne 0 ]
 then
     vagrant suspend
