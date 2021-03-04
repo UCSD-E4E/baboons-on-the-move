@@ -1,3 +1,6 @@
+"""
+CLI Plugin for performing optimization.
+"""
 from argparse import ArgumentParser, Namespace
 
 from numpy.core.numeric import Inf
@@ -10,6 +13,10 @@ LOSS_THRESH = 0.01
 
 
 class Optimize(CliPlugin):
+    """
+    CLI Plugin for performing optimization.
+    """
+
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 

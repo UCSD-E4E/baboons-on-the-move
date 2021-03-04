@@ -2,7 +2,7 @@
 Base class for Serial and Parallel classes.  Implements common functionality between the two.
 """
 import inspect
-from typing import Callable, Dict, List
+from typing import Callable, List
 
 from pipeline.initializer import initializer
 from pipeline.models.time import Time

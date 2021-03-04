@@ -18,6 +18,11 @@ CONFIG_STORE = None
 
 
 def set_config(config: Dict):
+    """
+    Updates the config store with the specified config.
+    """
+
+    # pylint: disable=global-statement
     global CONFIG_STORE
     CONFIG_STORE = config
 
@@ -62,6 +67,9 @@ def _update_config(config: Dict, declaration: Dict):
 
 
 def step_config(config: Dict) -> Dict:
+    """
+    Steps the config file once.
+    """
     with open(os.path.realpath("./config_declaration.yml"), "r") as stream:
         declaration = yaml.safe_load(stream)
 
@@ -71,6 +79,9 @@ def step_config(config: Dict) -> Dict:
 
 
 def get_latest_config() -> Tuple[Dict, float, bool]:
+    """
+    Gets the latest config from either the cloud or from the file system if the cloud doesn't have any results.
+    """
     initialize_app()
 
     ref = db.reference("optimize")
@@ -92,6 +103,9 @@ def get_latest_config() -> Tuple[Dict, float, bool]:
 
 
 def save_cloud_config(config: Dict, loss: float, set_latest: bool):
+    """
+    Saves the the specified config file witth the specified loss to the cloud.
+    """
     initialize_app()
 
     time = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
@@ -112,5 +126,8 @@ def save_cloud_config(config: Dict, loss: float, set_latest: bool):
 
 
 def save_config(config: Dict):
+    """
+    Updates the config.yaml file with the specified config.
+    """
     with open("./config.yml", "w") as f:
         yaml.dump(config, f)

@@ -1,7 +1,7 @@
 """
 Provides an algorithm for extracting baboons from drone footage.
 """
-from typing import Callable, Dict
+from typing import Callable
 from baboon_tracking.preset_pipelines import preset_pipelines, update_preset_pipelines
 from pipeline.parent_stage import ParentStage
 from pipeline.stage_result import StageResult
