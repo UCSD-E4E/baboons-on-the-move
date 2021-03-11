@@ -1,6 +1,8 @@
 """
 Calculate the foreground of the current frame.
 """
+import numpy as np
+import time
 from baboon_tracking.mixins.foreground_mixin import ForegroundMixin
 from baboon_tracking.mixins.intersected_frames_mixin import IntersectedFramesMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
@@ -16,7 +18,7 @@ from baboon_tracking.mixins.weights_mixin import WeightsMixin
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foreground import (
     foreground_c,
 )
-import numpy as np
+
 from pipeline import Stage
 from pipeline.decorators import config, stage
 from pipeline.stage_result import StageResult
@@ -81,9 +83,10 @@ class ForegroundFast(
         ]
 
     def execute(self) -> StageResult:
+        s = time.time()
         shifted_history_frames = self._shifted_history_frames.shifted_history_frames
         quantized_frames = self._quantized_frames.quantized_frames
-
+        """
         frame_group_index = range(len(shifted_history_frames) - 1)
         frame_group_index = [(r, r + 1) for r in frame_group_index]
 
@@ -94,23 +97,41 @@ class ForegroundFast(
         self.grouped_quantized_frames = [
             (quantized_frames[g[0]], quantized_frames[g[1]]) for g in frame_group_index
         ]
-        """
+        
         intersected_frames_actual = self._intersect_all_frames(
             self.grouped_shifted_history_frames, self.grouped_quantized_frames
         )
         """
+        #shifted_history_frames = np.stack([f.get_frame() for f in shifted_history_frames], axis=0)
+        #quantized_frames = np.stack(quantized_frames, axis=0)
         # self.intersected_frames = intersected_frames_actual
-        intersected_frames_fast = foreground_c.group_and_intersect_frames(
+        '''
+        self.unioned_frames = foreground_c.foreground(
+            shifted_history_frames, quantized_frames
+        )
+        '''
+        '''
+        intersected_frames_fast = foreground_c.foreground(
             shifted_history_frames, quantized_frames
         )
         self.intersected_frames = intersected_frames_fast
+        
         self.unioned_frames = foreground_c.union_frames(self.intersected_frames)
-        self.foreground = foreground_c.subtract_background(
-            self._preprocessed_frame.processed_frame,
-            self.unioned_frames,
+        '''
+        #s = time.time()
+        #t1 = time.time()
+        self.foreground = foreground_c.foreground_all(
+            shifted_history_frames,
+            quantized_frames,
+            self._preprocessed_frame.processed_frame.get_frame(),
             self._weights.weights,
             self._history_frames,
         )
+        #t2 = time.time()
+        #print('pre: ' + str((t1-s)*1000))
+        #print('foreground: ' + str((t2-t1)*1000))
+        #t = time.time()
+        #print('subtract_background: ' + str((t-s)*1000))
         """
         print(type(intersected_frames_actual[0]))
         print(type(self.intersected_frames[0]))
