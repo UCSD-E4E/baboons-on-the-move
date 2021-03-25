@@ -4,9 +4,7 @@ warnings.filterwarnings("ignore", message="numpy.ufunc size changed")
 cimport cython
 cimport numpy as np
 import  numpy as np
-import time
 import cv2
-#from cython.parallel import prange
 from baboon_tracking.mixins.foreground_mixin import ForegroundMixin
 from baboon_tracking.mixins.intersected_frames_mixin import IntersectedFramesMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
@@ -40,75 +38,6 @@ cdef combine(np.ndarray[np.uint8_t, ndim=2] frame, np.ndarray[np.int32_t, ndim=2
     combined[mask] = 0
 
     return combined
-'''
-cdef combine_loop(np.ndarray[np.uint8_t, ndim=2] frame, np.ndarray[np.int32_t, ndim=2] q_frame1, np.ndarray[np.int32_t, ndim=2] q_frame2):
-    """
-    Unpacking of combine function from intersect_frames as compiled loop
-    """
-    cdef np.ndarray[np.uint8_t, ndim=2] combined = frame.copy()
-    cdef Py_ssize_t i,j
-    cdef Py_ssize_t height = frame.shape[0]
-    cdef Py_ssize_t width = frame.shape[1]
-    cdef np.uint8_t diff
-    for i in range(height):
-        for j in range(width):
-            diff = q_frame1[i,j]-q_frame2[i,j]
-            if (diff <= 1 and diff >= -1):
-                combined[i,j] = 0
-
-    return combined
-
-cpdef combine_par(np.ndarray[np.uint8_t, ndim=2] frame, np.ndarray[np.int32_t, ndim=2] q_frame1, np.ndarray[np.int32_t, ndim=2] q_frame2):
-    
-    cdef np.uint8_t[:,:] combined = frame
-    cdef Py_ssize_t i,j
-    cdef Py_ssize_t height = frame.shape[0]
-    cdef Py_ssize_t width = frame.shape[1]
-    cdef np.uint8_t diff
-    for i in range(height):
-        for j in range(width):
-            diff = q_frame1[i,j]-q_frame2[i,j]
-            if (diff <= 1 and diff >= -1):
-                combined[i,j] = 0
-    
-    
-    mask = np.abs(q_frame1 - q_frame2) <= 1
-    combined = frame.copy()
-    combined[mask] = 0
-
-    return combined
-'''
-cdef group_and_intersect_frames(np.ndarray[np.uint8_t, ndim=3] shifted_history_frames, np.ndarray[np.int32_t, ndim=3] quantized_frames):
-    """
-    Groups and intersects frames as in stages group_frames and intersect_frames
-    """
-    cdef Py_ssize_t length = shifted_history_frames.shape[0]
-    cdef Py_ssize_t i
-    cdef np.ndarray[np.uint8_t, ndim=3] intersected_frames = np.zeros((length-1, shifted_history_frames.shape[1], shifted_history_frames.shape[2]), dtype=np.uint8)
-    for i in range(length-1):
-        intersected_frames[i] = (
-            combine(shifted_history_frames[i],quantized_frames[i],quantized_frames[i+1])
-            )
-    return intersected_frames
-'''
-cdef group_and_intersect_frames_par(np.ndarray[np.uint8_t, ndim=3] shifted_history_frames, np.ndarray[np.int32_t, ndim=3] quantized_frames):
-    """
-    Groups and intersects frames as in stages group_frames and intersect_frames
-    """
-    cdef Py_ssize_t length = shifted_history_frames.shape[0]
-    cdef Py_ssize_t i
-    cdef np.uint8_t[:,:,:] shifted_history_frames_view = shifted_history_frames
-    cdef np.int32_t[:,:,:] quantized_frames_view = quantized_frames
-    cdef np.uint8_t[:,:,:] intersected_frames = np.zeros((length-1, shifted_history_frames.shape[1], shifted_history_frames.shape[2]), dtype=np.uint8)
-    
-    for i in prange(length-1, nogil=True):
-        intersected_frames[i] = (
-            combine_par(shifted_history_frames_view[i],quantized_frames_view[i],quantized_frames_view[(i+1)])
-            )
-
-    
-    return intersected_frames
-'''
 
 @cython.boundscheck(False)
 cdef union_frames(np.ndarray[np.uint8_t, ndim=3] frames):
@@ -144,11 +73,11 @@ def foreground_all(shifted_history_frames,
         int history_frames):
     #shifted_history_frames = np.stack([f.get_frame() for f in shifted_history_frames], axis=0)
     #quantized_frames = np.stack(quantized_frames, axis=0)
-    intersected_frames = (group_and_intersect_frames_raw(shifted_history_frames,quantized_frames))
+    intersected_frames = (group_and_intersect_frames(shifted_history_frames,quantized_frames))
     unioned_frame = union_frames(intersected_frames)
     return subtract_background(processed_frame, unioned_frame, weights, history_frames)
 
-def group_and_intersect_frames_raw(shifted_history_frames, quantized_frames):
+def group_and_intersect_frames(shifted_history_frames, quantized_frames):
     """
     Groups and intersects frames as in stages group_frames and intersect_frames
     """
