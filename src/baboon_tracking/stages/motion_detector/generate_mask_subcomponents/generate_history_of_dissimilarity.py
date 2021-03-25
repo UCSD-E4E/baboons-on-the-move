@@ -11,7 +11,9 @@ from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
 from baboon_tracking.mixins.shifted_history_frames_mixin import (
     ShiftedHistoryFramesMixin,
 )
-
+from baboon_tracking.stages.motion_detector.generate_mask_subcomponents import (
+    generate_history_of_dissimilarity_c
+)
 from pipeline import Stage
 from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
@@ -39,7 +41,7 @@ class GenerateHistoryOfDissimilarity(Stage, HistoryOfDissimilarityMixin):
         shifted_history_frames = self._shifted_history_frames.shifted_history_frames
         quantized_frames = self._quantized_frames.quantized_frames
 
-        self.history_of_dissimilarity = self._get_history_of_dissimilarity(
+        self.history_of_dissimilarity = generate_history_of_dissimilarity_c.get_history_of_dissimilarity(
             shifted_history_frames, quantized_frames
         )
 
