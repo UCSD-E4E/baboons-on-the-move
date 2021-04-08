@@ -1,0 +1,114 @@
+Installing dependencies from lock file
+
+No dependencies to install or update
+
+Installing the current project: baboon-tracking (0.1.0)
+Installing dependencies from lock file
+
+No dependencies to install or update
+
+Installing the current project: baboon-tracking (0.1.0)
+test1.mp4
+Average Runtime per stage:
+  Serial: 865.1 ms
+    GetVideoFrame: 13.03 ms
+    PreprocessFrame: 8.38 ms
+      ConvertFromBGR2Gray: 2.11 ms
+      BlurGray: 1.73 ms
+      ShowLastFrame: 4.53 ms
+    MotionDetector: 834.47 ms
+      StoreHistoryFrame: 0.03 ms
+      ComputeTransformationMatrices: 164.72 ms
+      TransformedFrames: 155.27 ms
+        ShiftHistoryFrames: 75.38 ms
+        ComputeShiftedMasks: 79.88 ms
+      QuantizeHistoryFrames: 79.98 ms
+      GenerateWeights: 45.07 ms
+      GenerateMaskSubcomponents: 263.11 ms
+        GenerateHistoryOfDissimilarity: 92.33 ms
+        Foreground: 170.78 ms
+          ForegroundFast: 170.77 ms
+      ComputeMovingForeground: 40.22 ms
+      ApplyMasks: 9.46 ms
+      NoiseReduction: 115.74 ms
+      DetectBlobs: 46.44 ms
+      ShowLastFrame: 2.87 ms
+    TestExit: 26.5 ms
+test2.mp4
+Average Runtime per stage:
+  Serial: 859.11 ms
+    GetVideoFrame: 12.5 ms
+    PreprocessFrame: 5.38 ms
+      ConvertFromBGR2Gray: 1.89 ms
+      BlurGray: 1.56 ms
+      ShowLastFrame: 1.92 ms
+    MotionDetector: 831.93 ms
+      StoreHistoryFrame: 0.02 ms
+      ComputeTransformationMatrices: 162.95 ms
+      TransformedFrames: 155.1 ms
+        ShiftHistoryFrames: 75.16 ms
+        ComputeShiftedMasks: 79.94 ms
+      QuantizeHistoryFrames: 79.79 ms
+      GenerateWeights: 44.94 ms
+      GenerateMaskSubcomponents: 263.19 ms
+        GenerateHistoryOfDissimilarity: 92.44 ms
+        Foreground: 170.75 ms
+          ForegroundFast: 170.74 ms
+      ComputeMovingForeground: 40.13 ms
+      ApplyMasks: 9.44 ms
+      NoiseReduction: 115.28 ms
+      DetectBlobs: 46.68 ms
+      ShowLastFrame: 2.75 ms
+    TestExit: 26.5 ms
+test3.mp4
+Average Runtime per stage:
+  Serial: 892.17 ms
+    GetVideoFrame: 9.21 ms
+    PreprocessFrame: 5.3 ms
+      ConvertFromBGR2Gray: 1.97 ms
+      BlurGray: 1.68 ms
+      ShowLastFrame: 1.64 ms
+    MotionDetector: 863.19 ms
+      StoreHistoryFrame: 0.03 ms
+      ComputeTransformationMatrices: 165.09 ms
+      TransformedFrames: 154.97 ms
+        ShiftHistoryFrames: 75.18 ms
+        ComputeShiftedMasks: 79.78 ms
+      QuantizeHistoryFrames: 78.26 ms
+      GenerateWeights: 45.23 ms
+      GenerateMaskSubcomponents: 263.3 ms
+        GenerateHistoryOfDissimilarity: 91.94 ms
+        Foreground: 171.35 ms
+          ForegroundFast: 171.34 ms
+      ComputeMovingForeground: 40.15 ms
+      ApplyMasks: 9.5 ms
+      NoiseReduction: 116.06 ms
+      DetectBlobs: 46.79 ms
+      ShowLastFrame: 2.67 ms
+    TestExit: 26.32 ms
+test4.mp4
+Average Runtime per stage:
+  Serial: 966.79 ms
+    GetVideoFrame: 9.2 ms
+    PreprocessFrame: 5.15 ms
+      ConvertFromBGR2Gray: 1.96 ms
+      BlurGray: 1.66 ms
+      ShowLastFrame: 1.53 ms
+    MotionDetector: 935.77 ms
+      StoreHistoryFrame: 0.03 ms
+      ComputeTransformationMatrices: 116.27 ms
+      TransformedFrames: 155.03 ms
+        ShiftHistoryFrames: 75.25 ms
+        ComputeShiftedMasks: 79.78 ms
+      QuantizeHistoryFrames: 78.7 ms
+      GenerateWeights: 51.81 ms
+      GenerateMaskSubcomponents: 304.99 ms
+        GenerateHistoryOfDissimilarity: 97.85 ms
+        Foreground: 207.13 ms
+          ForegroundFast: 207.12 ms
+      ComputeMovingForeground: 40.77 ms
+      ApplyMasks: 9.87 ms
+      NoiseReduction: 127.88 ms
+      DetectBlobs: 98.95 ms
+      ShowLastFrame: 2.68 ms
+    TestExit: 26.24 ms
