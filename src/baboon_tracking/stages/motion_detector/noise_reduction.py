@@ -32,7 +32,7 @@ class NoiseReduction(Stage, MovingForegroundMixin):
         element = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (30, 30))
         opened_mask = cv2.dilate(eroded, element)
 
-        combined_mask = np.zeros(opened_mask.shape).astype(np.uint8)
+        combined_mask = np.zeros(opened_mask.shape, dtype=np.uint8)
         combined_mask[opened_mask == moving_foreground] = 255
         combined_mask[moving_foreground == 0] = 0
 
