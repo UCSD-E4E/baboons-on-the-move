@@ -36,7 +36,7 @@ class ComputeShiftedMasks(Stage, ShiftedMasksMixin):
         transformation_matrices = self._transformation_matrices.transformation_matrices
         frame = self._frame.processed_frame
 
-        img = np.ones(frame.get_frame().shape).astype(np.uint8)
+        img = np.ones(frame.get_frame().shape, dtype=np.uint8)
         self.shifted_masks = [
             cv2.warpPerspective(
                 img, M, (frame.get_frame().shape[1], frame.get_frame().shape[0]),
