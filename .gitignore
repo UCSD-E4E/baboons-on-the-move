@@ -225,3 +225,5 @@ env.yml
 
 .vscode/settings.json
 !web/baboon-tracking-status/build
+
+.ps-cli-config
