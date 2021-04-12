@@ -255,5 +255,15 @@ memory: RAM
         vagrant suspend
     }
 } elseif ($config["Backend"] -eq "WSL2") {
+    $ansiblePath = bash -c "which ansible-playbook"
+    if ([string]::IsNullOrWhiteSpace($ansiblePath)) {
+        bash -c "sudo apt install ansible -y"
+    }
+
+    $ansibleCheck = bash -c "ansible-playbook --connection=local --inventory 127.0.0.1, playbook.yml --check | grep 'ok=3'"
+    if ([string]::IsNullOrWhiteSpace($ansibleCheck)) {
+        bash -c "sudo ansible-playbook --connection=local --inventory 127.0.0.1, playbook.yml"
+    }
+
     bash -c "export DISPLAY=`$(ip route|awk '/^default/{print `$3}'):0.0; export WIDTH=$($smallestScreen.WorkingArea.Width); export HEIGHT=$($smallestScreen.WorkingArea.Height); ./cli $($args[0])"
 }

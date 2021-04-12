@@ -3,28 +3,6 @@
 SHELL_NAME=$(basename $SHELL)
 echo Using $SHELL_NAME...
 
-# LINUX_VERSION=$(lsb_release -d | awk -F"\t" '{print $2}')
-# if [[ $LINUX_VERSION == 'Ubuntu 20.04.2 LTS' ]]
-# then
-#     echo Ubuntu 20.04 Detected.
-
-#     ansible-playbook -h > /dev/null
-#     if [ $? -ne 0 ]
-#     then
-#         echo Ansible not installed.
-#         echo Installing ansible to setup machine...
-#         sudo apt update
-#         sudo apt install ansible -y
-#     fi
-
-#     ansible-playbook --connection=local --inventory 127.0.0.1, playbook.yml --check | grep "ok=3" > /dev/null
-#     if [ $? -ne 0 ]
-#     then
-#         echo Attempting to install missing dependencies...
-#         sudo ansible-playbook --connection=local --inventory 127.0.0.1, playbook.yml
-#     fi
-# fi
-
 # Check to see if pyenv is on the path.
 pyenv --version > /dev/null
 if [ $? -ne 0 ]

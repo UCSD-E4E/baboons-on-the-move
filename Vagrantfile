@@ -77,6 +77,8 @@ Vagrant.configure("2") do |config|
     shell.binary = true
 
     shell.inline = "apt-get update
-                    snap install code --classic"
+                    snap install code --classic
+                    apt-get install ansible
+                    ansible-playbook --connection=local --inventory 127.0.0.1, playbook.yml"
   end
 end
