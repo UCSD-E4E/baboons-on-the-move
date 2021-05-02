@@ -6,25 +6,38 @@ import numpy as np
 from baboon_tracking.models.frame import Frame
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from pipeline import Stage
-from pipeline.decorators import stage
+from pipeline.decorators import stage, config
 from pipeline.stage_result import StageResult
 
 
+@config(
+    parameter_name="required_motion_observations",
+    key="hysteresis/required_motion_observations",
+)
+@config(
+    parameter_name="required_no_motion_observations",
+    key="hysteresis/required_no_motion_observations",
+)
 @stage("moving_foreground")
 class HysteresisFilter(Stage, MovingForegroundMixin):
     """
     Implements a filter using Hysteriesis
     """
 
-    def __init__(self, moving_foreground: MovingForegroundMixin) -> None:
+    def __init__(
+        self,
+        required_motion_observations: int,
+        required_no_motion_observations: int,
+        moving_foreground: MovingForegroundMixin,
+    ) -> None:
         Stage.__init__(self)
         MovingForegroundMixin.__init__(self)
 
         self._result = None
         self._motion_observations = None
         self._no_motion_observations = None
-        self._required_motion_observations = 6
-        self._required_no_motion_observations = 1
+        self._required_motion_observations = required_motion_observations
+        self._required_no_motion_observations = required_no_motion_observations
         self._moving_foreground = moving_foreground
 
     def execute(self) -> StageResult:

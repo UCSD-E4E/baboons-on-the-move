@@ -32,3 +32,7 @@ blob_detect:
         filterByInertia: true
         minInertiaRatio: 0.01
         maxInertiaRatio: 1
+
+hysteresis:
+    required_motion_observations: 6
+    required_no_motion_observations: 1
