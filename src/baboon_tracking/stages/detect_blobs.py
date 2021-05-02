@@ -15,7 +15,7 @@ from pipeline.decorators import config, stage
 from pipeline.stage_result import StageResult
 
 
-@config(parameter_name="blob_det_params", key="blob_detect/params")
+@config(parameter_name="blob_det_params", key="motion_detector/blob_detect/params")
 @stage("moving_foreground")
 class DetectBlobs(Stage, BlobImageMixin, BaboonsMixin):
     """

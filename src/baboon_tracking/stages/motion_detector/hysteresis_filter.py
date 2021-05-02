@@ -12,11 +12,11 @@ from pipeline.stage_result import StageResult
 
 @config(
     parameter_name="required_motion_observations",
-    key="hysteresis/required_motion_observations",
+    key="motion_detector/hysteresis/required_motion_observations",
 )
 @config(
     parameter_name="required_no_motion_observations",
-    key="hysteresis/required_no_motion_observations",
+    key="motion_detector/hysteresis/required_no_motion_observations",
 )
 @stage("moving_foreground")
 class HysteresisFilter(Stage, MovingForegroundMixin):

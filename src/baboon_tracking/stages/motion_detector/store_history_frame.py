@@ -10,7 +10,9 @@ from pipeline.decorators import config, stage
 from pipeline.stage_result import StageResult
 
 
-@config(parameter_name="history_frame_count", key="history_frames")
+@config(
+    parameter_name="history_frame_count", key="motion_detector/history_frames",
+)
 @stage("preprocessed_frame")
 class StoreHistoryFrame(Stage, HistoryFramesMixin):
     """

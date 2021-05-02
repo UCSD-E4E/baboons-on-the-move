@@ -14,8 +14,11 @@ from pipeline.stage import Stage
 from pipeline.stage_result import StageResult
 
 
-@config(parameter_name="max_features", key="registration/max_features")
-@config(parameter_name="good_match_percent", key="registration/good_match_percent")
+@config(parameter_name="max_features", key="motion_detector/registration/max_features")
+@config(
+    parameter_name="good_match_percent",
+    key="motion_detector/registration/good_match_percent",
+)
 @stage("preprocessed_frame")
 @stage("history_frames")
 class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):

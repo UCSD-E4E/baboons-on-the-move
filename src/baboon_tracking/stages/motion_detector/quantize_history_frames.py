@@ -11,7 +11,9 @@ from pipeline.stage import Stage
 from pipeline.stage_result import StageResult
 
 
-@config(parameter_name="scale_factor", key="quantize_frames/scale_factor")
+@config(
+    parameter_name="scale_factor", key="motion_detector/quantize_frames/scale_factor"
+)
 @stage("shifted_history_frames")
 class QuantizeHistoryFrames(Stage, QuantizedFramesMixin):
     """Quantizes the shifted history frame."""

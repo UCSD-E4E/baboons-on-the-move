@@ -11,9 +11,18 @@ from pipeline.stage_result import StageResult
 from pipeline.decorators import stage, config
 
 
-@config(parameter_name="erode_kernel_size", key="noise_reduction/erode_kernel_size")
-@config(parameter_name="dilate_kernel_size", key="noise_reduction/dilate_kernel_size")
-@config(parameter_name="combine_kernel_size", key="noise_reduction/combine_kernel_size")
+@config(
+    parameter_name="erode_kernel_size",
+    key="motion_detector/noise_reduction/erode_kernel_size",
+)
+@config(
+    parameter_name="dilate_kernel_size",
+    key="motion_detector/noise_reduction/dilate_kernel_size",
+)
+@config(
+    parameter_name="combine_kernel_size",
+    key="motion_detector/noise_reduction/combine_kernel_size",
+)
 @stage("moving_foreground")
 class NoiseReduction(Stage, MovingForegroundMixin):
     """

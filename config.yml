@@ -2,37 +2,38 @@ input: './data/input.mp4'
 output: './output/output.mp4'
 mask_output: './output/mask.mp4'
 
-history_frames: 8
-
 preprocess:
     kernel_size: 5
 
-noise_reduction:
-    erode_kernel_size: 6
-    dilate_kernel_size: 30
-    combine_kernel_size: 12
+motion_detector:
+    history_frames: 8
 
-registration:
-    max_features: 500
-    good_match_percent: 0.15
+    registration:
+        max_features: 500
+        good_match_percent: 0.15
 
-quantize_frames:
-    scale_factor: 50
+    quantize_frames:
+        scale_factor: 50
 
-blob_detect:
-    params:
-        minDistBetweenBlobs: 0
-        filterByColor: true
-        blobColor: 255
-        filterByArea: true
-        minArea: 10
-        maxArea: 300000
-        filterByCircularity: false
-        filterByConvexity: false
-        filterByInertia: true
-        minInertiaRatio: 0.01
-        maxInertiaRatio: 1
+    noise_reduction:
+        erode_kernel_size: 6
+        dilate_kernel_size: 30
+        combine_kernel_size: 12
 
-hysteresis:
-    required_motion_observations: 6
-    required_no_motion_observations: 1
+    hysteresis:
+        required_motion_observations: 6
+        required_no_motion_observations: 1
+
+    blob_detect:
+        params:
+            minDistBetweenBlobs: 0
+            filterByColor: true
+            blobColor: 255
+            filterByArea: true
+            minArea: 10
+            maxArea: 300000
+            filterByCircularity: false
+            filterByConvexity: false
+            filterByInertia: true
+            minInertiaRatio: 0.01
+            maxInertiaRatio: 1

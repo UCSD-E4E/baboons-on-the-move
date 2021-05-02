@@ -21,7 +21,7 @@ from pipeline.decorators import config, stage
 @stage("foreground")
 @stage("weights")
 @stage("frame_mixin")
-@config(parameter_name="history_frames", key="history_frames")
+@config(parameter_name="history_frames", key="motion_detector/history_frames")
 class ComputeMovingForeground(Stage, MovingForegroundMixin):
     """
     Computes the moving foreground using the subcomponents previously computed

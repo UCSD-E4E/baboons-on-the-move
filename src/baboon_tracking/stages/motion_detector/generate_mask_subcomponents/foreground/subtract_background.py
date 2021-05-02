@@ -15,7 +15,7 @@ from pipeline.stage_result import StageResult
 @stage("preprocessed_frame")
 @stage("unioned_frames")
 @stage("weights")
-@config(parameter_name="history_frames", key="history_frames")
+@config(parameter_name="history_frames", key="motion_detector/history_frames")
 class SubtractBackground(Stage, ForegroundMixin):
     """
     Subtracts background representation from the frame.
