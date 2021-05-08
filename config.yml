@@ -23,17 +23,3 @@ motion_detector:
     hysteresis:
         required_motion_observations: 6
         required_no_motion_observations: 1
-
-    blob_detect:
-        params:
-            minDistBetweenBlobs: 0
-            filterByColor: true
-            blobColor: 255
-            filterByArea: true
-            minArea: 10
-            maxArea: 300000
-            filterByCircularity: false
-            filterByConvexity: false
-            filterByInertia: true
-            minInertiaRatio: 0.01
-            maxInertiaRatio: 1

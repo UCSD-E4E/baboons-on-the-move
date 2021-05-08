@@ -1,8 +1,8 @@
 """
 module for loading from labeled data.
 """
+from math import ceil, floor
 from xml.etree import ElementTree as ET
-import argparse
 
 
 def _load_xml(xml_path: str):
@@ -15,24 +15,9 @@ def _load_xml(xml_path: str):
     return root
 
 
-def _get_centroid(box_element: ET.Element):
+def get_regions_from_xml(xml_path: str):
     """
-    returns centroid to be the point between top left and bottom right points
-    copied then modified from /src/scripts/generate_velocities.py
-    """
-    xtl = float(box_element.get("xtl"))
-    ytl = float(box_element.get("ytl"))
-    xbr = float(box_element.get("xbr"))
-    ybr = float(box_element.get("ybr"))
-    centroid_x = xtl + ((xbr - xtl) / 2)
-    centroid_y = ytl + ((ybr - ytl) / 2)
-    diameter = xbr - xtl
-    return centroid_x, centroid_y, diameter
-
-
-def get_centroids_from_xml(xml_path: str):
-    """
-    loads the specified XML and then calculates the centroids of the boxes.
+    loads the specified XML and then calculates the regions of the boxes.
     """
 
     xml = _load_xml(xml_path)
@@ -48,21 +33,12 @@ def get_centroids_from_xml(xml_path: str):
             if video_frames.get(frame) is None:
                 video_frames[frame] = []
 
-            centroid = _get_centroid(box)
-            centroidx = centroid[0]
-            centroidy = centroid[1]
-            diameter = centroid[2]
-            # stores each centroid in the form ((float)x, (float)y, (float)diameter)
-            video_frames[frame].append((centroidx, centroidy, diameter))
+            xtl = floor(float(box.get("xtl")))
+            ytl = floor(float(box.get("ytl")))
+            xbr = ceil(float(box.get("xbr")))
+            ybr = ceil(float(box.get("ybr")))
+
+            region = (xtl, ytl, xbr, ybr)
+            video_frames[frame].append(region)
 
     return video_frames
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Parse labeled data XML by frame")
-    parser.add_argument(
-        "XML_file_path", metavar="path", type=str, help="path to the XML file"
-    )
-    args = parser.parse_args()
-    centroidsByFrame = get_centroids_from_xml(args.XML_file_path)
-    print(centroidsByFrame)

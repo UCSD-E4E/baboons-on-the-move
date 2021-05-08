@@ -34,13 +34,10 @@ class BaselineBaboonTracker:
 
                     if baboons_mixin.baboons is not None:
                         for baboon in baboons_mixin.baboons:
-                            centroid_x, centroid_y = baboon.centroid
+                            x1, y1, x2, y2 = baboon.rectangle
                             f.write(
-                                "{0}, {1}, {2}, {3}\n".format(
-                                    centroid_x,
-                                    centroid_y,
-                                    baboon.diameter,
-                                    frame_counter,
+                                "{0}, {1}, {2}, {3}, {4}\n".format(
+                                    x1, y1, x2, y2, frame_counter,
                                 )
                             )
 

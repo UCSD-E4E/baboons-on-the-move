@@ -1,24 +1,22 @@
 """
 Module for calculating metrics.
 """
-from dataclasses import dataclass
 from typing import List
-
 import numpy as np
 
 from baboon_tracking import BaboonTracker
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
-from library.labeled_data import get_centroids_from_xml
+from library.labeled_data import get_regions_from_xml
 from library.region import check_if_same_region
 
 
-@dataclass
 class Metric:
     """Class for keeping track of a metric."""
 
-    true_positive: int = 0
-    false_negative: int = 0
-    false_positive: int = 0
+    def __init__(self, true_positive: int, false_negative: int, false_positive: int):
+        self.true_positive: int = true_positive
+        self.false_negative: int = false_negative
+        self.false_positive: int = false_positive
 
 
 def calculate_loss(metrics: List[Metric]):
@@ -37,9 +35,9 @@ def get_metrics() -> List[Metric]:
     Gets the metrics for the specified video.
     """
     print("testing on input")
-    baboon_labels = get_centroids_from_xml("./data/input.xml")
+    baboon_labels = get_regions_from_xml("./data/input.xml")
 
-    baboon_tracker = BaboonTracker(input_file="input.mp4")
+    baboon_tracker = BaboonTracker(input_file="./input.mp4")
     print("tracker opened")
     baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 
@@ -56,10 +54,7 @@ def get_metrics() -> List[Metric]:
         new_found_baboons = []
         labeled_baboons = []
         if baboons_mixin.baboons is not None:
-            new_found_baboons = [
-                (b.centroid[0], b.centroid[1], b.diameter)
-                for b in baboons_mixin.baboons
-            ]
+            new_found_baboons = [b.rectangle for b in baboons_mixin.baboons]
         if frame_counter in baboon_labels:
             labeled_baboons = baboon_labels[frame_counter]
 

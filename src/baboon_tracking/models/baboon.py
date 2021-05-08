@@ -9,6 +9,5 @@ class Baboon:
     Defines a baboon object.
     """
 
-    def __init__(self, centroid: Tuple[float, float], diameter: float):
-        self.centroid = centroid
-        self.diameter = diameter
+    def __init__(self, rectange: Tuple[int, int, int, int]):
+        self.rectangle = rectange

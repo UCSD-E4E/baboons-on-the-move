@@ -100,49 +100,53 @@ class Metrics extends React.Component<{}, IState> {
 
         const losses = (await lossesRef.get()).val();
 
-        const [latestUpdateString,] = Object.entries(losses).slice(-1)[0];
-        const latestUpdate = this.parseDate(latestUpdateString);
+        if (losses) {
+            const [latestUpdateString,] = Object.entries(losses).slice(-1)[0];
+            const latestUpdate = this.parseDate(latestUpdateString);
 
-        const data = Object.entries(losses).map((l, idx) => {
-            const [, value] = l;
-
-            return {
-                x: idx,
-                y: value as number
-            };
-        });
-
-        const dataPointBackgroundColor = Object.entries(losses).map(l => {
-            const [key,] = l;
-
-            return key === latest ? "#90cd8a" : "rgba(0, 0, 0, 0.1)";
-        })
-
-        let percentImprovement: number = 0;
-        if (data.length > 1) {
-            const best = Object.entries(losses).filter(l => {
-                const [key,] = l;
-
-                return key === latest;
-            }).map(l => {
+            const data = Object.entries(losses).map((l, idx) => {
                 const [, value] = l;
 
-                return value as number;
-            })[0];
-            percentImprovement = Math.round((data[0].y - best) * 10000 / data[0].y) / 100;
+                return {
+                    x: idx,
+                    y: value as number
+                };
+            });
+
+            const dataPointBackgroundColor = Object.entries(losses).map(l => {
+                const [key,] = l;
+
+                return key === latest ? "#90cd8a" : "rgba(0, 0, 0, 0.1)";
+            })
+
+            let percentImprovement: number = 0;
+            if (data.length > 1) {
+                const best = Object.entries(losses).filter(l => {
+                    const [key,] = l;
+
+                    return key === latest;
+                }).map(l => {
+                    const [, value] = l;
+
+                    return value as number;
+                })[0];
+                percentImprovement = Math.round((data[0].y - best) * 10000 / data[0].y) / 100;
+            }
+
+            const csv = btoa(["Iteration, Loss"]
+                .concat(data.map(d => `${d.x}, ${d.y}`))
+                .join("\n"));
+
+            return {
+                csv: csv,
+                data: data,
+                percentImprovement: percentImprovement,
+                latestUpdate: latestUpdate,
+                dataPointBackgroundColor: dataPointBackgroundColor
+            };
         }
 
-        const csv = btoa(["Iteration, Loss"]
-            .concat(data.map(d => `${d.x}, ${d.y}`))
-            .join("\n"));
-
-        return {
-            csv: csv,
-            data: data,
-            percentImprovement: percentImprovement,
-            latestUpdate: latestUpdate,
-            dataPointBackgroundColor: dataPointBackgroundColor
-        };
+        return {};
     }
 
     async componentDidMount() {
