@@ -28,7 +28,7 @@ def update_preset_pipelines(input_file="input.mp4"):
         factory(GetVideoFrame, "./data/" + input_file),
         PreprocessFrame,
         MotionDetector,
-        SaveVideo,
+        # SaveVideo,
         TestExit,
     )
 
