@@ -11,7 +11,7 @@ from baboon_tracking.stages.motion_detector.compute_transformation_matrices impo
     ComputeTransformationMatrices,
 )
 
-# from baboon_tracking.stages.motion_detector.draw_regions import DrawRegions
+from baboon_tracking.stages.motion_detector.draw_regions import DrawRegions
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.generate_mask_subcomponents import (
     GenerateMaskSubcomponents,
 )
@@ -29,7 +29,7 @@ from baboon_tracking.stages.motion_detector.store_history_frame import StoreHist
 
 from baboon_tracking.stages.show_last_frame import ShowLastFrame
 
-# from baboon_tracking.stages.save_video import SaveVideo
+from baboon_tracking.stages.save_video import SaveVideo
 from pipeline import Serial
 
 
@@ -52,11 +52,11 @@ class MotionDetector(Serial):
             ApplyMasks,
             ShowLastFrame,
             # HysteresisFilter,
-            ShowLastFrame,
+            # ShowLastFrame,
             NoiseReduction,
             ShowLastFrame,
             DetectBlobs,
             ShowLastFrame,
-            # DrawRegions,
-            # SaveVideo,
+            DrawRegions,
+            SaveVideo,
         )

@@ -61,5 +61,6 @@ def get_python_files():
         and os.path.realpath("./src/scripts") not in f
         and os.path.realpath("./test") not in f
         and os.path.realpath("./docs") not in f
+        and os.path.realpath("./src/third_party") not in f
         and f != os.path.realpath("./src/main.py")
     ]

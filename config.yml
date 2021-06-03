@@ -9,11 +9,13 @@ motion_detector:
     history_frames: 8
 
     registration:
-        max_features: 500
         good_match_percent: 0.15
+        ransac_max_error: 5.0
+        ssc_num_ret_points: 10000
+        ssc_tolerence: 0.1
 
     quantize_frames:
-        scale_factor: 50
+        scale_factor: 40
 
     noise_reduction:
         erode_kernel_size: 6
@@ -21,5 +23,5 @@ motion_detector:
         combine_kernel_size: 12
 
     hysteresis:
-        required_motion_observations: 6
+        required_motion_observations: 1
         required_no_motion_observations: 1

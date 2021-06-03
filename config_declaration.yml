@@ -22,15 +22,26 @@ motion_detector:
     std: 0.5
 
   registration:
-    max_features:
-      type: int32
-      min: 0
-      std: 5
     good_match_percent:
       type: float
       min: 0
       max: 1
       std: 0.1
+    ransac_max_error:
+      type: float
+      min: 0
+      max: 20
+      std: 0.1
+    ssc_num_ret_points:
+      type: int32
+      min: 0
+      max: 100000
+      std: 1
+    ssc_tolerence:
+      type: flat
+      min: 0
+      max: 2
+      std: 0.01
 
   quantize_frames:
     scale_factor:
