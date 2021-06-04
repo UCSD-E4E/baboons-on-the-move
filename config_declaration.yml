@@ -64,11 +64,11 @@ motion_detector:
       std: 0.5
 
   hysteresis:
-      required_motion_observations:
-        type: int32
-        min: 0
-        std: 0.1
-      required_no_motion_observations: 1
-        type: int32
-        min: 0
-        std: 0.1
+    required_motion_observations:
+      type: int32
+      min: 0
+      std: 0.1
+    required_no_motion_observations:
+      type: int32
+      min: 0
+      std: 0.1

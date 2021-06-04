@@ -16,6 +16,7 @@ from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.generate
     GenerateMaskSubcomponents,
 )
 from baboon_tracking.stages.motion_detector.generate_weights import GenerateWeights
+from baboon_tracking.stages.motion_detector.group_filter import GroupFilter
 
 # from baboon_tracking.stages.motion_detector.hysteresis_filter import HysteresisFilter
 from baboon_tracking.stages.motion_detector.noise_reduction import NoiseReduction
@@ -53,6 +54,8 @@ class MotionDetector(Serial):
             ShowLastFrame,
             # HysteresisFilter,
             # ShowLastFrame,
+            GroupFilter,
+            ShowLastFrame,
             NoiseReduction,
             ShowLastFrame,
             DetectBlobs,
