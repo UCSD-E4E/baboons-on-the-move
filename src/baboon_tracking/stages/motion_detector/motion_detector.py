@@ -29,7 +29,7 @@ from baboon_tracking.stages.motion_detector.store_history_frame import StoreHist
 
 from baboon_tracking.stages.show_last_frame import ShowLastFrame
 
-# from baboon_tracking.stages.save_video import SaveVideo
+from baboon_tracking.stages.save_video import SaveVideo
 from pipeline import Serial
 
 
@@ -58,5 +58,6 @@ class MotionDetector(Serial):
             DetectBlobs,
             ShowLastFrame,
             DrawRegions,
-            # SaveVideo,
+            # ShowLastFrame,
+            SaveVideo,
         )

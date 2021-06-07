@@ -14,6 +14,10 @@ from pipeline.parent_stage import ParentStage
 from pipeline.stage import Stage
 
 
+from library.firebase import initialize_app
+from config import get_latest_config, set_config
+
+
 preset_pipelines: Dict[str, Stage] = {}
 
 
@@ -32,6 +36,11 @@ def update_preset_pipelines(input_file="input.mp4"):
         # SaveVideo,
         TestExit,
     )
+
+    # if True:
+    #     initialize_app()
+    #     config, _, _ = get_latest_config()
+    #     set_config(config)
 
 
 update_preset_pipelines()
