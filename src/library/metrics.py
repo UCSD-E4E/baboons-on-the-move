@@ -34,10 +34,14 @@ def get_metrics() -> List[Metric]:
     """
     Gets the metrics for the specified video.
     """
+    runtime_config = {"display": False}
+
     print("testing on input")
     baboon_labels = get_regions_from_xml("./data/input.xml")
 
-    baboon_tracker = BaboonTracker(input_file="./input.mp4")
+    baboon_tracker = BaboonTracker(
+        input_file="./input.mp4", runtime_config=runtime_config
+    )
     print("tracker opened")
     baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 

@@ -2,15 +2,17 @@
 Save the frames from the previous step to the output folder.
 """
 import pathlib
+from typing import Dict
 
 import cv2
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.stages.show_last_frame import ShowLastFrame
 
-from pipeline.decorators import last_stage, stage
+from pipeline.decorators import last_stage, stage, runtime_config
 from pipeline.stage_result import StageResult
 
 
+@runtime_config("rconfig")
 @stage("capture")
 @last_stage("dependent")
 class SaveVideo(ShowLastFrame):
@@ -18,8 +20,10 @@ class SaveVideo(ShowLastFrame):
     Save the frames from the previous step to the output folder.
     """
 
-    def __init__(self, dependent: any, capture: CaptureMixin) -> None:
-        ShowLastFrame.__init__(self, dependent, capture)
+    def __init__(
+        self, dependent: any, capture: CaptureMixin, rconfig: Dict[str, any]
+    ) -> None:
+        ShowLastFrame.__init__(self, dependent, capture, rconfig)
 
         pathlib.Path("./output").mkdir(exist_ok=True)
 
@@ -27,6 +31,9 @@ class SaveVideo(ShowLastFrame):
 
     def execute(self) -> StageResult:
         ShowLastFrame.execute(self)
+
+        if not self._display:
+            return StageResult(True, True)
 
         # This searches the previous object for frame types.
         if not self._frame_video_writers:

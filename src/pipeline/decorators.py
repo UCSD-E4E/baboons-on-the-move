@@ -50,3 +50,19 @@ def stage(parameter: str):
         return function
 
     return inner_function
+
+
+def runtime_config(parameter: str):
+    """
+    Satisfies a parameter with the runtime configuration
+    """
+
+    def inner_function(function: Callable):
+        if not hasattr(function, "runtime_configuration"):
+            function.runtime_configuration = []
+
+        function.runtime_configuration.append(parameter)
+
+        return function
+
+    return inner_function

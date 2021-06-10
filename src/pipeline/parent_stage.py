@@ -17,8 +17,11 @@ class ParentStage(Stage):
 
     static_stages = []
 
-    def __init__(self, name: str, *stage_types: List[Callable]):
+    def __init__(self, name: str, *stage_types: List[Callable], runtime_config=None):
         Stage.__init__(self)
+
+        if runtime_config is None:
+            runtime_config = {}
 
         self.name = name
         self.stages: List[Stage] = []
@@ -41,6 +44,10 @@ class ParentStage(Stage):
                     ][0]
 
                     parameters_dict[stage] = most_recent_mixin
+
+            if hasattr(stage_type, "runtime_configuration"):
+                for parameter in stage_type.runtime_configuration:
+                    parameters_dict[parameter] = runtime_config
 
             self.stages.append(initializer(stage_type, parameters_dict=parameters_dict))
             self.static_stages.append(self.stages[-1])

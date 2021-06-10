@@ -16,8 +16,8 @@ class Serial(ParentStage):
     A serial pipeline which can be used as a stage to provide a logical unit.
     """
 
-    def __init__(self, name: str, *stage_types: List[Callable]):
-        ParentStage.__init__(self, name, *stage_types)
+    def __init__(self, name: str, *stage_types: List[Callable], runtime_config=None):
+        ParentStage.__init__(self, name, *stage_types, runtime_config=runtime_config)
 
     def execute(self) -> StageResult:
         """

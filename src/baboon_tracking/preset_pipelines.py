@@ -21,7 +21,7 @@ from pipeline.stage import Stage
 preset_pipelines: Dict[str, Stage] = {}
 
 
-def update_preset_pipelines(input_file="input.mp4"):
+def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
     """
     Updates the input information for the preset pipelines.
     """
@@ -35,6 +35,7 @@ def update_preset_pipelines(input_file="input.mp4"):
         MotionDetector,
         # SaveVideo,
         TestExit,
+        runtime_config=runtime_config,
     )
 
     # if True:
