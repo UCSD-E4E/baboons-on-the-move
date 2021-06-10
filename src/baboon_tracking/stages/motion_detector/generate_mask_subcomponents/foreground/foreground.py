@@ -1,6 +1,7 @@
 """
 Calculate the foreground of the current frame.
 """
+from typing import Dict
 
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foreground.group_frames import (
     GroupFrames,
@@ -24,13 +25,13 @@ class Foreground(Serial):
     Calculate the foreground of the current frame.
     """
 
-    def __init__(self, rconfig=None) -> None:
+    def __init__(self, rconfig: Dict[str, any]) -> None:
         Serial.__init__(
             self,
             "Foreground",
+            rconfig,
             GroupFrames,
             IntersectFrames,
             UnionIntersections,
             SubtractBackground,
-            runtime_config=rconfig,
         )

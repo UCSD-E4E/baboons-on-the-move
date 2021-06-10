@@ -2,7 +2,7 @@
 Base class for Serial and Parallel classes.  Implements common functionality between the two.
 """
 import inspect
-from typing import Callable, List
+from typing import Callable, List, Dict
 
 from pipeline.initializer import initializer
 from pipeline.models.time import Time
@@ -17,7 +17,9 @@ class ParentStage(Stage):
 
     static_stages = []
 
-    def __init__(self, name: str, *stage_types: List[Callable], runtime_config=None):
+    def __init__(
+        self, name: str, runtime_config: Dict[str, any], *stage_types: List[Callable]
+    ):
         Stage.__init__(self)
 
         if runtime_config is None:

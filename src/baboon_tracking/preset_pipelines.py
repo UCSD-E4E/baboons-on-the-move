@@ -30,12 +30,12 @@ def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
 
     preset_pipelines["default"] = Serial(
         "BaboonTracker",
+        runtime_config,
         factory(GetVideoFrame, "./data/" + input_file),
         PreprocessFrame,
         MotionDetector,
         # SaveVideo,
         TestExit,
-        runtime_config=runtime_config,
     )
 
     # if True:

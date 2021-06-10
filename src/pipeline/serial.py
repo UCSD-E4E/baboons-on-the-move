@@ -2,7 +2,7 @@
 Implements a serial pipeline.
 """
 
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Dict
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -16,8 +16,10 @@ class Serial(ParentStage):
     A serial pipeline which can be used as a stage to provide a logical unit.
     """
 
-    def __init__(self, name: str, *stage_types: List[Callable], runtime_config=None):
-        ParentStage.__init__(self, name, *stage_types, runtime_config=runtime_config)
+    def __init__(
+        self, name: str, runtime_config: Dict[str, any], *stage_types: List[Callable]
+    ):
+        ParentStage.__init__(self, name, runtime_config, *stage_types)
 
     def execute(self) -> StageResult:
         """

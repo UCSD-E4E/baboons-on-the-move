@@ -1,6 +1,7 @@
 """
 Implements a motion tracker pipeline.
 """
+from typing import Dict
 
 from baboon_tracking.stages.motion_detector.detect_blobs import DetectBlobs
 from baboon_tracking.stages.motion_detector.apply_masks import ApplyMasks
@@ -41,10 +42,11 @@ class MotionDetector(Serial):
     Implements a motion tracker pipeline.
     """
 
-    def __init__(self, rconfig=None):
+    def __init__(self, rconfig: Dict[str, any]):
         Serial.__init__(
             self,
             "MotionDetector",
+            rconfig,
             StoreHistoryFrame,
             ComputeTransformationMatrices,
             TransformedFrames,
@@ -65,5 +67,4 @@ class MotionDetector(Serial):
             DrawRegions,
             # ShowLastFrame,
             SaveVideo,
-            runtime_config=rconfig,
         )

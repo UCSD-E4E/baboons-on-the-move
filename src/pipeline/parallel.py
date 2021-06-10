@@ -1,7 +1,7 @@
 """
 Executes child stages in parallel.
 """
-from typing import Callable, List, Tuple
+from typing import Callable, List, Tuple, Dict
 
 import numpy as np
 from PIL import Image, ImageDraw
@@ -15,8 +15,10 @@ class Parallel(ParentStage):
     Executes child stages in parallel.
     """
 
-    def __init__(self, name: str, *stage_types: List[Callable], runtime_config=None):
-        ParentStage.__init__(self, name, *stage_types, runtime_config=runtime_config)
+    def __init__(
+        self, name: str, runtime_config: Dict[str, any], *stage_types: List[Callable]
+    ):
+        ParentStage.__init__(self, name, runtime_config, *stage_types)
 
     def execute(self) -> StageResult:
         """
