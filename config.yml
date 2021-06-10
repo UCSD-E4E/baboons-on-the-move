@@ -25,3 +25,6 @@ motion_detector:
     hysteresis:
         required_motion_observations: 1
         required_no_motion_observations: 1
+
+    group_filter:
+        size: 7

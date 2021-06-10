@@ -14,8 +14,8 @@ from pipeline.parent_stage import ParentStage
 from pipeline.stage import Stage
 
 
-from library.firebase import initialize_app
-from config import get_latest_config, set_config
+# from library.firebase import initialize_app
+# from config import get_latest_config, set_config
 
 
 preset_pipelines: Dict[str, Stage] = {}

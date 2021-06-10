@@ -72,3 +72,10 @@ motion_detector:
       type: int32
       min: 0
       std: 0.1
+
+  group_filter:
+    size:
+      type: int32
+      min: 0
+      max: 8
+      std: 0.1

@@ -1,18 +1,30 @@
-import numpy as np
+"""
+Implements a group filter to ensure that all pixels are in a group at least size n.
+"""
+
 from typing import Tuple
+import numpy as np
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.models.frame import Frame
 from pipeline import Stage
-from pipeline.decorators import stage
+from pipeline.decorators import config, stage
 from pipeline.stage_result import StageResult
 
 
+@config("group_size", "group_filter/size")
 @stage("moving_foreground")
 class GroupFilter(Stage, MovingForegroundMixin):
-    def __init__(self, moving_foreground: MovingForegroundMixin) -> None:
+    """
+    Implements a group filter to ensure that all pixels are in a group at least size n.
+    """
+
+    def __init__(
+        self, group_size: int, moving_foreground: MovingForegroundMixin
+    ) -> None:
         Stage.__init__(self)
         MovingForegroundMixin.__init__(self)
 
+        self._group_size = group_size
         self._moving_foreground = moving_foreground
 
     def _pixel_has_neighbors(self, coord: Tuple[int, int]):
@@ -39,7 +51,7 @@ class GroupFilter(Stage, MovingForegroundMixin):
                 if moving_foreground[y, x] > 0:
                     count += 1
 
-                if count >= 7:
+                if count >= self._group_size:
                     return True
 
         return False
@@ -61,4 +73,3 @@ class GroupFilter(Stage, MovingForegroundMixin):
         )
 
         return StageResult(True, True)
-
