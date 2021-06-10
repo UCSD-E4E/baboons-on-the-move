@@ -8,14 +8,16 @@ from baboon_tracking.stages.preprocess.convert_from_bgr2gray import ConvertFromB
 # from baboon_tracking.stages.preprocess.denoise import Denoise
 from baboon_tracking.stages.show_last_frame import ShowLastFrame
 from pipeline import Serial
+from pipeline.decorators import runtime_config
 
 
+@runtime_config("rconfig")
 class PreprocessFrame(Serial):
     """
     Pipeline step for preprocessing a frame.
     """
 
-    def __init__(self):
+    def __init__(self, rconfig=None):
         Serial.__init__(
             self,
             "PreprocessFrame",
@@ -23,4 +25,5 @@ class PreprocessFrame(Serial):
             BlurGray,
             # Denoise,
             ShowLastFrame,
+            runtime_config=rconfig,
         )

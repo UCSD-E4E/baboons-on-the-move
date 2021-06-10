@@ -15,14 +15,16 @@ from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foregrou
     UnionIntersections,
 )
 from pipeline import Serial
+from pipeline.decorators import runtime_config
 
 
+@runtime_config("rconfig")
 class Foreground(Serial):
     """
     Calculate the foreground of the current frame.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, rconfig=None) -> None:
         Serial.__init__(
             self,
             "Foreground",
@@ -30,4 +32,5 @@ class Foreground(Serial):
             IntersectFrames,
             UnionIntersections,
             SubtractBackground,
+            runtime_config=rconfig,
         )

@@ -9,14 +9,20 @@ from baboon_tracking.stages.motion_detector.transformed_frames.shift_history_fra
     ShiftHistoryFrames,
 )
 from pipeline.parallel import Parallel
+from pipeline.decorators import runtime_config
 
 
+@runtime_config("rconfig")
 class TransformedFrames(Parallel):
     """
     Transforms frames using previously computed transformation matrix.
     """
 
-    def __init__(self):
+    def __init__(self, rconfig=None):
         Parallel.__init__(
-            self, "TransformedFrames", ShiftHistoryFrames, ComputeShiftedMasks,
+            self,
+            "TransformedFrames",
+            ShiftHistoryFrames,
+            ComputeShiftedMasks,
+            runtime_config=rconfig,
         )

@@ -32,14 +32,16 @@ from baboon_tracking.stages.show_last_frame import ShowLastFrame
 
 from baboon_tracking.stages.save_video import SaveVideo
 from pipeline import Serial
+from pipeline.decorators import runtime_config
 
 
+@runtime_config("rconfig")
 class MotionDetector(Serial):
     """
     Implements a motion tracker pipeline.
     """
 
-    def __init__(self):
+    def __init__(self, rconfig=None):
         Serial.__init__(
             self,
             "MotionDetector",
@@ -63,4 +65,5 @@ class MotionDetector(Serial):
             DrawRegions,
             # ShowLastFrame,
             SaveVideo,
+            runtime_config=rconfig,
         )
