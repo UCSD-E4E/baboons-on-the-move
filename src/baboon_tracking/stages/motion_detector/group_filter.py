@@ -11,7 +11,7 @@ from pipeline.decorators import config, stage
 from pipeline.stage_result import StageResult
 
 
-@config("group_size", "group_filter/size")
+@config("group_size", "motion_detector/group_filter/size")
 @stage("moving_foreground")
 class GroupFilter(Stage, MovingForegroundMixin):
     """
