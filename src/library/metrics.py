@@ -3,6 +3,7 @@ Module for calculating metrics.
 """
 from typing import List
 import numpy as np
+from tqdm import tqdm
 
 from baboon_tracking import BaboonTracker
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
@@ -36,21 +37,19 @@ def get_metrics() -> List[Metric]:
     """
     runtime_config = {"display": False}
 
-    print("testing on input")
+    tqdm.write("testing on input")
     baboon_labels = get_regions_from_xml("./data/input.xml")
 
     baboon_tracker = BaboonTracker(
         input_file="./input.mp4", runtime_config=runtime_config
     )
-    print("tracker opened")
+    tqdm.write("tracker opened")
     baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 
     should_continue = True
     frame_counter = 0
     metrics: List[Metric] = []
     while should_continue:
-        print("frame: " + str(frame_counter))
-
         true_positive = 0
         false_positive = 0
 
