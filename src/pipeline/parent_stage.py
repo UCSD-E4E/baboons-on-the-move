@@ -62,6 +62,10 @@ class ParentStage(Stage):
 
         return time
 
+    def on_init(self) -> None:
+        for stage in self.stages:
+            stage.on_init()
+
     def on_destroy(self) -> None:
         for stage in self.stages:
             stage.on_destroy()

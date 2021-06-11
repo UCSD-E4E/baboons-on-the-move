@@ -18,6 +18,8 @@ class BaboonTracker:
         update_preset_pipelines(input_file=input_file, runtime_config=runtime_config)
         self._pipeline = preset_pipelines[pipeline_name]
 
+        self._pipeline.on_init()
+
     def step(self) -> StageResult:
         """
         Runs one step of the algorithm.

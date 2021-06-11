@@ -20,8 +20,12 @@ class DisplayProgress(Stage):
     def __init__(self, capture: CaptureMixin, frame: FrameMixin) -> None:
         Stage.__init__(self)
 
-        self._progress = tqdm(range(int(capture.frame_count))).__iter__()
+        self._frame_count = int(capture.frame_count)
+        self._progress = None
         self._frame = frame
+
+    def on_init(self) -> None:
+        self._progress = tqdm(range(self._frame_count)).__iter__()
 
     def execute(self) -> StageResult:
         idx = next(self._progress)
@@ -30,3 +34,6 @@ class DisplayProgress(Stage):
             idx = next(self._progress)
 
         return StageResult(True, True)
+
+    def on_destroy(self) -> None:
+        self._progress.close()
