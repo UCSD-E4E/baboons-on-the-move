@@ -4,8 +4,8 @@ Automatically sizes the window to the user's screen.
 """
 import tkinter as tk
 import os
-import cv2
 from typing import Dict
+import cv2
 
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.models.frame import Frame
