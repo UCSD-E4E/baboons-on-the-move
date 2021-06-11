@@ -49,8 +49,6 @@ def get_metrics() -> List[Metric]:
     frame_counter = 0
     metrics: List[Metric] = []
     while should_continue:
-        print("frame: " + str(frame_counter))
-
         true_positive = 0
         false_positive = 0
 
