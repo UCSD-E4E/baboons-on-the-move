@@ -47,6 +47,7 @@ def _pixel_has_neighbors(moving_foreground, group_size: int, coord: Tuple[int, i
 def _execute(
     moving_foreground, curr_moving_foreground, group_size: int, height: int, width: int
 ):
+    # pylint: disable=not-an-iterable
     for y in prange(height):
         for x in prange(width):
             if _pixel_has_neighbors(curr_moving_foreground, group_size, (x, y),):
@@ -74,14 +75,6 @@ class GroupFilter(Stage, MovingForegroundMixin):
             self._moving_foreground.moving_foreground.get_frame()
         )
         height, width = moving_foreground.shape
-
-        # _execute[5, 256](
-        #     moving_foreground,
-        #     self._moving_foreground.moving_foreground.get_frame(),
-        #     self._group_size,
-        #     height,
-        #     width,
-        # )
 
         _execute(
             moving_foreground,
