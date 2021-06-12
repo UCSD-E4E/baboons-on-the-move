@@ -24,7 +24,7 @@ from pipeline.decorators import stage, config
     key="motion_detector/noise_reduction/combine_kernel_size",
 )
 @stage("moving_foreground")
-class NoiseReduction(Stage, MovingForegroundMixin):
+class DilateErodeFilter(Stage, MovingForegroundMixin):
     """
     Reduces the noise as a result of the motion detector.
     """

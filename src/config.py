@@ -42,6 +42,18 @@ def get_config() -> Dict:
         return CONFIG_STORE
 
 
+def get_config_part(key: str) -> Dict:
+    config = get_config()
+
+    key_parts = key.split("/")
+
+    key_curr_config = config
+    for key_part in key_parts:
+        key_curr_config = key_curr_config[key_part]
+
+    return key_curr_config
+
+
 def _update_config(config: Dict, declaration: Dict):
     for key, value in declaration.items():
         if "type" in value:

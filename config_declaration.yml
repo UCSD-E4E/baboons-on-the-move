@@ -67,15 +67,50 @@ motion_detector:
     required_motion_observations:
       type: int32
       min: 0
-      std: 0.1
+      std: 0.5
     required_no_motion_observations:
       type: int32
       min: 0
-      std: 0.1
+      std: 0.5
 
   group_filter:
     size:
       type: int32
       min: 0
       max: 8
-      std: 0.1
+      std: 0.5
+
+motion_detector_stages:
+  HysteresisFilter:
+      order:
+        type: int32
+        min: 0
+        max: 100
+        std: 0.5
+      enabled:
+        type: int32
+        min: 0
+        max: 1
+        std: 0.5
+  GroupFilter:
+      order:
+        type: int32
+        min: 0
+        max: 100
+        std: 0.5
+      enabled:
+        type: int32
+        min: 0
+        max: 1
+        std: 0.5
+  DilateErodeFilter:
+      order:
+        type: int32
+        min: 0
+        max: 100
+        std: 0.5
+      enabled:
+        type: int32
+        min: 0
+        max: 1
+        std: 0.5

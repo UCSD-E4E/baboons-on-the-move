@@ -3,7 +3,7 @@ Intializes classes, satisfying configuration and supplied parameters.
 """
 import inspect
 from typing import Callable, Dict
-from config import get_config
+from config import get_config_part
 
 
 def initializer(function: Callable, parameters_dict: Dict[str, any]):
@@ -11,16 +11,8 @@ def initializer(function: Callable, parameters_dict: Dict[str, any]):
     Intializes classes, satisfying configuration and supplied parameters.
     """
     if hasattr(function, "config"):
-        current_config: Dict[str, any] = get_config()
-
         for key in function.config.keys():
-            key_parts = function.config[key].split("/")
-
-            key_curr_config = current_config
-            for key_part in key_parts:
-                key_curr_config = key_curr_config[key_part]
-
-            parameters_dict[key] = key_curr_config
+            parameters_dict[key] = get_config_part(function.config[key])
 
     signature = inspect.signature(function.__init__)
 

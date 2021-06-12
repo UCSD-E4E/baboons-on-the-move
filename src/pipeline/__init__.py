@@ -6,3 +6,4 @@ from .stage import Stage
 from .stage_result import StageResult
 from .serial import Serial
 from .parallel import Parallel
+from .config_serial import ConfigSerial

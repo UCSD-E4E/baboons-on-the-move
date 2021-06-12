@@ -11,6 +11,7 @@ from baboon_tracking.stages.motion_detector.compute_moving_foreground import (
 from baboon_tracking.stages.motion_detector.compute_transformation_matrices import (
     ComputeTransformationMatrices,
 )
+from baboon_tracking.stages.motion_detector.dilate_erode_filter import DilateErodeFilter
 
 from baboon_tracking.stages.motion_detector.draw_regions import DrawRegions
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.generate_mask_subcomponents import (
@@ -18,9 +19,11 @@ from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.generate
 )
 from baboon_tracking.stages.motion_detector.generate_weights import GenerateWeights
 from baboon_tracking.stages.motion_detector.group_filter import GroupFilter
+from baboon_tracking.stages.motion_detector.noise_reduction.noise_reduction import (
+    NoiseReduction,
+)
 
 # from baboon_tracking.stages.motion_detector.hysteresis_filter import HysteresisFilter
-from baboon_tracking.stages.motion_detector.noise_reduction import NoiseReduction
 from baboon_tracking.stages.motion_detector.quantize_history_frames import (
     QuantizeHistoryFrames,
 )
@@ -56,12 +59,7 @@ class MotionDetector(Serial):
             ComputeMovingForeground,
             ApplyMasks,
             ShowLastFrame,
-            # HysteresisFilter,
-            # ShowLastFrame,
-            GroupFilter,
-            ShowLastFrame,
             NoiseReduction,
-            ShowLastFrame,
             DetectBlobs,
             ShowLastFrame,
             DrawRegions,
