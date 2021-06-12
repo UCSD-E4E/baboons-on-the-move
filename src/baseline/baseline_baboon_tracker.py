@@ -21,9 +21,13 @@ class BaselineBaboonTracker:
         root = "./data/tests"
         files = [join("tests", d) for d in listdir(root) if isfile(join(root, d))]
 
+        runtime_config = {"display": False}
+
         for file in files:
             output_file = join(baseline_folder, splitext(basename(file))[0] + ".csv")
-            baboon_tracker = BaboonTracker(input_file=file)
+            baboon_tracker = BaboonTracker(
+                input_file=file, runtime_config=runtime_config
+            )
             baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 
             with open(output_file, "w") as f:

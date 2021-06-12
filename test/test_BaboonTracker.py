@@ -29,12 +29,16 @@ class TestBaboonTracker(unittest.TestCase):
         with open("baseline.txt", "r") as f:
             baseline_folder = "./data/tests/baselines/" + f.readline()
 
+        runtime_config = {"display": False}
+
         print("")
         for file in files:
             print('Testing "' + file + '"')
 
             baseline_file = join(baseline_folder, splitext(basename(file))[0] + ".csv")
-            baboon_tracker = BaboonTracker(input_file=file)
+            baboon_tracker = BaboonTracker(
+                input_file=file, runtime_config=runtime_config
+            )
             baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 
             baboons: List[str] = []
@@ -48,13 +52,13 @@ class TestBaboonTracker(unittest.TestCase):
 
                 if baboons_mixin.baboons is not None:
                     curr_frame_baboons = [
-                        (float(x), float(y), float(diameter))
-                        for x, y, diameter, frame in baboons
+                        (float(x1), float(y1), float(x2), float(y2))
+                        for x1, y1, x2, y2, frame in baboons
                         if int(frame) == frame_counter
                     ]
 
                     new_found_baboons = [
-                        (b.centroid[0], b.centroid[1], b.diameter)
+                        (b.rectangle[0], b.rectangle[1], b.rectangle[2], b.rectangle[3])
                         for b in baboons_mixin.baboons
                     ]
 

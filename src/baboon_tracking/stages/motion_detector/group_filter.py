@@ -4,7 +4,7 @@ Implements a group filter to ensure that all pixels are in a group at least size
 
 from typing import Tuple
 import numpy as np
-from numba import jit, cuda
+from numba import jit, prange
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.models.frame import Frame
 from pipeline import Stage
@@ -42,13 +42,13 @@ def _pixel_has_neighbors(moving_foreground, group_size: int, coord: Tuple[int, i
     return False
 
 
-@jit(nopython=True)
+@jit(nopython=True, parallel=True)
 # @cuda.jit()
 def _execute(
     moving_foreground, curr_moving_foreground, group_size: int, height: int, width: int
 ):
-    for y in range(height):
-        for x in range(width):
+    for y in prange(height):
+        for x in prange(width):
             if _pixel_has_neighbors(curr_moving_foreground, group_size, (x, y),):
                 moving_foreground[y, x] = 255
 
