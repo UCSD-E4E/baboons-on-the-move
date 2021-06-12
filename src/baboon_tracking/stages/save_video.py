@@ -29,10 +29,14 @@ class SaveVideo(ShowLastFrame):
 
         self._frame_video_writers = None
 
+        self._save = True
+        if "save" in rconfig:
+            self._save = rconfig["save"]
+
     def execute(self) -> StageResult:
         ShowLastFrame.execute(self)
 
-        if not self._display:
+        if not self._save:
             return StageResult(True, True)
 
         # This searches the previous object for frame types.

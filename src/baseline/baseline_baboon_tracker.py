@@ -21,7 +21,7 @@ class BaselineBaboonTracker:
         root = "./data/tests"
         files = [join("tests", d) for d in listdir(root) if isfile(join(root, d))]
 
-        runtime_config = {"display": False}
+        runtime_config = {"display": False, "save": False}
 
         for file in files:
             output_file = join(baseline_folder, splitext(basename(file))[0] + ".csv")

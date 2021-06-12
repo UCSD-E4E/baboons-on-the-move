@@ -29,7 +29,7 @@ class TestBaboonTracker(unittest.TestCase):
         with open("baseline.txt", "r") as f:
             baseline_folder = "./data/tests/baselines/" + f.readline()
 
-        runtime_config = {"display": False}
+        runtime_config = {"display": False, "save": False}
 
         print("")
         for file in files:

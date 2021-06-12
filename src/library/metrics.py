@@ -35,7 +35,7 @@ def get_metrics() -> List[Metric]:
     """
     Gets the metrics for the specified video.
     """
-    runtime_config = {"display": False}
+    runtime_config = {"display": False, "save": False}
 
     tqdm.write("testing on input")
     baboon_labels = get_regions_from_xml("./data/input.xml")
