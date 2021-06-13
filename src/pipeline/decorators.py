@@ -36,7 +36,7 @@ def last_stage(parameter: str):
     return inner_function
 
 
-def stage(parameter: str):
+def stage(parameter: str, is_property=False):
     """
     Satisfies a parameter with the last stage executed which is an instance of the mixin type.
     """
@@ -45,14 +45,14 @@ def stage(parameter: str):
         if not hasattr(function, "stages"):
             function.stages = []
 
-        function.stages.append(parameter)
+        function.stages.append((parameter, is_property))
 
         return function
 
     return inner_function
 
 
-def runtime_config(parameter: str):
+def runtime_config(parameter: str, is_property=False):
     """
     Satisfies a parameter with the runtime configuration
     """
@@ -61,7 +61,7 @@ def runtime_config(parameter: str):
         if not hasattr(function, "runtime_configuration"):
             function.runtime_configuration = []
 
-        function.runtime_configuration.append(parameter)
+        function.runtime_configuration.append((parameter, is_property))
 
         return function
 

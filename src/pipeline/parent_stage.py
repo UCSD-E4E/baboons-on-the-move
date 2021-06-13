@@ -35,7 +35,10 @@ class ParentStage(Stage):
                     parameters_dict[parameter] = self.stages[-1]
 
             if hasattr(stage_type, "stages"):
-                for stage in stage_type.stages:
+                for stage, is_property in stage_type.stages:
+                    if is_property:
+                        continue
+
                     signature = inspect.signature(stage_type)
                     depen_type = signature.parameters[stage].annotation
 
@@ -48,10 +51,17 @@ class ParentStage(Stage):
                     parameters_dict[stage] = most_recent_mixin
 
             if hasattr(stage_type, "runtime_configuration"):
-                for parameter in stage_type.runtime_configuration:
+                for parameter, is_property in stage_type.runtime_configuration:
+                    if is_property:
+                        continue
+
                     parameters_dict[parameter] = runtime_config
 
-            self.stages.append(initializer(stage_type, parameters_dict=parameters_dict))
+            self.stages.append(
+                initializer(
+                    stage_type, parameters_dict, runtime_config, self.static_stages,
+                )
+            )
             self.static_stages.append(self.stages[-1])
 
     def get_time(self) -> Time:
