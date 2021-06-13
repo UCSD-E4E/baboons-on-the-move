@@ -1,3 +1,7 @@
+"""
+Provides a decorator for automatically showing the results of current stage to the screen.
+"""
+
 import os
 import tkinter as tk
 from typing import Callable, Dict
@@ -10,6 +14,9 @@ from pipeline.decorators import runtime_config, stage
 
 
 def show_result(function: Callable):
+    """
+    Provides a decorator for automatically showing the results of current stage to the screen.
+    """
     prev_execute = function.execute
     display = True
     im_size = None

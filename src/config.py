@@ -43,6 +43,9 @@ def get_config() -> Dict:
 
 
 def get_config_part(key: str) -> Dict:
+    """
+    Gets the config part at the specified key.
+    """
     config = get_config()
 
     key_parts = key.split("/")

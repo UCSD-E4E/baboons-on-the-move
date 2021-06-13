@@ -1,3 +1,7 @@
+"""
+Provides a decorator for automatically saving the results of current stage to a video file.
+"""
+
 from typing import Callable, Dict
 import pathlib
 import cv2
@@ -9,6 +13,10 @@ from pipeline.stage_result import StageResult
 
 
 def save_result(function: Callable):
+    """
+    Provides a decorator for automatically saving the results of current stage to a video file.
+    """
+
     prev_execute = function.execute
     prev_on_destroy = function.on_destroy
     save = True

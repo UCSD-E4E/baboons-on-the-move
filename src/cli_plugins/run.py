@@ -9,14 +9,17 @@ from cli_plugins.cli_plugin import CliPlugin  # pylint: disable=import-outside-t
 
 
 def str2bool(value):
+    """
+    Sets up a command line argument that can be converted to bool.
+    """
     if isinstance(value, bool):
         return value
-    elif value.lower() in ("yes", "true", "t", "y", "1"):
+    if value.lower() in ("yes", "true", "t", "y", "1"):
         return True
-    elif value.lower() in ("no", "false", "f", "n", "0"):
+    if value.lower() in ("no", "false", "f", "n", "0"):
         return False
-    else:
-        raise argparse.ArgumentTypeError("Boolen value expected.")
+
+    raise argparse.ArgumentTypeError("Boolen value expected.")
 
 
 class Run(CliPlugin):
