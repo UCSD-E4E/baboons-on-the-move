@@ -2,7 +2,7 @@
 Detect blobs using the built in OpenCV blob detector.
 """
 import cv2
-from baboon_tracking.decorators.show import show
+from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.blob_image_mixin import BlobImageMixin
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
@@ -14,7 +14,7 @@ from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
 
 
-@show
+@show_result
 @stage("moving_foreground")
 class DetectBlobs(Stage, BlobImageMixin, BaboonsMixin):
     """

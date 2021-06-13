@@ -5,7 +5,7 @@ Implements a group filter to ensure that all pixels are in a group at least size
 from typing import Tuple
 import numpy as np
 from numba import jit, prange
-from baboon_tracking.decorators.show import show
+from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.models.frame import Frame
 from pipeline import Stage
@@ -55,7 +55,7 @@ def _execute(
                 moving_foreground[y, x] = 255
 
 
-@show
+@show_result
 @config("group_size", "motion_detector/group_filter/size")
 @stage("moving_foreground")
 class GroupFilter(Stage, MovingForegroundMixin):

@@ -3,7 +3,7 @@ Blurs a gray frame using a Gaussian blur.
 """
 
 import cv2
-from baboon_tracking.decorators.show import show
+from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
 from baboon_tracking.models.frame import Frame
 from pipeline.decorators import stage, config
@@ -11,7 +11,7 @@ from pipeline import Stage
 from pipeline.stage_result import StageResult
 
 
-@show
+@show_result
 @config(parameter_name="kernel_size", key="preprocess/kernel_size")
 @stage("preprocessed_frame")
 class BlurGray(Stage, PreprocessedFrameMixin):

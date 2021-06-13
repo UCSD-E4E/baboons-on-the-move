@@ -2,7 +2,7 @@
 Implements a filter using Hysteriesis
 """
 import numpy as np
-from baboon_tracking.decorators.show import show
+from baboon_tracking.decorators.show_result import show_result
 
 from baboon_tracking.models.frame import Frame
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
@@ -11,7 +11,7 @@ from pipeline.decorators import stage, config
 from pipeline.stage_result import StageResult
 
 
-@show
+@show_result
 @config(
     parameter_name="required_motion_observations",
     key="motion_detector/hysteresis/required_motion_observations",

@@ -3,7 +3,7 @@ Reduces the noise as a result of the motion detector.
 """
 import cv2
 import numpy as np
-from baboon_tracking.decorators.show import show
+from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.models.frame import Frame
 
@@ -12,7 +12,7 @@ from pipeline.stage_result import StageResult
 from pipeline.decorators import stage, config
 
 
-@show
+@show_result
 @config(
     parameter_name="erode_kernel_size",
     key="motion_detector/noise_reduction/erode_kernel_size",

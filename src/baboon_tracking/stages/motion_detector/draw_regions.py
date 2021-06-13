@@ -3,7 +3,8 @@ Implements a stage that takes the input frame and draws the regions over it.
 """
 
 import cv2
-from baboon_tracking.decorators.show import show
+from baboon_tracking.decorators.save_result import save_result
+from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.frame import Frame
@@ -12,7 +13,8 @@ from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
 
 
-@show
+@save_result
+@show_result
 @stage("frame")
 @stage("baboons")
 class DrawRegions(Stage):

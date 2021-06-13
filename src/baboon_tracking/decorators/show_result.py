@@ -9,7 +9,7 @@ from pipeline.stage_result import StageResult
 from pipeline.decorators import runtime_config, stage
 
 
-def show(function: Callable):
+def show_result(function: Callable):
     prev_execute = function.execute
     display = True
     im_size = None
@@ -66,7 +66,7 @@ def show(function: Callable):
                 im_size = (width, height)
 
             if os.environ.get("DISPLAY", "") != "":
-                # This searches the previous object for frame types.
+                # This searches the current object for frame types.
                 if not frame_attributes:
                     frame_attributes = [
                         a for a in dir(self) if isinstance(getattr(self, a), Frame)
@@ -87,13 +87,12 @@ def show(function: Callable):
         return result
 
     function.execute = execute
-    function.set_runtime_config = set_runtime_config
-    function.set_capture = set_capture
+    function.show_result_set_runtime_config = set_runtime_config
+    function.show_result_set_capture = set_capture
 
-    function = runtime_config("set_runtime_config", is_property=True)(function)
-    function = stage("set_capture", is_property=True)(function)
+    function = runtime_config("show_result_set_runtime_config", is_property=True)(
+        function
+    )
+    function = stage("show_result_set_capture", is_property=True)(function)
 
     return function
-
-
-show.temp = None
