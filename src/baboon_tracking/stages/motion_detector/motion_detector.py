@@ -12,11 +12,11 @@ from baboon_tracking.stages.motion_detector.compute_transformation_matrices impo
     ComputeTransformationMatrices,
 )
 
-from baboon_tracking.stages.motion_detector.draw_regions import DrawRegions
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.generate_mask_subcomponents import (
     GenerateMaskSubcomponents,
 )
 from baboon_tracking.stages.motion_detector.generate_weights import GenerateWeights
+from baboon_tracking.stages.motion_detector.min_size_filter import MinSizeFilter
 from baboon_tracking.stages.motion_detector.noise_reduction.noise_reduction import (
     NoiseReduction,
 )
@@ -56,7 +56,5 @@ class MotionDetector(Serial):
             ApplyMasks,
             NoiseReduction,
             DetectBlobs,
-            DrawRegions,
-            # ShowLastFrame,
-            # SaveVideo,
+            MinSizeFilter,
         )

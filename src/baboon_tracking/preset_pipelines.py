@@ -2,7 +2,9 @@
 Provides an algorithm for extracting baboons from drone footage.
 """
 from typing import Dict
+from baboon_tracking.stages.dead_reckoning import DeadReckoning
 from baboon_tracking.stages.display_progress import DisplayProgress
+from baboon_tracking.stages.draw_regions import DrawRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
 from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
@@ -15,8 +17,8 @@ from pipeline.parent_stage import ParentStage
 from pipeline.stage import Stage
 
 
-# from library.firebase import initialize_app
-# from config import get_latest_config, set_config
+from library.firebase import initialize_app
+from config import get_latest_config, set_config
 
 
 preset_pipelines: Dict[str, Stage] = {}
@@ -35,15 +37,15 @@ def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
         factory(GetVideoFrame, "./data/" + input_file),
         PreprocessFrame,
         MotionDetector,
-        # SaveVideo,
+        DeadReckoning,
+        DrawRegions,
         TestExit,
         DisplayProgress,
     )
 
-    # if True:
-    #     initialize_app()
-    #     config, _, _ = get_latest_config()
-    #     set_config(config)
+    initialize_app()
+    config, _, _ = get_latest_config()
+    set_config(config)
 
 
 update_preset_pipelines()

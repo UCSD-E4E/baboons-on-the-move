@@ -80,6 +80,22 @@ motion_detector:
       max: 8
       std: 0.5
 
+  min_size_filter:
+    min_size:
+      type: int32
+      min: 0
+      std: 0.5
+
+dead_reckoning:
+    dist_threshold:
+      type: int32
+      min: 0
+      std: 0.5
+    same_region_threshold:
+      type: float
+      min: 0
+      std: 0.01
+
 motion_detector_stages:
   HysteresisFilter:
       order:
