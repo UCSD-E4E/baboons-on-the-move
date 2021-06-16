@@ -17,7 +17,6 @@ from pipeline.parent_stage import ParentStage
 from pipeline.stage import Stage
 
 
-from library.firebase import initialize_app
 from config import get_latest_config, set_config
 
 
@@ -43,7 +42,6 @@ def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
         DisplayProgress,
     )
 
-    initialize_app()
     config, _, _ = get_latest_config()
     set_config(config)
 

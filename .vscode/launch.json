@@ -13,6 +13,8 @@
             "args": [
                 "run",
                 "--save",
+                "no",
+                "--display",
                 "no"
             ]
         }

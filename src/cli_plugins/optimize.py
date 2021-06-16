@@ -4,8 +4,10 @@ CLI Plugin for performing optimization.
 from argparse import ArgumentParser, Namespace
 
 from numpy.core.numeric import Inf
+from firebase_admin import db
 from cli_plugins.cli_plugin import CliPlugin
 from library.metrics import calculate_loss, get_metrics
+from library.firebase import initialize_app
 from config import get_latest_config, step_config, set_config, save_cloud_config
 
 
@@ -24,7 +26,15 @@ class Optimize(CliPlugin):
         prev_loss = Inf
         loss = -Inf
 
-        while True:
+        initialize_app()
+        ref = db.reference("optimize")
+        continue_ref = ref.child("continue")
+
+        if continue_ref.get() is None:
+            continue_ref.set(True)
+
+        # Allow optimization to be killed
+        while continue_ref.get():
             config, prev_loss, pulled_from_cloud = get_latest_config()
             if pulled_from_cloud:
                 config = step_config(config)

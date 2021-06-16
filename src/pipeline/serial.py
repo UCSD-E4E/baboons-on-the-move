@@ -39,6 +39,10 @@ class Serial(ParentStage):
                 return StageResult(False, None)
 
         should_continue = False
+
+        if not self.stages:
+            should_continue = True
+
         if result is not None:
             should_continue = result.next_stage
 

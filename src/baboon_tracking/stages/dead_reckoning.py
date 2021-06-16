@@ -1,9 +1,13 @@
-from numpy.core.numeric import identity
+import pathlib
+from typing import List
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.baboon import Baboon
 from library.region import bb_intersection_over_union
 from math import sqrt
+import shutil
+from os.path import exists
+import pickle
 
 from pipeline import Stage
 from pipeline.stage_result import StageResult
@@ -35,7 +39,16 @@ class DeadReckoning(Stage, BaboonsMixin):
         self._frame = frame
 
         self._counter = 0
-        self.all_baboons = {}
+        self._all_baboons = {}
+
+        self._create_directory()
+
+    def _create_directory(self):
+        if exists("./temp/dead_reckoning"):
+            shutil.rmtree("./temp/dead_reckoning")
+
+        pathlib.Path("./temp").mkdir(exist_ok=True)
+        pathlib.Path("./temp/dead_reckoning").mkdir(exist_ok=True)
 
     def _centroid(self, baboon: Baboon):
         x1, y1, x2, y2 = baboon.rectangle
@@ -71,12 +84,45 @@ class DeadReckoning(Stage, BaboonsMixin):
 
         return (second, first, overlay)
 
+    def has_frame(self, frame_number):
+        return frame_number in self._all_baboons or exists(
+            "./temp/dead_reckoning/{frame_number}.pickle".format(
+                frame_number=frame_number
+            )
+        )
+
+    def get(self, frame_number: int) -> List[Baboon]:
+        if frame_number in self._all_baboons:
+            return self._all_baboons[frame_number]
+
+        file_path = "./temp/dead_reckoning/{frame_number}.pickle".format(
+            frame_number=frame_number
+        )
+
+        if exists(file_path):
+            with open(file_path, "rb") as f:
+                return pickle.load(f)
+
+    def set(self, frame_number: int, baboons: List[Baboon]):
+        self._all_baboons[frame_number] = baboons
+
+        if len(self._all_baboons) > 2:
+            min_frame = min(self._all_baboons.keys())
+            save = self._all_baboons.pop(min_frame)
+
+            file_path = "./temp/dead_reckoning/{frame_number}.pickle".format(
+                frame_number=min_frame
+            )
+
+            with open(file_path, "wb") as f:
+                pickle.dump(save, f)
+
     def execute(self) -> StageResult:
         prev_frame = self._frame.frame.get_frame_number() - 1
         baboons = self._baboons.baboons.copy()
 
-        if prev_frame in self.all_baboons:
-            prev_baboons = self.all_baboons[prev_frame]
+        if self.has_frame(prev_frame):
+            prev_baboons = self.get(prev_frame)
 
             distances = [
                 [(p, b, self._dist(p, b)) for p in prev_baboons]
@@ -147,7 +193,7 @@ class DeadReckoning(Stage, BaboonsMixin):
             baboon.identity = self._counter
             self._counter += 1
 
-        self.all_baboons[self._frame.frame.get_frame_number()] = baboons
+        self.set(self._frame.frame.get_frame_number(), baboons)
         self.baboons = baboons
 
         return StageResult(True, True)
