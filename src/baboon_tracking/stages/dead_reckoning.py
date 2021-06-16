@@ -183,7 +183,8 @@ class DeadReckoning(Stage, BaboonsMixin):
         }
 
         for _, baboon, _ in same_baboons:
-            baboons.remove(baboon)
+            if baboon in baboons:
+                baboons.remove(baboon)
 
         for baboon in self._baboons.baboons:
             if baboon.identity is not None:
