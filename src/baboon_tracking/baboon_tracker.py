@@ -13,7 +13,10 @@ class BaboonTracker:
     """
 
     def __init__(
-        self, pipeline_name="default", input_file="input.mp4", runtime_config=None
+        self,
+        pipeline_name="default",
+        input_file="./data/input.mp4",
+        runtime_config=None,
     ):
         update_preset_pipelines(input_file=input_file, runtime_config=runtime_config)
         self._pipeline = preset_pipelines[pipeline_name]

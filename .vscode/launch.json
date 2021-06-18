@@ -11,11 +11,7 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                "run",
-                "--save",
-                "no",
-                "--display",
-                "no"
+                "gui"
             ]
         }
     ]

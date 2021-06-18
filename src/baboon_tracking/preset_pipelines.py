@@ -23,7 +23,7 @@ from config import get_latest_config, set_config
 preset_pipelines: Dict[str, Stage] = {}
 
 
-def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
+def update_preset_pipelines(input_file="./data/input.mp4", runtime_config=None):
     """
     Updates the input information for the preset pipelines.
     """
@@ -33,7 +33,7 @@ def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
     preset_pipelines["default"] = Serial(
         "BaboonTracker",
         runtime_config,
-        factory(GetVideoFrame, "./data/" + input_file),
+        factory(GetVideoFrame, input_file),
         PreprocessFrame,
         MotionDetector,
         DeadReckoning,

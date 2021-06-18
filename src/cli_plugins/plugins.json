@@ -85,6 +85,14 @@
             "description": "Generate Python files"
         },
         {
+            "module": "gui",
+            "class": "Gui",
+            "subcommands": [
+                "gui"
+            ],
+            "description": "Run the GUI"
+        },
+        {
             "module": "lint",
             "class": "Lint",
             "subcommands": [

@@ -38,4 +38,7 @@ class GetVideoFrame(Stage, FrameMixin, CaptureMixin):
         self.frame = Frame(frame, self._frame_number)
         self._frame_number += 1
 
+        if not success:
+            print(self._frame_number)
+
         return StageResult(success, success)
