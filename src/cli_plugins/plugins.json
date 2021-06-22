@@ -85,7 +85,7 @@
             "description": "Generate Python files"
         },
         {
-            "module": "gui",
+            "module": "gui_plugin",
             "class": "Gui",
             "subcommands": [
                 "gui"

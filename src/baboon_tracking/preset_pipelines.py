@@ -42,8 +42,8 @@ def update_preset_pipelines(input_file="./data/input.mp4", runtime_config=None):
         DisplayProgress,
     )
 
-    config, _, _ = get_latest_config()
-    set_config(config)
+    # config, _, _ = get_latest_config()
+    # set_config(config)
 
 
 update_preset_pipelines()

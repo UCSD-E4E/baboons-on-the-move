@@ -1,0 +1,63 @@
+#:kivy 2.0.0
+
+<MainScreen>:
+    ActionBar:
+        pos_hint: {'top':1}
+        ActionView:
+            use_separator: True
+            ActionPrevious:
+                title: 'Baboon Tracker'
+                with_previous: False
+            ActionGroup:
+                text: 'File'
+                mode: 'spinner'
+                ActionButton:
+                    text: 'Open...'
+                    on_press: root.open_file()
+                ActionSeparator:
+                ActionButton:
+                    text: 'Exit'
+                    on_press: root.exit()
+
+<FilePickerScreen>:
+    title: "Select a file to process..."
+    BoxLayout:
+        size: root.size
+        pos: root.pos
+        orientation: "vertical"
+        FileChooserIconView:
+            id: filechooser
+            path: root.default_path
+            filters: [ "*.mp4" ]
+
+        BoxLayout:
+            size_hint_y: None
+            height: 30
+            Button:
+                text: "Cancel"
+                on_release: root.cancel()
+
+            Button:
+                text: "Open"
+                on_release: root.load(filechooser.path, filechooser.selection)
+
+<ProgressScreen>:
+    size_hint : (1,None)
+    height: 200
+    title: "Processing video..."
+    BoxLayout:
+        pos: root.pos
+        orientation: "vertical"
+
+        Label:
+            text: "Time Remaining: " + root.format_time(root.time_remaining)
+
+        Label:
+            text: "Total Time: " + root.format_time(root.total_time)
+
+        Label:
+            text: "Time per Iteration: " + root.format_time(root.time_per_iteration)
+
+        ProgressBar:
+            max: root.progress_max
+            value: root._progress_value
