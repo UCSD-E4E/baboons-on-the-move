@@ -1,7 +1,22 @@
-
-# Created by https://www.gitignore.io/api/linux,macos,python,windows
-# Edit at https://www.gitignore.io/?templates=linux,macos,python,windows
+### C++ ###
+# CMake
+build/
 *.pth
+
+# Build artifacts
+*.so
+*.o
+*.a
+
+# clangd
+.clangd/
+
+### Vi/Vim ###
+# Editor ephemera
+*.swp
+
+# Session files
+*.vim 
 
 ### Linux ###
 *~
@@ -51,9 +66,6 @@ Temporary Items
 __pycache__/
 *.py[cod]
 *$py.class
-
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python
