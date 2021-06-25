@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.8)
 
 project(baboon-tracking LANGUAGES CXX) # Could add CUDA here in the future
 
-# Set module path so that we can use e.g. the FindOpenCV module
+# Set module path so that we can add modules to find system dependencies (we add no modules rn)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 
 # Find packages, some of which are packaged in the repo in THIRDPARTY_DEP_DIR
@@ -14,7 +14,7 @@ find_package(fmt REQUIRED
 
 # Right now we have a very simple project structure with one target that builds one executable
 add_executable(${PROJECT_NAME}
-	main.cpp
+	src/main.cpp
 )
 
 # Add include directories for bundled and unbundled thirdparty deps
@@ -32,6 +32,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	fmt::fmt
 	pthread # Needed on Linux for std::thread
 )
+
+# Set up compiler flags for just C++
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>/W4 /WX>)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -Werror -pedantic>)
+endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
 
