@@ -38,7 +38,7 @@ class Parallel(ParentStage):
 
         return StageResult(True, True)
 
-    def flowchart(self):
+    def flowchart_image(self):
         """
         Generates a chart that represents this pipeline.
         """
@@ -47,7 +47,7 @@ class Parallel(ParentStage):
         padding = np.array([10, 10])
 
         subcharts: List[Tuple[Image.Image, Tuple[int, int], Tuple[int, int]]] = [
-            s.flowchart() for s in self.stages
+            s.flowchart_image() for s in self.stages
         ]
         height = (
             sum([img.size[1] for img, _, _ in subcharts])

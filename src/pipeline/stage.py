@@ -95,7 +95,7 @@ class Stage(ABC):
 
         return Time(type(self).__name__, self._time / self._executions)
 
-    def flowchart(self):
+    def flowchart_image(self):
         """
         Generates a flowchart for the current stage.
         """
