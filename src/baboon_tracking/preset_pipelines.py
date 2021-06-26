@@ -8,6 +8,7 @@ from baboon_tracking.stages.draw_regions import DrawRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
 from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
+from baboon_tracking.stages.save_baboons import SaveBaboons
 
 # from baboon_tracking.stages.save_video import SaveVideo
 from baboon_tracking.stages.test_exit import TestExit
@@ -36,7 +37,8 @@ def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
         factory(GetVideoFrame, "./data/" + input_file),
         PreprocessFrame,
         MotionDetector,
-        DeadReckoning,
+        SaveBaboons,
+        # DeadReckoning,
         DrawRegions,
         TestExit,
         DisplayProgress,
