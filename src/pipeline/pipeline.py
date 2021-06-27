@@ -1,14 +1,24 @@
 from abc import ABC
-from typing import Callable
+from typing import Callable, List
 from pipeline.parent_stage import ParentStage
 
 from pipeline.stage import Stage
+from pipeline.serial import Serial
+from pipeline.parallel import Parallel
 from pipeline.stage_result import StageResult
 
 
 class Pipeline(ABC):
-    def __init__(self, stage: Stage):
-        self.stage = stage
+    def __init__(
+        self, name: str, *stage_types: List[Stage], parallel=False, runtime_config=None
+    ):
+        ParentStage.static_stages = []
+
+        if parallel:
+            self.stage = Parallel(name, runtime_config, *stage_types)
+        else:
+            self.stage = Serial(name, runtime_config, *stage_types)
+
         self.stage.on_init()
 
     def step(self) -> StageResult:

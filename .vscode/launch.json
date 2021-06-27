@@ -15,7 +15,7 @@
                 "--save",
                 "no",
                 "--display",
-                "no"
+                "yes"
             ]
         },
         {

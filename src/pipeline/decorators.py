@@ -52,20 +52,20 @@ def stage(parameter: str, is_property=False):
     return inner_function
 
 
-# def stage_from_previous_iteration(parameter: str, is_property=False):
-#     """
-#     Satisfies a parameter with the last stage executed which is an instance of the mixin type from the previous execution.
-#     """
+def stage_from_previous_iteration(parameter: str, is_property=False):
+    """
+    Satisfies a parameter with the last stage executed which is an instance of the mixin type from the previous execution.
+    """
 
-#     def inner_function(function: Callable):
-#         if not hasattr(function, "stages_from_prev_iter"):
-#             function.stages_from_prev_iter = []
+    def inner_function(function: Callable):
+        if not hasattr(function, "stages_from_prev_iter"):
+            function.stages_from_prev_iter = []
 
-#         function.stages_from_prev_iter.append((parameter, is_property))
+        function.stages_from_prev_iter.append((parameter, is_property))
 
-#         return function
+        return function
 
-#     return inner_function
+    return inner_function
 
 
 def runtime_config(parameter: str, is_property=False):
