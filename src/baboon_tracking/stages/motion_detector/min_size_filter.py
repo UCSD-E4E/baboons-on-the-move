@@ -11,6 +11,7 @@ from pipeline.decorators import stage, config
 class MinSizeFilter(Stage, BaboonsMixin):
     def __init__(self, min_size: int, baboons: BaboonsMixin) -> None:
         Stage.__init__(self)
+        BaboonsMixin.__init__(self)
 
         self._min_size = min_size
 
