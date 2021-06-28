@@ -8,19 +8,6 @@
 namespace baboon_tracking {
 template <typename... Pipes> class pipeline {
 private:
-  template <typename... Ts> struct select_last {
-    // Can be replaced with std::type_identity in C++20
-    template <typename T> struct type_identity { using type = T; };
-
-    // Do a unary right fold expression with the comma operator to get the last
-    // type in our parameter pack
-    using type = typename decltype((type_identity<Ts>{}, ...))::type;
-  };
-
-  // Assumes there's a function on the first and last pipe called run
-  using pipeline_result_t = typename decltype(
-      std::mem_fn(&select_last<Pipes...>::type::run))::result_type;
-
   template <typename> struct is_tuple : std::false_type {};
   template <typename... Ts>
   struct is_tuple<std::tuple<Ts...>> : std::true_type {};
@@ -56,7 +43,7 @@ private:
 public:
   pipeline(Pipes &&... pipes) : pipes{std::make_tuple(std::move(pipes)...)} {}
 
-  template <typename I> pipeline_result_t process(I &&input) {
+  template <typename I> auto process(I &&input) {
     // Need a proxy function because std::apply can't directly apply to a member
     // and std::bind is a pain
     auto run_pipes_proxy = [this, &input](const Pipes &... pipes) {
