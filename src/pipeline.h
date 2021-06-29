@@ -51,5 +51,9 @@ public:
     };
     return std::apply(run_pipes_proxy, pipes);
   }
+
+  template <typename... Is> auto process(Is &&... inputs) {
+    return process(std::make_tuple(inputs...));
+  }
 };
 } // namespace baboon_tracking

@@ -11,8 +11,8 @@ struct A {
 
   A(int divisor) : divisor{divisor} {};
 
-  std::tuple<int, int> run(double input) const {
-    return std::make_tuple(static_cast<int>(input) / divisor, divisor);
+  std::tuple<int, int> run(double input, double to_add) const {
+    return std::make_tuple(static_cast<int>(input) / divisor + to_add, divisor);
   }
 };
 
@@ -46,7 +46,7 @@ struct D {
 int main() {
   baboon_tracking::pipeline pl{A{3}, B{}, C{}, D{}};
 
-  fmt::print("result: {}\n", pl.process(10.3));
+  fmt::print("result: {}\n", pl.process(10.3, 9));
 
   return EXIT_SUCCESS;
 }
