@@ -18,6 +18,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._baboons = baboons
         self._particle_filters: List[ParticleFilter] = []
         self._particle_count = 5
+        self._probability_thresh = 0.6
 
     def execute(self) -> StageResult:
         for particle_filter in self._particle_filters:
@@ -31,6 +32,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         ]
         probs = flatten(probs)
         probs.sort(key=lambda p: p[0], reverse=True)
+        probs = [(p, b) for p, b in probs if p >= self._probability_thresh]
 
         used_babooons: Set[Baboon] = set()
         for _, baboon in probs:
