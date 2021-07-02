@@ -26,6 +26,6 @@ class Chart(CliPlugin):
         )
 
     def execute(self, args: Namespace):
-        CsvParticleFilterPipeline(None).flowchart().show()
+        CsvParticleFilterPipeline(None).flowchart().save("./temp/chart.png")
 
         # BaboonTracker(args.pipeline_name).flowchart().show()

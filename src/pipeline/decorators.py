@@ -52,10 +52,13 @@ def stage(parameter: str, is_property=False):
     return inner_function
 
 
-def stage_from_previous_iteration(parameter: str, is_property=False):
+def stage_from_previous_iteration(parameter: str, is_property=True):
     """
     Satisfies a parameter with the last stage executed which is an instance of the mixin type from the previous execution.
     """
+
+    if not is_property:
+        raise "This operation does not support constructor injection."
 
     def inner_function(function: Callable):
         if not hasattr(function, "stages_from_prev_iter"):
