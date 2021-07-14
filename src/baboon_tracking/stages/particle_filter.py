@@ -1,3 +1,4 @@
+import multiprocessing
 from typing import List, Set
 from baboon_tracking.models.baboon import Baboon
 from pipeline import Stage
@@ -6,7 +7,21 @@ from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.particle_filter import ParticleFilter
 from pipeline.decorators import stage
 
+
+from baboon_tracking.models.particle_filter import ParticleFilter
+from multiprocessing import shared_memory
+
+import concurrent.futures
+import time
+
 flatten = lambda t: [item for sublist in t for item in sublist]
+
+
+def ProcessPool(filter: ParticleFilter, baboons: BaboonsMixin):
+
+    filter.predict()
+    filter.update(baboons)
+    filter.resample()
 
 
 @stage("baboons")
@@ -21,7 +36,12 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._probability_thresh = 0.6
 
     def execute(self) -> StageResult:
+
+        # with concurrent.futures.ProcessPoolExecutor() as executor:
+        #     executor.map(ProcessPool, self._particle_filters, self._baboons.baboons)
+
         for particle_filter in self._particle_filters:
+            # multiprocessing.Process(particle_filter.predict()).start
             particle_filter.predict()
             particle_filter.update(self._baboons.baboons)
             particle_filter.resample()
@@ -48,6 +68,8 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         )
 
         self.baboons = [p.get_baboon() for p in self._particle_filters]
+
+        time.process_time()
 
         return StageResult(True, True)
 
