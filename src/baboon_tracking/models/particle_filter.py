@@ -102,6 +102,8 @@ class ParticleFilter:
                 [Particle(baboon, self._weight) for _ in range(particle_count)]
             )
 
+            count = len(self.particles)
+
     def get_baboon(self):
         baboon_weights: Dict[Baboon, float] = {}
 

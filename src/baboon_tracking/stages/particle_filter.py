@@ -1,27 +1,22 @@
-import multiprocessing
+import concurrent.futures
+
 from typing import List, Set
 from baboon_tracking.models.baboon import Baboon
-from pipeline import Stage
-from pipeline.stage_result import StageResult
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.particle_filter import ParticleFilter
+from pipeline import Stage
+from pipeline.stage_result import StageResult
 from pipeline.decorators import stage
 
-
-from baboon_tracking.models.particle_filter import ParticleFilter
-from multiprocessing import shared_memory
-
-import concurrent.futures
-import time
 
 flatten = lambda t: [item for sublist in t for item in sublist]
 
 
-def ProcessPool(filter: ParticleFilter, baboons: BaboonsMixin):
+def process_pool(particle_filter: ParticleFilter, baboons: BaboonsMixin):
 
-    filter.predict()
-    filter.update(baboons)
-    filter.resample()
+    particle_filter.predict()
+    particle_filter.update(baboons)
+    particle_filter.resample()
 
 
 @stage("baboons")
@@ -30,21 +25,18 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         Stage.__init__(self)
         BaboonsMixin.__init__(self)
 
+        self._executor = concurrent.futures.ProcessPoolExecutor()
         self._baboons = baboons
         self._particle_filters: List[ParticleFilter] = []
         self._particle_count = 5
         self._probability_thresh = 0.6
 
+    def on_destroy(self) -> None:
+        self._executor.shutdown()
+
     def execute(self) -> StageResult:
 
-        # with concurrent.futures.ProcessPoolExecutor() as executor:
-        #     executor.map(ProcessPool, self._particle_filters, self._baboons.baboons)
-
-        for particle_filter in self._particle_filters:
-            # multiprocessing.Process(particle_filter.predict()).start
-            particle_filter.predict()
-            particle_filter.update(self._baboons.baboons)
-            particle_filter.resample()
+        self._executor.map(process_pool, self._particle_filters, self._baboons.baboons)
 
         probs = [
             [(p.get_probability(b), b) for b in self._baboons.baboons]
@@ -68,8 +60,6 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         )
 
         self.baboons = [p.get_baboon() for p in self._particle_filters]
-
-        time.process_time()
 
         return StageResult(True, True)
 
