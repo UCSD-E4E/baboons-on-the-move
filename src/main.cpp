@@ -1,52 +1,67 @@
+#include <chrono>
 #include <cstdlib>
 #include <string>
 #include <tuple>
 
 #include <fmt/core.h>
 
+#include <opencv2/imgcodecs.hpp>
+#include <opencv2/videoio.hpp>
+
 #include "pipeline.h"
+#include "pipes.h"
+
+using baboon_tracking::frame;
 
 struct A {
-  int divisor;
-
-  A(int divisor) : divisor{divisor} {};
-
-  std::tuple<int, int> run(double input, double to_add) const {
-    return std::make_tuple(static_cast<int>(input) / divisor + to_add, divisor);
-  }
-};
-
-struct do_not_copy {
-  std::string str;
-
-  do_not_copy(std::string str) : str{str} {};
-  do_not_copy(do_not_copy &&moved) : str{moved.str} {};
-
-  do_not_copy(do_not_copy const &) = delete;
-  do_not_copy &operator=(do_not_copy const &) = delete;
-  do_not_copy() = delete;
+  frame run(frame &&pass) const { return std::move(pass); }
 };
 
 struct B {
-
-  std::tuple<do_not_copy, int> run(int input, int divisor) const {
-    return std::make_tuple(fmt::format("input // {} = {}", divisor, input),
-                           4915);
+  frame run(frame &&pass) const { return std::move(pass); }
+  bool should_break() const {
+    fmt::print("Got called\n");
+    return true;
   }
 };
 
 struct C {
-  do_not_copy run(do_not_copy &&input, int) const { return std::move(input); }
-};
-
-struct D {
-  std::string run(do_not_copy &&input) const { return input.str; }
+  frame run(frame &&pass) {
+    fmt::print("poopfard\n");
+    return std::move(pass);
+  }
 };
 
 int main() {
-  baboon_tracking::pipeline pl{A{3}, B{}, C{}, D{}};
+  baboon_tracking::pipeline foo{A{}, B{}, C{}};
+  fmt::print("Result: {}\n", foo.process(frame{3, cv::Mat{}}).number);
 
-  fmt::print("result: {}\n", pl.process(10.3, 9));
+  auto hist_frames =
+      std::make_shared<baboon_tracking::historical_frames_container>(100);
+  baboon_tracking::pipeline pl{
+      baboon_tracking::convert_bgr_to_gray{}, baboon_tracking::blur_gray{3},
+      baboon_tracking::compute_homography{0.7, 0.2, 0.1, 10000, hist_frames}};
+
+  // cv::VideoCapture vc{"./sample_1920x1080.avi"};
+  cv::Mat image = cv::imread("./maxresdefault.jpg");
+  for (std::uint64_t i = 0; /*vc.read(image)*/; i++) {
+    auto start = std::chrono::steady_clock::now();
+    baboon_tracking::frame fr{i, image.clone()};
+    auto res = pl.process(std::move(fr));
+    auto end = std::chrono::steady_clock::now();
+
+    if (res.size() > 0) {
+      std::string res_contents = "Result: ";
+      res_contents << res[0];
+
+      fmt::print("{}; a {}x{} cv::Mat\n", res_contents, res[0].rows,
+                 res[1].cols);
+    }
+    fmt::print(
+        "Took {} ms\n",
+        std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
+            .count());
+  }
 
   return EXIT_SUCCESS;
 }

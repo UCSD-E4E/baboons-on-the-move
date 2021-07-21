@@ -15,6 +15,9 @@ find_package(fmt REQUIRED
 # Right now we have a very simple project structure with one target that builds one executable
 add_executable(${PROJECT_NAME}
 	src/main.cpp
+	
+	src/preprocessing_pipes.cpp
+	src/motion_detecting_pipes.cpp
 )
 
 # Require C++17
