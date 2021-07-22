@@ -25,6 +25,8 @@ jobs:
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       run: |
         python ./cli.py decrypt
+        echo $TOKEN | base64 --decode > google_drive_token.pickle
+        python ./cli.py data
 #     - name: Lint with flake8
 #       run: |
 #         # stop the build if there are Python syntax errors or undefined names
