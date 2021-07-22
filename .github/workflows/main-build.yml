@@ -1,0 +1,39 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Main Build
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      env:
+        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+      run: |
+        python ./cli.py decrypt
+    - name: Get Data
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+      run: |
+        echo $TOKEN | base64 --decode > google_drive_token.pickle
+        python ./cli.py data
+    - name: Lint
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+      run: |
+        python ./cli.py lint
+#   - python ./cli.py test
