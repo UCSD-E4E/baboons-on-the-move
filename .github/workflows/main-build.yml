@@ -21,6 +21,8 @@ jobs:
       with:
         python-version: 3.8
     - name: Install dependencies
+      env: # Or as an environment variable
+        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       run: |
         python ./cli.py decrypt
 #     - name: Lint with flake8
