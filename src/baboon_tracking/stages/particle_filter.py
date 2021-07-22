@@ -28,8 +28,8 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._executor = concurrent.futures.ProcessPoolExecutor()
         self._baboons = baboons
         self._particle_filters: List[ParticleFilter] = []
-        self._particle_count = 5
-        self._probability_thresh = 0.6
+        self._particle_count = 500
+        self._probability_thresh = 0.5
 
     def on_destroy(self) -> None:
         self._executor.shutdown()

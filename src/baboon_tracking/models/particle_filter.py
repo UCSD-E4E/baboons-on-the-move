@@ -18,10 +18,20 @@ class Particle:
         sample, _ = model.sample()
         degs = random() * 2 * pi
 
-        x = int(np.asscalar(np.round(sample * sin(degs))))
-        y = int(np.asscalar(np.round(sample * cos(degs))))
+        val = 500.0
+        half_val = val / 2.0
 
-        self.baboon = self._get_moved_baboon(x, y)
+        delta_x = int(np.asscalar(np.round(sample * sin(degs))))
+        delta_y = int(np.asscalar(np.round(sample * cos(degs))))
+
+        delta_x1 = int(round(random() * val - half_val))
+        delta_y1 = int(round(random() * val - half_val))
+        delta_x2 = int(round(random() * val - half_val))
+        delta_y2 = int(round(random() * val - half_val))
+
+        self.baboon = self._get_moved_baboon(
+            delta_x, delta_y, delta_x1, delta_y1, delta_x2, delta_y2
+        )
 
     def update(self, baboons: List[Baboon]):
         baboons = [
@@ -38,7 +48,15 @@ class Particle:
         self.weight *= weight
         self.baboon = baboon
 
-    def _get_moved_baboon(self, delta_x: int, delta_y: int):
+    def _get_moved_baboon(
+        self,
+        delta_x: int,
+        delta_y: int,
+        delta_x1: int,
+        delta_y1: int,
+        delta_x2: int,
+        delta_y2: int,
+    ):
         x1, y1, x2, y2 = self.baboon.rectangle
 
         x1 += delta_x
@@ -46,6 +64,12 @@ class Particle:
 
         x2 += delta_x
         y2 += delta_y
+
+        x1 += delta_x1
+        y1 += delta_y1
+
+        x2 += delta_x2
+        y2 += delta_y2
 
         return Baboon(
             (x1, y1, x2, y2), id_str=self.baboon.id_str, identity=self.baboon.identity
