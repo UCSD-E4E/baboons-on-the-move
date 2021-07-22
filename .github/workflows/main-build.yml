@@ -23,7 +23,7 @@ jobs:
     - name: Install dependencies
       env:
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-        TEST: ${{ secrets.TEST }}
+#         TEST: ${{ secrets.TEST }}
       run: |
         echo $TEST
         python ./cli.py decrypt
