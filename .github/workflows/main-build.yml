@@ -23,9 +23,7 @@ jobs:
     - name: Install dependencies
       env:
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-        TEST: ${{ secrets.TEST }}
       run: |
-        echo 123 $TEST
         python ./cli.py decrypt
 #     - name: Lint with flake8
 #       run: |
