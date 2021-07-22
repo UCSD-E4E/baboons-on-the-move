@@ -25,6 +25,10 @@ jobs:
         ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       run: |
         python ./cli.py decrypt
+    - name: Get Data
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+      run: |
         echo $TOKEN | base64 --decode > google_drive_token.pickle
         python ./cli.py data
 #     - name: Lint with flake8
