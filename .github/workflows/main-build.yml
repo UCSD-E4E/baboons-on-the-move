@@ -36,4 +36,8 @@ jobs:
         TOKEN: ${{ secrets.TOKEN }}
       run: |
         python ./cli.py lint
-#   - python ./cli.py test
+    - name: Test
+      env:
+        TOKEN: ${{ secrets.TOKEN }}
+      run: |
+        python ./cli.py test

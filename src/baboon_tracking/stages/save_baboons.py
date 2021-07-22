@@ -1,3 +1,7 @@
+"""
+Saves the list of baboons in CSV format.
+"""
+
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from pipeline import Stage
@@ -8,6 +12,10 @@ from pipeline.stage_result import StageResult
 @stage("baboons")
 @stage("frame")
 class SaveBaboons(Stage):
+    """
+    Saves the list of baboons in CSV format.
+    """
+
     def __init__(self, baboons: BaboonsMixin, frame: FrameMixin) -> None:
         Stage.__init__(self)
 
