@@ -35,4 +35,3 @@ class SaveBaboons(Stage):
 
     def on_destroy(self) -> None:
         self._file.close()
-

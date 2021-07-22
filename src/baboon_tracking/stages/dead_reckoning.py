@@ -160,8 +160,8 @@ class DeadReckoning(Stage, BaboonsMixin):
             curr_ids = [b.identity for b in baboons if b.identity is not None]
 
             for id_str in curr_ids:
-            	if id_str in prev_ids:
-                	prev_ids.pop(id_str)
+                if id_str in prev_ids:
+                    prev_ids.pop(id_str)
 
             prev_items = [prev_ids[i] for i in prev_ids]
 
@@ -199,4 +199,3 @@ class DeadReckoning(Stage, BaboonsMixin):
         self.baboons = baboons
 
         return StageResult(True, True)
-

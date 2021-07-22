@@ -31,4 +31,3 @@ class MinSizeFilter(Stage, BaboonsMixin):
         ]
 
         return StageResult(True, True)
-
