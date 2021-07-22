@@ -9,11 +9,36 @@ mask_output:
   skip_learn: true
 
 preprocess:
-  kernel_size:
-    type: int32
-    min: 1
-    odd: true
-    std: 1
+  preprocess_gray:
+    blur_gray:
+      kernel_size:
+        type: int32
+        min: 1
+        odd: true
+        std: 1
+
+  preprocess_color:
+      denoise_color:
+          h:
+            type: float
+            min: 1
+            max: 100
+            std: 0.2
+          h_color:
+            type: float
+            min: 1
+            max: 100
+            std: 0.2
+          template_window_size:
+            type: int32
+            min: 1
+            max: 100
+            std: 0.5
+          search_window_size:
+            type: int32
+            min: 1
+            max: 100
+            std: 0.5
 
 motion_detector:
   history_frames:

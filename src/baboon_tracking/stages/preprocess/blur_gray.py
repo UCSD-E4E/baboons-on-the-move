@@ -12,7 +12,9 @@ from pipeline.stage_result import StageResult
 
 
 @show_result
-@config(parameter_name="kernel_size", key="preprocess/kernel_size")
+@config(
+    parameter_name="kernel_size", key="preprocess/preprocess_gray/blur_gray/kernel_size"
+)
 @stage("preprocessed_frame")
 class BlurGray(Stage, PreprocessedFrameMixin):
     """
