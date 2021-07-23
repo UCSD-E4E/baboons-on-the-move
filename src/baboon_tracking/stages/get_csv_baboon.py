@@ -39,4 +39,3 @@ class GetCsvBaboon(Stage, BaboonsMixin):
             return StageResult(True, True)
         else:
             return StageResult(True, False)
-

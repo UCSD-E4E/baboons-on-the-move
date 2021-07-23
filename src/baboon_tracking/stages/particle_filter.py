@@ -62,4 +62,3 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self.baboons = [p.get_baboon() for p in self._particle_filters]
 
         return StageResult(True, True)
-
