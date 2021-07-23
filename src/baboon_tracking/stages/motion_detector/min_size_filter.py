@@ -1,3 +1,6 @@
+"""
+A filter that ensures blobs are of a minimum size.
+"""
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.baboon import Baboon
 
@@ -9,8 +12,13 @@ from pipeline.decorators import stage, config
 @config("min_size", "motion_detector/min_size_filter/min_size")
 @stage("baboons")
 class MinSizeFilter(Stage, BaboonsMixin):
+    """
+    A filter that ensures blobs are of a minimum size.
+    """
+
     def __init__(self, min_size: int, baboons: BaboonsMixin) -> None:
         Stage.__init__(self)
+        BaboonsMixin.__init__(self)
 
         self._min_size = min_size
 
@@ -30,4 +38,3 @@ class MinSizeFilter(Stage, BaboonsMixin):
         ]
 
         return StageResult(True, True)
-

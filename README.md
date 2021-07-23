@@ -1,5 +1,5 @@
 # baboon-tracking
-[![Build Status](https://travis-ci.org/UCSD-E4E/baboon-tracking.svg?branch=master)](https://travis-ci.org/UCSD-E4E/baboon-tracking)
+[![Main Build](https://github.com/UCSD-E4E/baboon-tracking/actions/workflows/main-build.yml/badge.svg)](https://github.com/UCSD-E4E/baboon-tracking/actions/workflows/main-build.yml)
 
 This repository contains the state-of-the-art aerial drone background tracking algorithm.  This project is sponsored by [UCSD Engineers for Exploration](http://e4e.ucsd.edu/).
 
