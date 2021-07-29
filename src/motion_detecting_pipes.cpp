@@ -72,7 +72,8 @@ std::tuple<std::uint64_t, std::vector<cv::Mat>>
 compute_homography::run(frame &&gray_blurred_frame) {
   std::uint64_t current_frame_num = gray_blurred_frame.number;
   historical_frames->add_historical_frame(std::move(gray_blurred_frame));
-  if (current_frame_num < historical_frames->max_historical_frames()) {
+  if (current_frame_num < historical_frames->max_historical_frames() - 1) {
+    fmt::print("Skipping in run\n");
     return {};
   }
   const auto current_frame =
@@ -81,7 +82,7 @@ compute_homography::run(frame &&gray_blurred_frame) {
   auto num_historical_frames = historical_frames->max_historical_frames();
   std::vector<cv::Mat> homographies;
   homographies.reserve(num_historical_frames);
-  for (std::uint64_t i = 0; i <= num_historical_frames; i++) {
+  for (std::uint64_t i = 0; i < num_historical_frames; i++) {
     auto hom = register_and_compute_homography(
         historical_frames->get_historical_frame(current_frame_num - i),
         current_frame);
@@ -120,27 +121,6 @@ compute_homography::register_and_compute_homography(const frame &frame_one,
   matches.erase(matches.begin() + num_good_matches, matches.end());
 
   // Match key points into a new Mat
-  /*auto matches_size = matches.size();
-  if (matches_size > std::numeric_limits<int>::max())
-    throw std::runtime_error{
-        "Number of matches would overflow a signed integer"};
-
-  cv::Mat points_one{static_cast<int>(matches_size), 1, CV_32FC2};
-  cv::Mat points_two{static_cast<int>(matches_size), 1, CV_32FC2};
-
-  // We take great care here so that the compiler will autovectorize this loop
-  float *points_one_data = points_one.ptr<float>();
-  float *points_two_data = points_two.ptr<float>();
-  const cv::DMatch *matches_data = matches.data();
-  const cv::KeyPoint *keypoints_one_data = keypoints_one.data();
-  const cv::KeyPoint *keypoints_two_data = keypoints_two.data();
-  for (decltype(matches_size) i = 0; i < matches_size; i++) {
-    points_one_data[i] = keypoints_one_data[matches_data[i].queryIdx].pt.x;
-    points_one_data[i + 1] = keypoints_one_data[matches_data[i].queryIdx].pt.y;
-
-    points_two_data[i] = keypoints_two_data[matches_data[i].trainIdx].pt.x;
-    points_two_data[i + 1] = keypoints_two_data[matches_data[i].trainIdx].pt.y;
-  }*/
   auto matches_size = matches.size();
   std::vector<cv::Point2f> points_one{matches_size};
   std::vector<cv::Point2f> points_two{matches_size};
@@ -185,14 +165,12 @@ transform_history_frames_and_masks::run(std::uint64_t current_frame_num,
        i++) {
     auto frame_to_transform =
         historical_frames->get_historical_frame(current_frame_num - i);
-    auto image_size =
-        cv::Size(frame_to_transform.image.cols, frame_to_transform.image.rows);
+    auto image_size = frame_to_transform.image.size();
 
     cv::Mat transformed_image;
     cv::warpPerspective(frame_to_transform.image, transformed_image,
                         homographies[i], image_size);
-    transformed_history_frames.emplace_back(transformed_image,
-                                            frame_to_transform.number);
+    transformed_history_frames.emplace_back(frame{frame_to_transform.number, transformed_image});
 
     cv::Mat mask_to_transform = cv::Mat::ones(image_size, CV_8UC1) *
                                 std::numeric_limits<std::uint8_t>::max();
@@ -201,8 +179,10 @@ transform_history_frames_and_masks::run(std::uint64_t current_frame_num,
     transformed_masks.emplace_back(mask_to_transform);
   }
 
+  fmt::print("Transformed frame image type: {}, transformed mask image type: {}\n", transformed_history_frames[0].image.type(), transformed_masks[0].type());
+
   return std::make_tuple(current_frame_num,
                          std::move(transformed_history_frames),
-                         transformed_masks);
+                         std::move(transformed_masks));
 }
 } // namespace baboon_tracking

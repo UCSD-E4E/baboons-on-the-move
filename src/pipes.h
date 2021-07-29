@@ -4,6 +4,8 @@
 
 #include <opencv2/features2d.hpp>
 
+#include <fmt/core.h>
+
 #include <condition_variable>
 #include <map>
 #include <memory>
@@ -104,7 +106,8 @@ public:
   run(frame &&gray_blurred_frame);
 
   bool should_break() {
-    return historical_frames->is_full();
+    if (!historical_frames->is_full()) fmt::print("Skipping in break\n");
+    return !historical_frames->is_full();
   } // TODO: fix this race condition
 
 private:
@@ -145,13 +148,62 @@ public:
       : historical_frames{historical_frames} {};
 
   std::tuple<std::uint64_t, std::vector<frame>, std::vector<cv::Mat>>
-  run(std::uint64_t current_frame_num, std::vector<cv::Mat> homographies);
+  run(std::uint64_t current_frame_num, std::vector<cv::Mat>&& homographies);
 
 private:
   std::shared_ptr<historical_frames_container> historical_frames;
 };
 
+class rescale_transformed_history_frames {
+public:
+  rescale_transformed_history_frames(double scale_factor)
+      : scale_factor{scale_factor} {};
+
+  std::tuple<std::uint64_t, std::vector<frame>, std::vector<cv::Mat>, std::vector<frame>>
+  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks);
+
+private:
+  double scale_factor;
+};
+
 class generate_weights {
 public:
+  std::tuple<std::uint64_t, std::vector<frame>, std::vector<cv::Mat>, std::vector<frame>, cv::Mat>
+  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks, std::vector<frame>&& transformed_rescaled_history_frames);
+};
+
+class generate_history_of_dissimilarity {
+public:
+  std::tuple<std::uint64_t, std::vector<cv::Mat>, std::vector<frame>, std::vector<frame>, cv::Mat, cv::Mat>
+  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks, std::vector<frame>&& transformed_rescaled_history_frames, cv::Mat&& weights) ;
+};
+
+class group_transformed_rescaled_frames {
+public:
+  std::tuple<std::uint64_t, cv::Mat, std::vector<std::tuple<frame, frame>>, std::vector<std::tuple<frame, frame>>>
+  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks, std::vector<frame>&& transformed_rescaled_history_frames, cv::Mat&& weights, cv::Mat&& hist_of_dissimilarity);
+};
+
+class intersect_frames {
+public:
+  std::tuple<std::uint64_t, cv::Mat, std::vector<cv::Mat>>
+  run(std::uint64_t current_frame_num, cv::Mat&& weights, std::vector<std::tuple<frame, frame>> grouped_transformed_frames, std::vector<std::tuple<frame, frame>> grouped_transformed_rescaled_frames);
+};
+
+class union_intersected_frames {
+public:
+  std::tuple<std::uint64_t, cv::Mat, cv::Mat>
+  run(std::uint64_t current_frame_num, cv::Mat&& weights, std::vector<cv::Mat>);
+};
+
+class subtract_background {
+public:
+  subtract_background(std::shared_ptr<historical_frames_container> historical_frames) : historical_frames{historical_frames} {};
+
+  std::tuple<std::uint64_t, frame>
+  run(std::uint64_t current_frame_num, cv::Mat&& weights, cv::Mat&& background);
+
+private:
+  std::shared_ptr<historical_frames_container> historical_frames;
 };
 } // namespace baboon_tracking

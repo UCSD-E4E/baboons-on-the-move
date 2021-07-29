@@ -5,6 +5,8 @@
 #include <tuple>
 #include <utility>
 
+#include <fmt/core.h>
+
 namespace baboon_tracking {
 template <typename... Pipes> class pipeline {
 private:
@@ -15,14 +17,15 @@ private:
   // These take a long and int parameter to break overload ambiguity when the
   // only thing constraining the overload resolution is the expression SFINAE
   template <typename T>
-  auto should_break_impl(const T &pipe, int) -> decltype(pipe.should_break()) {
+  auto should_break_impl(T &pipe, int) -> decltype(pipe.should_break()) {
     return pipe.should_break();
   }
-  template <typename T> bool should_break_impl(const T &, long) {
+  template <typename T>
+  auto should_break_impl(T &, long) {
     return false;
   }
 
-  template <typename T> bool should_break(const T &pipe) {
+  template <typename T> bool should_break(T &pipe) {
     // Default to the first overload (which taks an int) when there is ambiguity
     return should_break_impl(pipe, int{});
   }
