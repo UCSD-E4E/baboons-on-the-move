@@ -171,13 +171,13 @@ public:
               const std::vector<frame> &transformed_rescaled_history_frames);
 };
 
-class group_transformed_rescaled_frames {
+/*class group_transformed_rescaled_frames {
 public:
   std::tuple<std::vector<std::tuple<frame, frame>>,
              std::vector<std::tuple<frame, frame>>>
   run(const std::vector<frame> &&transformed_history_frames,
       const std::vector<frame> &&transformed_rescaled_history_frames);
-};
+};*/
 
 class intersect_frames {
 public:

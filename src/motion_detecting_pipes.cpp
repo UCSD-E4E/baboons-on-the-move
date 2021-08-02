@@ -189,6 +189,23 @@ transform_history_frames_and_masks::run(
 } // namespace baboon_tracking
 
 namespace baboon_tracking {
+std::vector<frame> rescale_transformed_history_frames::run(
+    const std::vector<frame> &transformed_history_frames) {
+  std::vector<frame> transformed_rescaled_history_frames;
+  transformed_rescaled_history_frames.reserve(
+      transformed_history_frames.size());
+
+  for (auto &&transformed_frame : transformed_history_frames) {
+    transformed_rescaled_history_frames.emplace_back(
+        frame{transformed_frame.number,
+              transformed_frame.image.clone() * (scale_factor / 255.0)});
+  }
+
+  return transformed_rescaled_history_frames;
+}
+} // namespace baboon_tracking
+
+namespace baboon_tracking {
 cv::Mat generate_history_of_dissimilarity::run(
     const std::vector<frame> &transformed_history_frames,
     const std::vector<frame> &transformed_rescaled_history_frames) {
@@ -230,6 +247,7 @@ cv::Mat generate_history_of_dissimilarity::run(
            std::numeric_limits<uint8_t>::max()));
   return dissimilarity;
 }
+
 std::vector<frame> intersect_frames::run(
     const std::vector<frame> &&transformed_history_frames,
     const std::vector<frame> &&transformed_rescaled_history_frames) {
