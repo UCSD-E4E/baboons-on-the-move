@@ -1,6 +1,7 @@
 #include "pipes.h"
 
 #include <opencv2/calib3d.hpp>
+#include <opencv2/core.hpp>
 #include <opencv2/cudaarithm.hpp>
 #include <opencv2/imgproc.hpp>
 
@@ -206,6 +207,26 @@ std::vector<frame> rescale_transformed_history_frames::run(
 } // namespace baboon_tracking
 
 namespace baboon_tracking {
+cv::Mat generate_weights::run(
+    const std::vector<frame> &transformed_rescaled_history_frames) {
+  cv::Mat weights{transformed_rescaled_history_frames[0].image.size(), CV_8UC1};
+  // Note: this static makes this not thread safe
+  static cv::Mat mask{transformed_rescaled_history_frames[0].image.size(),
+                      CV_8UC1};
+  for (auto iter = std::next(transformed_rescaled_history_frames.begin());
+       iter != transformed_rescaled_history_frames.end(); iter++) {
+    cv::absdiff(iter->image, std::prev(iter)->image, mask);
+    cv::compare(mask, 1, mask, cv::CMP_LE);
+    cv::scaleAdd(
+        mask, 1 / static_cast<double>(std::numeric_limits<std::uint8_t>::max()),
+        weights, weights);
+  }
+
+  return weights;
+}
+} // namespace baboon_tracking
+
+namespace baboon_tracking {
 cv::Mat generate_history_of_dissimilarity::run(
     const std::vector<frame> &transformed_history_frames,
     const std::vector<frame> &transformed_rescaled_history_frames) {
@@ -357,12 +378,12 @@ frame compute_moving_foreground::run(cv::Mat &&dissimilarity,
       dissimilarity_low + dissimilarity_medium + dissimilairy_high;
 
   cv::MatExpr moving_foreground =
-      (weight_levels == 2 & foreground_levels >= dissimilarity_levels) /
+      ((weight_levels == 2) & (foreground_levels >= dissimilarity_levels)) /
       uint8_max_double;
   moving_foreground =
       moving_foreground +
-      (weight_levels == 1 & (dissimilarity_levels == 1 &
-                             (foreground_levels > dissimilarity_levels))) /
+      ((weight_levels == 1) & ((dissimilarity_levels == 1) &
+                               (foreground_levels > dissimilarity_levels))) /
           uint8_max_double;
 
   // XXX: MatExpr doesn't seem to be able to write into existing memory, which

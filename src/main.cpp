@@ -29,6 +29,9 @@ public:
 
     auto [current_frame_num, homographies] =
         compute_homography.run(std::move(blurred_frame));
+    if (homographies.empty())
+      return std::vector<cv::Rect>{};
+
     auto [transformed_history_frames, transformed_masks] =
         transform_history_frames_and_masks.run(current_frame_num,
                                                std::move(homographies));
@@ -83,7 +86,7 @@ int main() {
   for (std::uint64_t i = 0; /*vc.read(image)*/; i++) {
     auto start = std::chrono::steady_clock::now();
     baboon_tracking::frame fr{i, image.clone()};
-    pl.process(std::move(fr));
+    auto blobs = pl.process(std::move(fr));
     auto end = std::chrono::steady_clock::now();
 
     /*if (res.size() > 0) {
@@ -94,9 +97,10 @@ int main() {
                  res[1].cols);
     }*/
     fmt::print(
-        "Took {} ms\n",
+        "Took {} ms, got {} blobs\n",
         std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
-            .count());
+            .count(),
+        blobs.size());
   }
 
   return EXIT_SUCCESS;
