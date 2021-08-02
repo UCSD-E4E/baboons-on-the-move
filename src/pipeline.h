@@ -20,10 +20,7 @@ private:
   auto should_break_impl(T &pipe, int) -> decltype(pipe.should_break()) {
     return pipe.should_break();
   }
-  template <typename T>
-  auto should_break_impl(T &, long) {
-    return false;
-  }
+  template <typename T> auto should_break_impl(T &, long) { return false; }
 
   template <typename T> bool should_break(T &pipe) {
     // Default to the first overload (which taks an int) when there is ambiguity

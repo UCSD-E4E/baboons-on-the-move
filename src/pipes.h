@@ -4,8 +4,6 @@
 
 #include <opencv2/features2d.hpp>
 
-#include <fmt/core.h>
-
 #include <condition_variable>
 #include <map>
 #include <memory>
@@ -44,10 +42,13 @@ private:
 
 namespace baboon_tracking {
 class historical_frames_container {
+private:
+  using frame_set_t = std::set<frame, std::less<>>;
+
 public:
   // Need to add a parameter for max number of threads and then we'll reserve
   // that amount as extra
-  historical_frames_container(std::set<frame>::size_type max_historical_frames)
+  historical_frames_container(frame_set_t::size_type max_historical_frames)
       : max_frames{max_historical_frames} {};
 
   void add_historical_frame(frame &&preprocessed_frame);
@@ -65,16 +66,14 @@ public:
 
   bool is_full();
 
-  std::set<frame>::size_type max_historical_frames() const {
-    return max_frames;
-  }
+  frame_set_t::size_type max_historical_frames() const { return max_frames; }
 
 private:
   std::mutex mutex;
   std::condition_variable frame_added_cv;
 
-  std::set<frame, std::less<>> historical_frames;
-  std::set<frame>::size_type max_frames;
+  frame_set_t historical_frames;
+  frame_set_t::size_type max_frames;
 };
 
 class store_history_frame {
@@ -104,11 +103,6 @@ public:
 
   std::tuple<std::uint64_t, std::vector<cv::Mat>>
   run(frame &&gray_blurred_frame);
-
-  bool should_break() {
-    if (!historical_frames->is_full()) fmt::print("Skipping in break\n");
-    return !historical_frames->is_full();
-  } // TODO: fix this race condition
 
 private:
   cv::Mat register_and_compute_homography(const frame &frame_one,
@@ -147,8 +141,9 @@ public:
       std::shared_ptr<historical_frames_container> historical_frames)
       : historical_frames{historical_frames} {};
 
-  std::tuple<std::uint64_t, std::vector<frame>, std::vector<cv::Mat>>
-  run(std::uint64_t current_frame_num, std::vector<cv::Mat>&& homographies);
+  std::tuple<std::vector<frame>, std::vector<cv::Mat>>
+  run(std::uint64_t current_frame_num,
+      const std::vector<cv::Mat> &&homographies);
 
 private:
   std::shared_ptr<historical_frames_container> historical_frames;
@@ -159,8 +154,7 @@ public:
   rescale_transformed_history_frames(double scale_factor)
       : scale_factor{scale_factor} {};
 
-  std::tuple<std::uint64_t, std::vector<frame>, std::vector<cv::Mat>, std::vector<frame>>
-  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks);
+  std::vector<frame> run(const std::vector<frame> &transformed_history_frames);
 
 private:
   double scale_factor;
@@ -168,42 +162,68 @@ private:
 
 class generate_weights {
 public:
-  std::tuple<std::uint64_t, std::vector<frame>, std::vector<cv::Mat>, std::vector<frame>, cv::Mat>
-  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks, std::vector<frame>&& transformed_rescaled_history_frames);
+  cv::Mat run(const std::vector<frame> &transformed_rescaled_history_frames);
 };
 
 class generate_history_of_dissimilarity {
 public:
-  std::tuple<std::uint64_t, std::vector<cv::Mat>, std::vector<frame>, std::vector<frame>, cv::Mat, cv::Mat>
-  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks, std::vector<frame>&& transformed_rescaled_history_frames, cv::Mat&& weights) ;
+  cv::Mat run(const std::vector<frame> &transformed_history_frames,
+              const std::vector<frame> &transformed_rescaled_history_frames);
 };
 
 class group_transformed_rescaled_frames {
 public:
-  std::tuple<std::uint64_t, cv::Mat, std::vector<std::tuple<frame, frame>>, std::vector<std::tuple<frame, frame>>>
-  run(std::uint64_t current_frame_num, std::vector<frame>&& transformed_history_frames, std::vector<cv::Mat>&& transformed_masks, std::vector<frame>&& transformed_rescaled_history_frames, cv::Mat&& weights, cv::Mat&& hist_of_dissimilarity);
+  std::tuple<std::vector<std::tuple<frame, frame>>,
+             std::vector<std::tuple<frame, frame>>>
+  run(const std::vector<frame> &&transformed_history_frames,
+      const std::vector<frame> &&transformed_rescaled_history_frames);
 };
 
 class intersect_frames {
 public:
-  std::tuple<std::uint64_t, cv::Mat, std::vector<cv::Mat>>
-  run(std::uint64_t current_frame_num, cv::Mat&& weights, std::vector<std::tuple<frame, frame>> grouped_transformed_frames, std::vector<std::tuple<frame, frame>> grouped_transformed_rescaled_frames);
+  std::vector<frame>
+  run(const std::vector<frame> &&transformed_history_frames,
+      const std::vector<frame> &&transformed_rescaled_history_frames);
 };
 
 class union_intersected_frames {
 public:
-  std::tuple<std::uint64_t, cv::Mat, cv::Mat>
-  run(std::uint64_t current_frame_num, cv::Mat&& weights, std::vector<cv::Mat>);
+  frame run(const std::vector<frame> &&intersected_frames);
 };
 
 class subtract_background {
 public:
-  subtract_background(std::shared_ptr<historical_frames_container> historical_frames) : historical_frames{historical_frames} {};
+  subtract_background(
+      std::shared_ptr<historical_frames_container> historical_frames)
+      : historical_frames{historical_frames} {};
 
-  std::tuple<std::uint64_t, frame>
-  run(std::uint64_t current_frame_num, cv::Mat&& weights, cv::Mat&& background);
+  frame run(std::uint64_t current_frame_num, const frame &&union_of_all,
+            const cv::Mat &weights);
 
 private:
   std::shared_ptr<historical_frames_container> historical_frames;
+};
+
+class compute_moving_foreground {
+public:
+  compute_moving_foreground(
+      std::shared_ptr<historical_frames_container> historical_frames)
+      : historical_frames{historical_frames} {};
+
+  frame run(cv::Mat &&history_of_dissimilarity, frame &&foreground,
+            cv::Mat &&weights);
+
+private:
+  std::shared_ptr<historical_frames_container> historical_frames;
+};
+
+class apply_masks {
+public:
+  void run(frame *moving_foreground, std::vector<cv::Mat> &&shifted_masks);
+};
+
+class detect_blobs {
+public:
+  std::vector<cv::Rect> run(const frame &&moving_foreground);
 };
 } // namespace baboon_tracking
