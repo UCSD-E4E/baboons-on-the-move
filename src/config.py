@@ -42,11 +42,12 @@ def get_config() -> Dict:
         return CONFIG_STORE
 
 
-def get_config_part(key: str) -> Dict:
+def get_config_part(key: str, config=None) -> Dict:
     """
     Gets the config part at the specified key.
     """
-    config = get_config()
+    if config is None:
+        config = get_config()
 
     key_parts = key.split("/")
 
@@ -55,6 +56,18 @@ def get_config_part(key: str) -> Dict:
         key_curr_config = key_curr_config[key_part]
 
     return key_curr_config
+
+
+def set_config_part(key: str, config: Dict, value: any):
+    key_parts = key.split("/")
+    last_key_part = key_parts[-1]
+    key_parts = key_parts[:-1]
+
+    key_curr_config = config
+    for key_part in key_parts:
+        key_curr_config = key_curr_config[key_part]
+
+    key_curr_config[last_key_part] = value
 
 
 def _update_config(config: Dict, declaration: Dict):
