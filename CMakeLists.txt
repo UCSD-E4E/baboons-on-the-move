@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.12)
 
 project(baboon-tracking LANGUAGES CXX) # Could add CUDA here in the future
 
@@ -16,12 +16,13 @@ find_package(fmt REQUIRED
 add_executable(${PROJECT_NAME}
 	src/main.cpp
 	
-	src/preprocessing_pipes.cpp
-	src/motion_detecting_pipes.cpp
+	src/thread_pool.cpp
+	#src/preprocessing_pipes.cpp
+	#src/motion_detecting_pipes.cpp
 )
 
-# Require C++17
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+# Require C++20
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 # Add include directories for bundled and unbundled thirdparty deps
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -35,15 +36,22 @@ link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/lib}")
 # Link dependencies to our executable target
 target_link_libraries(${PROJECT_NAME} PRIVATE
 	${OpenCV_LIBS}
-	fmt::fmt
+	fmt::fmt-header-only
 	pthread # Needed on Linux for std::thread
 )
 
+# Sanitizers
+if (SANITIZE)
+	target_link_libraries(${PROJECT_NAME} PRIVATE
+		-fsanitize=undefined,integer,address
+	)
+endif()
+
 # Set up compiler flags for just C++
 if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>/W4 /WX>)
+	target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>/W4 /WX>)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -Werror -pedantic>)
+	target_compile_options(${PROJECT_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Wall -Wextra -Werror -pedantic>)
 endif()
 
 install(TARGETS ${PROJECT_NAME} DESTINATION bin)
