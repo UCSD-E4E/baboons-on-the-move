@@ -8,6 +8,7 @@
 
 #include "../drake/math/discrete_algebraic_riccati_equation.h"
 
+namespace baboon_tracking {
 template <int States, int Inputs>
 bool is_stabilizable(const Eigen::Matrix<double, States, States>& A,
                         const Eigen::Matrix<double, States, Inputs>& B) {
@@ -350,3 +351,4 @@ class kalman_filter {
    */
   Eigen::Matrix<double, States, 1> _x_hat;
 };
+}

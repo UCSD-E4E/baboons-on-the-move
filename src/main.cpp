@@ -11,7 +11,6 @@
 #include <opencv2/videoio.hpp>
 
 #include "pipes.h"
-#include "thread_pool.h"
 
 constexpr bool should_show = true;
 void show(std::string window_name, cv::InputArray image) {
@@ -121,17 +120,12 @@ private:
 
 int main() {
   unsigned int max_threads = 8;
-  std::uint64_t max_tasks =
-      15; // We can't have unlimited tasks because they keep frames around in
-          // memory, which can lead to excessive memory usage if left unchecked
 
   cv::Mat image;
   auto hist_frames = std::make_shared<
       baboon_tracking::historical_frames_container<decltype(image)>>(
       9, max_threads);
   pipeline pl{hist_frames};
-
-  baboon_tracking::thread_pool tp{max_tasks, max_threads};
 
   cv::VideoCapture vc{"./input.mp4"};
   for (std::uint64_t i = 0; vc.read(image); i++) {

@@ -4,6 +4,8 @@
 #include "historical_frame_container.h"
 #include "sortable_frame.h"
 
+#include "kalman/kalman_filter.h"
+
 #include "ssc.h"
 
 #include <opencv2/calib3d.hpp>
@@ -574,6 +576,50 @@ template <typename frame> struct pipes {
 
       return rectangles;
     }
+  };
+
+  template <int NumBaboons> class filter {
+  private:
+    static constexpr auto states_per_baboon = 4;
+    static constexpr auto num_states = NumBaboons * states_per_baboon;
+    static constexpr auto num_measurements = NumBaboons * 4;
+
+  public:
+    filter(std::array<double, num_states> state_std_devs,
+           std::array<double, num_measurements> measurement_std_devs,
+           double dt) {
+      // Remember: A is continuous—xdot = Ax
+      Eigen::Matrix<double, states_per_baboon, states_per_baboon> A_sub;
+      // clang-format off
+      A_sub << 0, 0, 1, 0,
+	       0, 0, 0, 1,
+	       0, 0, 0, 0,
+	       0, 0, 0, 0;
+      // clang-format on
+
+      Eigen::Matrix<double, num_states, num_states> A;
+      for (int i = 0; i < NumBaboons; i++) {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-value"
+        // XXX: need to resolve why we get a warning here on clang... compiler
+        // bug?
+        A.block<num_states, num_states>(i * num_states, i * num_states);
+#pragma clang diagnostic pop
+      }
+      Eigen::Matrix<double, num_states, 0> B =
+          Eigen::Matrix<double, num_measurements, 0>::Zero();
+      Eigen::Matrix<double, num_measurements, num_states> C;
+      for (int i = 0; i < NumBaboons; i++) {
+      }
+      Eigen::Matrix<double, num_measurements, 0> D =
+          Eigen::Matrix<double, num_measurements, 0>::Zero();
+
+      kf = kalman_filter<num_states, 0, num_measurements>{
+          A, B, C, D, state_std_devs, measurement_std_devs, dt};
+    };
+
+  private:
+    kalman_filter<num_states, 0, num_measurements> kf;
   };
 };
 } // namespace baboon_tracking
