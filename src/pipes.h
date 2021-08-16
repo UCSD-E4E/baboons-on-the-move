@@ -580,14 +580,18 @@ template <typename frame> struct pipes {
 
   template <int NumBaboons> class filter {
   private:
-    static constexpr auto states_per_baboon = 4;
-    static constexpr auto num_states = NumBaboons * states_per_baboon;
-    static constexpr auto num_measurements = NumBaboons * 4;
+    // x = [x, y, v_x, v_y, ...]
+    // y = [x_k, y_k, x_{k-1}, y_{k-1}, ...]
+    // No u
+    static constexpr int states_per_baboon = 4;
+    static constexpr int num_states = NumBaboons * states_per_baboon;
+    static constexpr int measurements_per_baboon = 4;
+    static constexpr int num_measurements = NumBaboons * measurements_per_baboon;
 
   public:
     filter(std::array<double, num_states> state_std_devs,
            std::array<double, num_measurements> measurement_std_devs,
-           double dt) {
+           double dt) : dt{dt} {
       // Remember: A is continuous—xdot = Ax
       Eigen::Matrix<double, states_per_baboon, states_per_baboon> A_sub;
       // clang-format off
@@ -599,17 +603,21 @@ template <typename frame> struct pipes {
 
       Eigen::Matrix<double, num_states, num_states> A;
       for (int i = 0; i < NumBaboons; i++) {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-value"
-        // XXX: need to resolve why we get a warning here on clang... compiler
-        // bug?
-        A.block<num_states, num_states>(i * num_states, i * num_states);
-#pragma clang diagnostic pop
+        A.template block<states_per_baboon, states_per_baboon>(i * num_states, i * num_states) = A_sub;
       }
       Eigen::Matrix<double, num_states, 0> B =
           Eigen::Matrix<double, num_measurements, 0>::Zero();
+
+      Eigen::Matrix<double, measurements_per_baboon, states_per_baboon> C_sub;
+      // clang-format off
+      C_sub << 1, 0, 0,  0,
+	       0, 1, 0,  0,
+	       0, 0, dt, 0,
+	       0, 0, 0, dt;
+      // clang-format on
       Eigen::Matrix<double, num_measurements, num_states> C;
       for (int i = 0; i < NumBaboons; i++) {
+        C.template block<measurements_per_baboon, states_per_baboon>(i * num_measurements, i * num_states) = C_sub;
       }
       Eigen::Matrix<double, num_measurements, 0> D =
           Eigen::Matrix<double, num_measurements, 0>::Zero();
@@ -618,8 +626,20 @@ template <typename frame> struct pipes {
           A, B, C, D, state_std_devs, measurement_std_devs, dt};
     };
 
+    void run(const int actual_num_baboons, const std::vector<cv::Rect> &current_bounding_boxes) {
+      Eigen::Matrix<double, num_states, 1> x_hat_old = kf.x_hat();
+      kf.predict(Eigen::Matrix<double, 0, 0>::Zero(), dt);
+
+      Eigen::Matrix<double, num_measurements, 1> y;
+      for (int i; i < actual_num_baboons; i++) {
+        y.template block<measurements_per_baboon, 1>(i * measurements_per_baboon, 1) << current_bounding_boxes[i].x;
+      }
+      kf.correct(Eigen::Matrix<double, 0, 0>::Zero());
+    }
+
   private:
     kalman_filter<num_states, 0, num_measurements> kf;
+    double dt; // Seconds
   };
 };
 } // namespace baboon_tracking
