@@ -30,7 +30,8 @@ template <typename frame> struct pipes {
   class convert_bgr_to_gray {
   public:
     frame run(frame &&color_frame) const {
-      frame out; // XXX: why do we need this with GpuMat?
+      frame out{color_frame.size(),
+                CV_8UC1}; // XXX: why do we need this with GpuMat?
       cvs::cvtColor(color_frame, out, cv::COLOR_BGR2GRAY, 0);
       return out;
     }
@@ -129,10 +130,9 @@ template <typename frame> struct pipes {
             cv::makePtr<cv::flann::LshIndexParams>(6, 12, 1));
         descriptor_matcher.match(descriptors_one, descriptors_two, matches);
       } else {
-#ifdef HAS_CUDA
+#ifdef USE_CUDA
         static auto descriptor_matcher =
-            cv::cuda::DescriptorMatcher::createBFMatcher(
-                cv::BRUTEFORCE_HAMMING);
+            cv::cuda::DescriptorMatcher::createBFMatcher(cv::NORM_HAMMING);
         descriptor_matcher->match(descriptors_one, descriptors_two, matches);
 #endif
       }
@@ -183,7 +183,7 @@ template <typename frame> struct pipes {
           fast_detector = cv::FastFeatureDetector::create();
           orb_detector = cv::ORB::create();
         } else if (!fast_detector && !orb_detector) {
-#ifdef HAS_CUDA
+#ifdef USE_CUDA
           fast_detector = cv::cuda::FastFeatureDetector::create();
           orb_detector = cv::cuda::ORB::create();
 #endif
@@ -218,11 +218,11 @@ template <typename frame> struct pipes {
         std::shared_ptr<historical_frames_container<frame>> historical_frames)
         : historical_frames{historical_frames} {};
 
-    std::tuple<std::vector<frame>, std::vector<cv::Mat>>
+    std::tuple<std::vector<frame>, std::vector<typename cvs::cpu_or_gpu_mat>>
     run(std::uint64_t current_frame_num,
         const std::vector<cv::Mat> &&homographies) {
       std::vector<frame> transformed_history_frames;
-      std::vector<cv::Mat> transformed_masks;
+      std::vector<typename cvs::cpu_or_gpu_mat> transformed_masks;
       for (std::uint64_t i = 0; i < historical_frames->max_historical_frames();
            i++) {
         auto frame_to_transform =
@@ -234,7 +234,7 @@ template <typename frame> struct pipes {
                              homographies[i], frame_size);
         transformed_history_frames.emplace_back(transformed_frame);
 
-        cv::Mat mask_to_transform = cv::Mat::ones(frame_size, CV_8UC1);
+        typename cvs::cpu_or_gpu_mat mask_to_transform{frame_size, CV_8UC1, 1};
         static_assert(
             sizeof(
                 std::remove_reference_t<decltype(homographies)>::size_type) >=
@@ -284,17 +284,18 @@ template <typename frame> struct pipes {
 
   class generate_weights {
   public:
-    cv::Mat run(const std::vector<frame> &transformed_rescaled_history_frames) {
-      cv::Mat weights = cv::Mat::zeros(
-          transformed_rescaled_history_frames[0].size(), CV_8UC1);
+    typename cvs::cpu_or_gpu_mat
+    run(const std::vector<frame> &transformed_rescaled_history_frames) {
+      typename cvs::cpu_or_gpu_mat weights{
+          transformed_rescaled_history_frames[0].size(), 0, CV_8UC1};
       if (transformed_rescaled_history_frames.size() >
           std::numeric_limits<std::uint8_t>::max())
         throw std::overflow_error("Number of history frames would overflow "
                                   "intermediate storage for weights");
 
       // Note: this static makes this not thread safe
-      static cv::Mat mask{transformed_rescaled_history_frames[0].size(),
-                          CV_8UC1};
+      static typename cvs::cpu_or_gpu_mat mask{
+          transformed_rescaled_history_frames[0].size(), CV_8UC1};
       for (auto iter = std::next(transformed_rescaled_history_frames.begin());
            iter != transformed_rescaled_history_frames.end(); iter++) {
         cvs::absdiff(*iter, *std::prev(iter), mask);
@@ -311,17 +312,19 @@ template <typename frame> struct pipes {
 
   class generate_history_of_dissimilarity {
   public:
-    cv::Mat run(const std::vector<frame> &transformed_history_frames,
-                const std::vector<frame> &transformed_rescaled_history_frames) {
-      cv::Mat dissimilarity =
-          cv::Mat::zeros(transformed_history_frames[0].size(), CV_32SC1);
+    typename cvs::cpu_or_gpu_mat
+    run(const std::vector<frame> &transformed_history_frames,
+        const std::vector<frame> &transformed_rescaled_history_frames) {
+      typename cvs::cpu_or_gpu_mat dissimilarity{
+          transformed_history_frames[0].size(), 0, CV_32SC1};
 
       // Note: static storage duration makes this pipe not thread safe
-      static cv::Mat mask{transformed_history_frames[0].size(), CV_8UC1};
-      static cv::Mat dissimilarity_part{transformed_history_frames[0].size(),
-                                        CV_8UC1};
-      for (typename std::remove_reference_t<
-               decltype(transformed_history_frames)>::size_type i = 0;
+      static typename cvs::cpu_or_gpu_mat mask{
+          transformed_history_frames[0].size(), CV_8UC1};
+      static typename cvs::cpu_or_gpu_mat dissimilarity_part{
+          transformed_history_frames[0].size(), CV_8UC1};
+      for (typename std::remove_reference_t<decltype(
+               transformed_history_frames)>::size_type i = 0;
            i < transformed_history_frames.size(); i++) {
         if (i == 0)
           continue;
@@ -366,9 +369,10 @@ template <typename frame> struct pipes {
       std::vector<frame> intersected_frames =
           std::move(transformed_history_frames);
 
-      cv::Mat mask{transformed_history_frames[0].size(), CV_8UC1};
-      for (typename std::remove_reference_t<
-               decltype(transformed_history_frames)>::size_type i = 0;
+      typename cvs::cpu_or_gpu_mat mask{transformed_history_frames[0].size(),
+                                        CV_8UC1};
+      for (typename std::remove_reference_t<decltype(
+               transformed_history_frames)>::size_type i = 0;
            i < transformed_history_frames.size() - 1; i++) {
         cvs::absdiff(transformed_rescaled_history_frames[i],
                      transformed_rescaled_history_frames[i + 1], mask);
@@ -406,16 +410,14 @@ template <typename frame> struct pipes {
         : historical_frames{historical_frames} {};
 
     frame run(std::uint64_t current_frame_num, const frame &&union_of_all,
-              const cv::Mat &weights) {
+              const typename cvs::cpu_or_gpu_mat &weights) {
       auto num_historical_frames = historical_frames->max_historical_frames();
-      auto zero_weights = [num_historical_frames](const auto &image,
-                                                  cv::Mat &&weights) {
-        frame weights_native(weights); // Either uploads weights to the GPU or
-                                       // effectively nothing on the CPU
-        cvs::compare(weights_native, num_historical_frames - 1, weights_native,
-                     cv::CMP_LT);
-        cvs::bitwise_and(weights_native, image, weights_native);
-        return weights_native;
+      auto zero_weights = [num_historical_frames](
+                              const frame &fr,
+                              typename cvs::cpu_or_gpu_mat &&weights) {
+        cvs::compare(weights, num_historical_frames - 1, weights, cv::CMP_LT);
+        cvs::bitwise_and(weights, fr, weights);
+        return frame(weights);
       };
 
       const frame current_frame =
@@ -437,8 +439,8 @@ template <typename frame> struct pipes {
         std::shared_ptr<historical_frames_container<frame>> historical_frames)
         : historical_frames{historical_frames} {};
 
-    frame run(cv::Mat &&dissimilarity, frame &&foreground_fr,
-              cv::Mat &&weights) {
+    frame run(typename cvs::cpu_or_gpu_mat &&dissimilarity,
+              frame &&foreground_fr, typename cvs::cpu_or_gpu_mat &&weights) {
       // Every time we divide by uint8_max_double we're normalizing 0-255 to 0-1
       // TODO: if we're consistient everywhere and we operate on a 32-bit
       // integer then we don't have to normalize. Will need to profile to
@@ -454,15 +456,18 @@ template <typename frame> struct pipes {
       // TODO: MatExpr doesn't work on cv::cuda::GpuMats... we download to host
       // memory rn. Worth it to fix?
       auto foreground = cv::Mat(foreground_fr);
+      auto dissimilarity_host = cv::Mat(dissimilarity);
+      auto weights_host = cv::Mat(weights);
 
       // We use MatExpr for lazy evaluation in order avoid the allocation of
       // temporary cv::Mats
 
       cv::MatExpr weights_low =
-          (weights <= history_frame_count_third) / uint8_max_double;
-      cv::MatExpr weights_medium = ((weights < history_frame_count - 1) &
-                                    (weights > history_frame_count_third)) /
-                                   uint8_max_double * 2.0;
+          (weights_host <= history_frame_count_third) / uint8_max_double;
+      cv::MatExpr weights_medium =
+          ((weights_host < history_frame_count - 1) &
+           (weights_host > history_frame_count_third)) /
+          uint8_max_double * 2.0;
       // XXX: where is weights_high?
 
       cv::MatExpr weight_levels = weights_low + weights_medium;
@@ -480,13 +485,13 @@ template <typename frame> struct pipes {
           foreground_low + foreground_medium + foreground_high;
 
       cv::MatExpr dissimilarity_low =
-          (dissimilarity <= third_gray) / uint8_max_double;
+          (dissimilarity_host <= third_gray) / uint8_max_double;
       cv::MatExpr dissimilarity_medium =
-          ((dissimilarity > third_gray) / uint8_max_double +
-           (dissimilarity < (2.0 * third_gray)) / uint8_max_double) *
+          ((dissimilarity_host > third_gray) / uint8_max_double +
+           (dissimilarity_host < (2.0 * third_gray)) / uint8_max_double) *
           2.0;
       cv::MatExpr dissimilairy_high =
-          (dissimilarity >= (2.0 * third_gray)) / uint8_max_double * 3.0;
+          (dissimilarity_host >= (2.0 * third_gray)) / uint8_max_double * 3.0;
 
       cv::MatExpr dissimilarity_levels =
           dissimilarity_low + dissimilarity_medium + dissimilairy_high;
@@ -514,7 +519,8 @@ template <typename frame> struct pipes {
 
   class apply_masks {
   public:
-    void run(frame *moving_foreground, std::vector<cv::Mat> &&shifted_masks) {
+    void run(frame *moving_foreground,
+             std::vector<typename cvs::cpu_or_gpu_mat> &&shifted_masks) {
       for (auto &&mask : shifted_masks) {
         cvs::multiply(*moving_foreground, mask, *moving_foreground);
       }
@@ -528,7 +534,15 @@ template <typename frame> struct pipes {
     void run(frame *moving_foreground) {
       static cv::Mat element = cv::getStructuringElement(
           cv::MORPH_RECT, cv::Size(erosion_size, erosion_size));
-      cv::erode(*moving_foreground, *moving_foreground, element);
+      if (!cvs::is_cuda) {
+        cv::erode(*moving_foreground, *moving_foreground, element);
+      } else {
+#ifdef USE_CUDA
+        static auto filter =
+            cv::cuda::createMorphologyFilter(cv::MORPH_ERODE, CV_8UC1, element);
+        filter->apply(*moving_foreground, *moving_foreground);
+#endif
+      }
     }
 
   private:
