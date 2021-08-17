@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.12)
 
 project(baboon-tracking LANGUAGES CXX) # Could add CUDA here in the future
 
+option(USE_CUDA "Include CUDA headers and use CUDA-accelerated functions" OFF)
+
 # Set module path so that we can add modules to find system dependencies (we add no modules rn)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
 
@@ -18,8 +20,6 @@ add_executable(${PROJECT_NAME}
 	
 	src/util/thread_pool.cpp
 	src/drake/math/discrete_algebraic_riccati_equation.cpp
-	#src/preprocessing_pipes.cpp
-	#src/motion_detecting_pipes.cpp
 )
 
 # Require C++17
@@ -46,6 +46,11 @@ if (SANITIZE)
 	target_link_libraries(${PROJECT_NAME} PRIVATE
 		-fsanitize=undefined,integer,address
 	)
+endif()
+
+# Set the HAS_CUDA macro
+if (USE_CUDA)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_CUDA=1)
 endif()
 
 # Set up compiler flags for just C++

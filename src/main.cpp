@@ -12,7 +12,7 @@
 
 #include "pipes.h"
 
-constexpr bool should_show = true;
+constexpr bool should_show = false;
 void show(std::string window_name, cv::InputArray image) {
   if (!should_show)
     return;
@@ -45,7 +45,7 @@ public:
         detect_blobs{} {}
 
   auto process(std::uint64_t current_frame_num, frame &&bgr_frame) {
-    auto drawing_frame = bgr_frame;
+    auto drawing_frame = bgr_frame.clone();
     auto gray_frame = convert_bgr_to_gray.run(std::move(bgr_frame));
     auto blurred_frame = blur_gray.run(std::move(gray_frame));
 
@@ -109,9 +109,19 @@ private:
 };
 
 int main() {
-  unsigned int max_threads = 8;
+  unsigned int max_threads = 8; // TODO: put the thread pool back optionally
 
+  // TODO: we're using USE_CUDA elsewhere to mean that CUDA headers are
+  // available (an unfortunate kludge that happens because some builds of OpenCV
+  // don't even come with the OpenCV CUDA headers even though those headers have
+  // appropriate stubbed functions). This is not with the spirit of the meaning
+  // of USE_CUDA (i.e. USE_CUDA should probably only be touched here, while
+  // HAS_CUDA should maybe be used elsewhere?)
+#ifdef USE_CUDA
+  cv::cuda::GpuMat image;
+#elif
   cv::Mat image;
+#endif
   auto hist_frames = std::make_shared<
       baboon_tracking::historical_frames_container<decltype(image)>>(
       9, max_threads);
@@ -119,7 +129,7 @@ int main() {
 
   cv::VideoCapture vc{"./input.mp4"};
   for (std::uint64_t i = 0; vc.read(image) && !image.empty(); i++) {
-    cv::waitKey();
+    cv::waitKey(1);
 
     auto start = std::chrono::steady_clock::now();
     auto blobs = pl.process(i, image.clone());
