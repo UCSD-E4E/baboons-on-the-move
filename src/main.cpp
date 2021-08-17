@@ -60,11 +60,6 @@ public:
                                                std::move(homographies));
     auto transformed_rescaled_history_frames =
         rescale_transformed_history_frames.run(transformed_history_frames);
-    // show("Current frame, transformed",
-    // transformed_history_frames[transformed_history_frames.size() - 1]);
-    // show("Current frame, transformed and rescaled",
-    // transformed_rescaled_history_frames[transformed_rescaled_history_frames.size()
-    // - 1]);
     auto weights = generate_weights.run(transformed_rescaled_history_frames);
     auto history_of_dissimilarity = generate_history_of_dissimilarity.run(
         transformed_history_frames, transformed_rescaled_history_frames);
@@ -73,18 +68,13 @@ public:
                              std::move(transformed_rescaled_history_frames));
     auto union_of_all =
         union_intersected_frames.run(std::move(intersected_frames));
-    // show("Union of all", union_of_all);
     auto foreground = subtract_background.run(current_frame_num,
                                               std::move(union_of_all), weights);
-    // show("Foreground", foreground);
-    // show("History of dissimilarity", history_of_dissimilarity);
-    // show("Weights", weights);
     auto moving_foreground = compute_moving_foreground.run(
         std::move(history_of_dissimilarity), std::move(foreground),
         std::move(weights));
     apply_masks.run(&moving_foreground, std::move(transformed_masks));
     erode.run(&moving_foreground);
-    // show("Moving foreground", moving_foreground);
     auto blobs = detect_blobs.run(std::move(moving_foreground));
     static const auto color = cv::Scalar(255, 0, 0);
     for (auto &&blob : blobs) {
@@ -128,7 +118,7 @@ int main() {
   pipeline pl{hist_frames};
 
   cv::VideoCapture vc{"./input.mp4"};
-  for (std::uint64_t i = 0; vc.read(image); i++) {
+  for (std::uint64_t i = 0; vc.read(image) && !image.empty(); i++) {
     cv::waitKey();
 
     auto start = std::chrono::steady_clock::now();

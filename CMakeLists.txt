@@ -22,8 +22,8 @@ add_executable(${PROJECT_NAME}
 	#src/motion_detecting_pipes.cpp
 )
 
-# Require C++20
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+# Require C++17
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 # Add include directories for bundled and unbundled thirdparty deps
 target_include_directories(${PROJECT_NAME} PRIVATE

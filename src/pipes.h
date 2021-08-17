@@ -66,6 +66,8 @@ template <typename frame> struct pipes {
     denoise(float denoise_strength) : denoise_strength{denoise_strength} {};
 
     frame run(frame &&gray_frame) const {
+      // TODO: should probably add a CUDA version of this to the aliases if we
+      // ever use the denoising step
       cv::fastNlMeansDenoisingColored(gray_frame, gray_frame, denoise_strength);
       return std::move(gray_frame);
     }
@@ -84,24 +86,6 @@ template <typename frame> struct pipes {
           ransac_max_reproj_error{ransac_max_reproj_error},
           ssc_tolerance{ssc_tolerance}, ssc_num_ret_points{ssc_num_ret_points},
           historical_frames{historical_frames} {};
-
-    /*compute_homography(compute_homography &&old) {
-      std::scoped_lock lk(old.memo_map_mutex);
-
-      good_match_percent = old.good_match_percent;
-      ransac_max_reproj_error = old.ransac_max_reproj_error;
-      ssc_tolerance = old.ssc_tolerance;
-      ssc_num_ret_points = old.ssc_num_ret_points;
-
-      fast_detector = std::move(old.fast_detector);
-      orb_detector = std::move(old.orb_detector);
-      descriptor_matcher = std::move(old.descriptor_matcher);
-
-      historical_frames = std::move(old.historical_frames);
-
-      memoized_keypoint_and_descriptor_map =
-          std::move(old.memoized_keypoint_and_descriptor_map);
-    }*/
 
     std::vector<cv::Mat> run(std::uint8_t current_frame_num,
                              frame &&gray_blurred_frame) {
@@ -220,13 +204,6 @@ template <typename frame> struct pipes {
     double ssc_tolerance;
     int ssc_num_ret_points;
 
-    /*cv::Ptr<cv::FastFeatureDetector> fast_detector =
-        cv::FastFeatureDetector::create();
-    cv::Ptr<cv::ORB> orb_detector = cv::ORB::create();
-    cv::Ptr<cv::DescriptorMatcher> descriptor_matcher =
-        cv::DescriptorMatcher::create(
-            cv::DescriptorMatcher::MatcherType::BRUTEFORCE_HAMMING);*/
-
     std::map<sortable_frame<frame>, std::tuple<std::vector<cv::KeyPoint>,
                                                typename cvs::cpu_or_gpu_mat>>
         memoized_keypoint_and_descriptor_map;
@@ -253,8 +230,8 @@ template <typename frame> struct pipes {
         auto frame_size = frame_to_transform.size();
 
         frame transformed_frame{frame_size, CV_8UC1};
-        cv::warpPerspective(frame_to_transform, transformed_frame,
-                            homographies[i], frame_size);
+        cvs::warpPerspective(frame_to_transform, transformed_frame,
+                             homographies[i], frame_size);
         transformed_history_frames.emplace_back(transformed_frame);
 
         cv::Mat mask_to_transform = cv::Mat::ones(frame_size, CV_8UC1);
@@ -262,8 +239,8 @@ template <typename frame> struct pipes {
             sizeof(
                 std::remove_reference_t<decltype(homographies)>::size_type) >=
             sizeof(decltype(i)));
-        cv::warpPerspective(mask_to_transform, mask_to_transform,
-                            homographies[i], frame_size);
+        cvs::warpPerspective(mask_to_transform, mask_to_transform,
+                             homographies[i], frame_size);
         transformed_masks.emplace_back(mask_to_transform);
       }
 
@@ -287,10 +264,9 @@ template <typename frame> struct pipes {
           transformed_history_frames.size());
 
       for (auto &&transformed_frame : transformed_history_frames) {
-        // transformed_rescaled_history_frames.emplace_back(transformed_frame.clone()
-        // * (scale_factor / 255.0));
-        frame transformed_rescaled_history_frame;
-        cv::multiply(
+        frame transformed_rescaled_history_frame{transformed_frame.size(),
+                                                 CV_8UC1};
+        cvs::multiply(
             transformed_frame,
             scale_factor /
                 static_cast<double>(std::numeric_limits<std::uint8_t>::max()),
@@ -321,9 +297,9 @@ template <typename frame> struct pipes {
                           CV_8UC1};
       for (auto iter = std::next(transformed_rescaled_history_frames.begin());
            iter != transformed_rescaled_history_frames.end(); iter++) {
-        cv::absdiff(*iter, *std::prev(iter), mask);
-        cv::compare(mask, 1, mask, cv::CMP_LE);
-        cv::scaleAdd(
+        cvs::absdiff(*iter, *std::prev(iter), mask);
+        cvs::compare(mask, 1, mask, cv::CMP_LE);
+        cvs::scaleAdd(
             mask,
             1 / static_cast<double>(std::numeric_limits<std::uint8_t>::max()),
             weights, weights);
@@ -354,19 +330,19 @@ template <typename frame> struct pipes {
         // more readable, but that would require allocating a new Mat each loop
         // iteration. This also allows for easy CUDA support.
 
-        cv::absdiff(transformed_rescaled_history_frames[i],
-                    transformed_history_frames[i - 1], mask);
-        cv::compare(mask, 1, mask,
-                    cv::CMP_GT); // This operation should be less or equal to
-                                 // than 1, but we do greater than 1 so we can
-                                 // avoid a bitwise not on the mask later on
+        cvs::absdiff(transformed_rescaled_history_frames[i],
+                     transformed_history_frames[i - 1], mask);
+        cvs::compare(mask, 1, mask,
+                     cv::CMP_GT); // This operation should be less or equal to
+                                  // than 1, but we do greater than 1 so we can
+                                  // avoid a bitwise not on the mask later on
 
-        cv::absdiff(transformed_history_frames[i],
-                    transformed_history_frames[i - 1], dissimilarity_part);
-        cv::bitwise_and(dissimilarity_part, mask, dissimilarity_part);
+        cvs::absdiff(transformed_history_frames[i],
+                     transformed_history_frames[i - 1], dissimilarity_part);
+        cvs::bitwise_and(dissimilarity_part, mask, dissimilarity_part);
 
-        cv::add(dissimilarity, dissimilarity_part, dissimilarity, cv::noArray(),
-                CV_32SC1);
+        cvs::add(dissimilarity, dissimilarity_part, dissimilarity,
+                 cv::noArray(), CV_32SC1);
       }
 
       // Note: we're trying to get a count of how many times in the history
@@ -394,14 +370,14 @@ template <typename frame> struct pipes {
       for (typename std::remove_reference_t<
                decltype(transformed_history_frames)>::size_type i = 0;
            i < transformed_history_frames.size() - 1; i++) {
-        cv::absdiff(transformed_rescaled_history_frames[i],
-                    transformed_rescaled_history_frames[i + 1], mask);
-        cv::compare(mask, 1, mask,
-                    cv::CMP_GT); // This operation should be less or equal to
-                                 // than 1, but we do greater than 1 so we can
-                                 // avoid a bitwise not on the mask later on
+        cvs::absdiff(transformed_rescaled_history_frames[i],
+                     transformed_rescaled_history_frames[i + 1], mask);
+        cvs::compare(mask, 1, mask,
+                     cv::CMP_GT); // This operation should be less or equal to
+                                  // than 1, but we do greater than 1 so we can
+                                  // avoid a bitwise not on the mask later on
 
-        cv::bitwise_and(intersected_frames[i], mask, intersected_frames[i]);
+        cvs::bitwise_and(intersected_frames[i], mask, intersected_frames[i]);
       }
       intersected_frames
           .pop_back(); // Because intersected_frames is being re-used from
@@ -416,7 +392,7 @@ template <typename frame> struct pipes {
     frame run(const std::vector<frame> &&intersected_frames) {
       frame union_of_all = intersected_frames[0];
       for (auto &&fr : intersected_frames) {
-        cv::bitwise_or(union_of_all, fr, union_of_all);
+        cvs::bitwise_or(union_of_all, fr, union_of_all);
       }
 
       return union_of_all;
@@ -436,9 +412,9 @@ template <typename frame> struct pipes {
                                                   cv::Mat &&weights) {
         frame weights_native(weights); // Either uploads weights to the GPU or
                                        // effectively nothing on the CPU
-        cv::compare(weights_native, num_historical_frames - 1, weights_native,
-                    cv::CMP_LT);
-        cv::bitwise_and(weights_native, image, weights_native);
+        cvs::compare(weights_native, num_historical_frames - 1, weights_native,
+                     cv::CMP_LT);
+        cvs::bitwise_and(weights_native, image, weights_native);
         return weights_native;
       };
 
@@ -447,7 +423,7 @@ template <typename frame> struct pipes {
       auto frame_new = zero_weights(current_frame, weights.clone());
       auto union_new = zero_weights(union_of_all, weights.clone());
 
-      cv::absdiff(frame_new, union_new, frame_new);
+      cvs::absdiff(frame_new, union_new, frame_new);
       return frame_new;
     }
 
@@ -540,7 +516,7 @@ template <typename frame> struct pipes {
   public:
     void run(frame *moving_foreground, std::vector<cv::Mat> &&shifted_masks) {
       for (auto &&mask : shifted_masks) {
-        cv::multiply(*moving_foreground, mask, *moving_foreground);
+        cvs::multiply(*moving_foreground, mask, *moving_foreground);
       }
     }
   };
@@ -562,7 +538,8 @@ template <typename frame> struct pipes {
   class detect_blobs {
   public:
     std::vector<cv::Rect> run(const frame &&moving_foreground) {
-      auto foreground_mask = moving_foreground;
+      // Have to download from the GPU; there is no CUDA findContours
+      auto foreground_mask = cv::Mat(moving_foreground);
 
       std::vector<std::vector<cv::Point>> contours;
       cv::findContours(foreground_mask, contours, cv::RETR_LIST,
@@ -586,12 +563,13 @@ template <typename frame> struct pipes {
     static constexpr int states_per_baboon = 4;
     static constexpr int num_states = NumBaboons * states_per_baboon;
     static constexpr int measurements_per_baboon = 4;
-    static constexpr int num_measurements = NumBaboons * measurements_per_baboon;
+    static constexpr int num_measurements =
+        NumBaboons * measurements_per_baboon;
 
   public:
     filter(std::array<double, num_states> state_std_devs,
-           std::array<double, num_measurements> measurement_std_devs,
-           double dt) : dt{dt} {
+           std::array<double, num_measurements> measurement_std_devs, double dt)
+        : dt{dt} {
       // Remember: A is continuous—xdot = Ax
       Eigen::Matrix<double, states_per_baboon, states_per_baboon> A_sub;
       // clang-format off
@@ -603,7 +581,8 @@ template <typename frame> struct pipes {
 
       Eigen::Matrix<double, num_states, num_states> A;
       for (int i = 0; i < NumBaboons; i++) {
-        A.template block<states_per_baboon, states_per_baboon>(i * num_states, i * num_states) = A_sub;
+        A.template block<states_per_baboon, states_per_baboon>(
+            i * num_states, i * num_states) = A_sub;
       }
       Eigen::Matrix<double, num_states, 0> B =
           Eigen::Matrix<double, num_measurements, 0>::Zero();
@@ -617,7 +596,8 @@ template <typename frame> struct pipes {
       // clang-format on
       Eigen::Matrix<double, num_measurements, num_states> C;
       for (int i = 0; i < NumBaboons; i++) {
-        C.template block<measurements_per_baboon, states_per_baboon>(i * num_measurements, i * num_states) = C_sub;
+        C.template block<measurements_per_baboon, states_per_baboon>(
+            i * num_measurements, i * num_states) = C_sub;
       }
       Eigen::Matrix<double, num_measurements, 0> D =
           Eigen::Matrix<double, num_measurements, 0>::Zero();
@@ -626,13 +606,16 @@ template <typename frame> struct pipes {
           A, B, C, D, state_std_devs, measurement_std_devs, dt};
     };
 
-    void run(const int actual_num_baboons, const std::vector<cv::Rect> &current_bounding_boxes) {
+    void run(const int actual_num_baboons,
+             const std::vector<cv::Rect> &current_bounding_boxes) {
       Eigen::Matrix<double, num_states, 1> x_hat_old = kf.x_hat();
       kf.predict(Eigen::Matrix<double, 0, 0>::Zero(), dt);
 
       Eigen::Matrix<double, num_measurements, 1> y;
       for (int i; i < actual_num_baboons; i++) {
-        y.template block<measurements_per_baboon, 1>(i * measurements_per_baboon, 1) << current_bounding_boxes[i].x;
+        y.template block<measurements_per_baboon, 1>(
+            i * measurements_per_baboon, 1)
+            << current_bounding_boxes[i].x;
       }
       kf.correct(Eigen::Matrix<double, 0, 0>::Zero());
     }
