@@ -19,7 +19,7 @@ add_executable(${PROJECT_NAME}
 	src/main.cpp
 	
 	src/util/thread_pool.cpp
-	src/drake/math/discrete_algebraic_riccati_equation.cpp
+	#src/drake/math/discrete_algebraic_riccati_equation.cpp
 )
 
 # Require C++17

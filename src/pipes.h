@@ -211,7 +211,6 @@ template <typename frame> struct pipes {
     std::shared_ptr<historical_frames_container<frame>> historical_frames;
   };
 
-  // TODO: could be two parallel pipes or parallel tasks in the pipe
   class transform_history_frames_and_masks {
   public:
     transform_history_frames_and_masks(

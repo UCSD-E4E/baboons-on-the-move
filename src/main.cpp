@@ -22,6 +22,7 @@ void show(std::string window_name, cv::InputArray image) {
     cv::namedWindow(window_name, cv::WINDOW_KEEPRATIO);
   cv::imshow(window_name, image);
   if (!has_shown[window_name]) {
+    // Frame is too big to display on my screen
     cv::resizeWindow(window_name, image.cols() / 4.0, image.rows() / 4.0);
     has_shown[window_name] = true;
   }
@@ -49,7 +50,6 @@ public:
     auto gray_frame = convert_bgr_to_gray.run(std::move(bgr_frame));
     auto blurred_frame = blur_gray.run(std::move(gray_frame));
 
-    // TODO: don't return current_frame_num anymore
     auto homographies =
         compute_homography.run(current_frame_num, std::move(blurred_frame));
     if (homographies.empty())
