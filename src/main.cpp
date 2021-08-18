@@ -119,7 +119,7 @@ int main() {
   // HAS_CUDA should maybe be used elsewhere?)
 #ifdef USE_CUDA
   cv::cuda::GpuMat image;
-#elif
+#else
   cv::Mat image;
 #endif
   auto hist_frames = std::make_shared<
