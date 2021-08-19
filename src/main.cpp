@@ -10,9 +10,10 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/videoio.hpp>
 
+#include "constant_velocity_kalman_filter.h"
 #include "pipes.h"
 
-constexpr bool should_show = false;
+constexpr bool should_show = true;
 void show(std::string window_name, cv::InputArray image) {
   if (!should_show)
     return;
@@ -76,11 +77,6 @@ public:
     apply_masks.run(&moving_foreground, std::move(transformed_masks));
     erode.run(&moving_foreground);
     auto blobs = detect_blobs.run(std::move(moving_foreground));
-    static const auto color = cv::Scalar(255, 0, 0);
-    for (auto &&blob : blobs) {
-      cv::rectangle(drawing_frame, blob, color, 4);
-    }
-    show("Blobs on frame", drawing_frame);
 
     fmt::print("{} done\n", current_frame_num);
 
@@ -128,17 +124,50 @@ int main() {
   pipeline pl{hist_frames};
 
   cv::VideoCapture vc{"./input.mp4"};
+
+  baboon_tracking::constant_velocity_kalman_filter<1> kf{
+      {2, 2, 4, 4}, // Units are pixels, pixels, pixels/s, pixels/s respectively
+      {10, 10, 10, 10},              // Units are all pixels
+      1.0 / vc.get(cv::CAP_PROP_FPS) // s/frame
+  };
+  kf.set_x_hat(0, 116); // 2920
+  kf.set_x_hat(1, 109); // 1210
+  kf.set_x_hat(2, 0);
+  kf.set_x_hat(3, 0);
+
   for (std::uint64_t i = 0; vc.read(image) && !image.empty(); i++) {
-    cv::waitKey(1);
+    cv::Mat cropped_image = image(cv::Rect{2800, 1100, 512, 512});
+
+    auto drawing_frame = cropped_image.clone();
 
     auto start = std::chrono::steady_clock::now();
-    auto blobs = pl.process(i, image.clone());
+    auto bounding_boxes = pl.process(i, std::move(cropped_image));
     auto end = std::chrono::steady_clock::now();
 
     fmt::print(
         "Took {} ms\n",
         std::chrono::duration_cast<std::chrono::milliseconds>(end - start)
             .count());
+
+    if (!bounding_boxes.empty()) {
+      auto x_hat = kf.run(1, bounding_boxes);
+
+      static const auto bounding_box_color = cv::Scalar(255, 0, 0);
+      for (auto &&bounding_box : bounding_boxes) {
+        cv::rectangle(drawing_frame, bounding_box, bounding_box_color, 4);
+      }
+
+      static const auto kf_translation_color = cv::Scalar(0, 255, 0);
+      cv::circle(drawing_frame,
+                 cv::Point2i{static_cast<int>(std::round(x_hat[0])),
+                             static_cast<int>(std::round(x_hat[1]))},
+                 3, kf_translation_color, 5);
+      fmt::print("kf estimate at ({}, {}) with velocity of ({}, {})\n",
+                 x_hat[0], x_hat[1], x_hat[2], x_hat[3]);
+
+      show("Blobs on frame", drawing_frame);
+      cv::waitKey();
+    }
   }
 
   fmt::print("finished");

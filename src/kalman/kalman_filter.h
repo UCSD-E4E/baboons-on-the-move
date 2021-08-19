@@ -3,8 +3,11 @@
 #include <cmath>
 
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/QR>
 #include <eigen3/Eigen/src/Cholesky/LDLT.h>
+#include <eigen3/Eigen/src/LU/PartialPivLU.h>
 #include <eigen3/Eigen/src/Eigenvalues/EigenSolver.h>
+#include <eigen3/unsupported/Eigen/src/MatrixFunctions/MatrixExponential.h>
 
 #include "../drake/math/discrete_algebraic_riccati_equation.h"
 
@@ -49,33 +52,6 @@ void discretize_A(const Eigen::Matrix<double, States, States>& contA,
                  double dt,
                  Eigen::Matrix<double, States, States>* discA) {
   *discA = (contA * dt).exp();
-}
-
-/**
- * Discretizes the given continuous A and B matrices.
- *
- * @param contA Continuous system matrix.
- * @param contB Continuous input matrix.
- * @param dt    Discretization timestep (seconds).
- * @param discA Storage for discrete system matrix.
- * @param discB Storage for discrete input matrix.
- */
-template <int States, int Inputs>
-void discretize_AB(const Eigen::Matrix<double, States, States>& cont_A,
-                  const Eigen::Matrix<double, States, Inputs>& cont_B,
-                  double dt,
-                  Eigen::Matrix<double, States, States>* disc_A,
-                  Eigen::Matrix<double, States, Inputs>* disc_B) {
-  // Matrices are blocked here to minimize matrix exponentiation calculations
-  Eigen::Matrix<double, States + Inputs, States + Inputs> M_cont;
-  M_cont.setZero();
-  M_cont.template block<States, States>(0, 0) = cont_A * dt;
-  M_cont.template block<States, Inputs>(0, States) = cont_B * dt;
-
-  // Discretize A and B with the given timestep
-  Eigen::Matrix<double, States + Inputs, States + Inputs> Mdisc = M_cont.exp();
-  *disc_A = Mdisc.template block<States, States>(0, 0);
-  *disc_B = Mdisc.template block<States, Inputs>(0, States);
 }
 
 /**
@@ -187,6 +163,29 @@ Eigen::Matrix<double, Outputs, Outputs> discretize_R(
 }
 
 /**
+ * Creates a covariance matrix from the given vector for use with Kalman
+ * filters.
+ *
+ * Each element is squared and placed on the covariance matrix diagonal.
+ *
+ * @param stdDevs An array. For a Q matrix, its elements are the standard
+ *                deviations of each state from how the model behaves. For an R
+ *                matrix, its elements are the standard deviations for each
+ *                output measurement.
+ * @return Process noise or measurement noise covariance matrix.
+ */
+template <size_t N>
+Eigen::Matrix<double, N, N> make_cov_matrix(
+    const std::array<double, N>& stdDevs) {
+  Eigen::DiagonalMatrix<double, N> result;
+  auto& diag = result.diagonal();
+  for (size_t i = 0; i < N; ++i) {
+    diag(i) = std::pow(stdDevs[i], 2);
+  }
+  return result;
+}
+
+/**
  * A Kalman filter combines predictions from a model and measurements to give an
  * estimate of the true system state. This is useful because many states cannot
  * be measured directly as a result of sensor noise, or because the state is
@@ -197,35 +196,31 @@ Eigen::Matrix<double, Outputs, Outputs> discretize_R(
  * K gain which minimizes the sum of squares error in the state estimate. This K
  * gain is used to correct the state estimate by some amount of the difference
  * between the actual measurements and the measurements predicted by the model.
- *
- * For more on the underlying math, read
- * https://file.tavsys.net/control/controls-engineering-in-frc.pdf chapter 9
- * "Stochastic control theory".
  */
-template <int States, int Inputs, int Outputs>
+template <int States, int Outputs>
 class kalman_filter {
  public:
   /**
    * Constructs a state-space observer with the given plant.
    *
-   * @param plant              The plant used for the prediction step.
+   * @param A                  System matrix (process model).
+   * @param C                  Measurement matrix (measurement model).
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep (seconds).
    */
   kalman_filter(const Eigen::Matrix<double, States, States>& A,
-		   const Eigen::Matrix<double, States, Inputs>& B,
 		   const Eigen::Matrix<double, Outputs, States>& C,
-		   const Eigen::Matrix<double, Outputs, Inputs>& D,
                    const std::array<double, States>& state_std_devs,
                    const std::array<double, Outputs>& measurement_std_devs,
-                   double dt) : A{A}, B{B}, C{C}, D{D} {
-    auto cont_Q = MakeCovMatrix(state_std_devs);
-    auto cont_R = MakeCovMatrix(measurement_std_devs);
+                   double dt) : A{A}, C{C} {
+    auto cont_Q = make_cov_matrix(state_std_devs);
+    auto cont_R = make_cov_matrix(measurement_std_devs);
 
     Eigen::Matrix<double, States, States> disc_A;
     Eigen::Matrix<double, States, States> disc_Q;
     discretize_AQ_taylor<States>(A, cont_Q, dt, &disc_A, &disc_Q);
+    disc_A_nominal = disc_A;
 
     auto disc_R = discretize_R<Outputs>(cont_R, dt);
 
@@ -310,36 +305,40 @@ class kalman_filter {
   void reset() { _x_hat.setZero(); }
 
   /**
-   * Project the model into the future with a new control input u.
+   * Project the model into the future. No control input—we assume a homogenous system.
    *
-   * @param u  New control input from controller.
    * @param dt Timestep for prediction (seconds).
    */
-  void predict(const Eigen::Matrix<double, Inputs, 1>& u, double dt) {
-    Eigen::Matrix<double, States, States> discA;
-    Eigen::Matrix<double, States, Inputs> discB;
-    discretize_AB<States, Inputs>(A, B, dt, &discA, &discB);
+  void predict(double dt) {
+    // We re-discretize A if there's a varyint timestep
+    Eigen::Matrix<double, States, States> disc_A;
+    discretize_A<States>(A, dt, &disc_A);
 
-    _x_hat = discA * _x_hat + discB * u;
+    _x_hat = disc_A * _x_hat;
+  }
+
+  /**
+   * Project the model into the future. No control input—we assume a homogenous system. This overload is for when you have a constant dt.
+   */
+  void predict() {
+    _x_hat = disc_A_nominal * _x_hat;
   }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
-   * @param u Same control input used in the last predict step.
    * @param y Measurement vector.
    */
-  void correct(const Eigen::Matrix<double, Inputs, 1>& u,
-               const Eigen::Matrix<double, Outputs, 1>& y) {
-    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − (Cx̂ₖ₊₁⁻ + Duₖ₊₁))
-    _x_hat += _K * (y - (C * _x_hat + D * u));
+  void correct(const Eigen::Matrix<double, Outputs, 1>& y) {
+    // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − Cx̂ₖ₊₁⁻)
+    _x_hat += _K * (y - C * _x_hat);
   }
 
  private:
   Eigen::Matrix<double, States, States> A;
-  Eigen::Matrix<double, States, Inputs> B;
   Eigen::Matrix<double, Outputs, States> C;
-  Eigen::Matrix<double, Outputs, Inputs> D;
+
+  Eigen::Matrix<double, States, States> disc_A_nominal; // A discretize for the nominal timestep
 
   /**
    * The steady-state Kalman gain matrix.

@@ -4,8 +4,6 @@
 #include "historical_frame_container.h"
 #include "sortable_frame.h"
 
-#include "kalman/kalman_filter.h"
-
 #include "ssc.h"
 
 #include <opencv2/calib3d.hpp>
@@ -322,8 +320,8 @@ template <typename frame> struct pipes {
           transformed_history_frames[0].size(), CV_8UC1};
       static typename cvs::cpu_or_gpu_mat dissimilarity_part{
           transformed_history_frames[0].size(), CV_8UC1};
-      for (typename std::remove_reference_t<decltype(
-               transformed_history_frames)>::size_type i = 0;
+      for (typename std::remove_reference_t<
+               decltype(transformed_history_frames)>::size_type i = 0;
            i < transformed_history_frames.size(); i++) {
         if (i == 0)
           continue;
@@ -370,8 +368,8 @@ template <typename frame> struct pipes {
 
       typename cvs::cpu_or_gpu_mat mask{transformed_history_frames[0].size(),
                                         CV_8UC1};
-      for (typename std::remove_reference_t<decltype(
-               transformed_history_frames)>::size_type i = 0;
+      for (typename std::remove_reference_t<
+               decltype(transformed_history_frames)>::size_type i = 0;
            i < transformed_history_frames.size() - 1; i++) {
         cvs::absdiff(transformed_rescaled_history_frames[i],
                      transformed_rescaled_history_frames[i + 1], mask);
@@ -566,76 +564,6 @@ template <typename frame> struct pipes {
 
       return rectangles;
     }
-  };
-
-  template <int NumBaboons> class filter {
-  private:
-    // x = [x, y, v_x, v_y, ...]
-    // y = [x_k, y_k, x_{k-1}, y_{k-1}, ...]
-    // No u
-    static constexpr int states_per_baboon = 4;
-    static constexpr int num_states = NumBaboons * states_per_baboon;
-    static constexpr int measurements_per_baboon = 4;
-    static constexpr int num_measurements =
-        NumBaboons * measurements_per_baboon;
-
-  public:
-    filter(std::array<double, num_states> state_std_devs,
-           std::array<double, num_measurements> measurement_std_devs, double dt)
-        : dt{dt} {
-      // Remember: A is continuous—xdot = Ax
-      Eigen::Matrix<double, states_per_baboon, states_per_baboon> A_sub;
-      // clang-format off
-      A_sub << 0, 0, 1, 0,
-	       0, 0, 0, 1,
-	       0, 0, 0, 0,
-	       0, 0, 0, 0;
-      // clang-format on
-
-      Eigen::Matrix<double, num_states, num_states> A;
-      for (int i = 0; i < NumBaboons; i++) {
-        A.template block<states_per_baboon, states_per_baboon>(
-            i * num_states, i * num_states) = A_sub;
-      }
-      Eigen::Matrix<double, num_states, 0> B =
-          Eigen::Matrix<double, num_measurements, 0>::Zero();
-
-      Eigen::Matrix<double, measurements_per_baboon, states_per_baboon> C_sub;
-      // clang-format off
-      C_sub << 1, 0, 0,  0,
-	       0, 1, 0,  0,
-	       0, 0, dt, 0,
-	       0, 0, 0, dt;
-      // clang-format on
-      Eigen::Matrix<double, num_measurements, num_states> C;
-      for (int i = 0; i < NumBaboons; i++) {
-        C.template block<measurements_per_baboon, states_per_baboon>(
-            i * num_measurements, i * num_states) = C_sub;
-      }
-      Eigen::Matrix<double, num_measurements, 0> D =
-          Eigen::Matrix<double, num_measurements, 0>::Zero();
-
-      kf = kalman_filter<num_states, 0, num_measurements>{
-          A, B, C, D, state_std_devs, measurement_std_devs, dt};
-    };
-
-    void run(const int actual_num_baboons,
-             const std::vector<cv::Rect> &current_bounding_boxes) {
-      Eigen::Matrix<double, num_states, 1> x_hat_old = kf.x_hat();
-      kf.predict(Eigen::Matrix<double, 0, 0>::Zero(), dt);
-
-      Eigen::Matrix<double, num_measurements, 1> y;
-      for (int i; i < actual_num_baboons; i++) {
-        y.template block<measurements_per_baboon, 1>(
-            i * measurements_per_baboon, 1)
-            << current_bounding_boxes[i].x;
-      }
-      kf.correct(Eigen::Matrix<double, 0, 0>::Zero());
-    }
-
-  private:
-    kalman_filter<num_states, 0, num_measurements> kf;
-    double dt; // Seconds
   };
 };
 } // namespace baboon_tracking
