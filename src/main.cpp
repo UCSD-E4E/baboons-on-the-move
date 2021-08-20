@@ -126,8 +126,10 @@ int main() {
   cv::VideoCapture vc{"./input.mp4"};
 
   baboon_tracking::constant_velocity_kalman_filter<1> kf{
-      {2, 2, 4, 4}, // Units are pixels, pixels, pixels/s, pixels/s respectively
-      {10, 10, 10, 10},              // Units are all pixels
+      {20, 20, 40,
+       40}, // Units are pixels, pixels, pixels/s, pixels/s respectively
+      {10, 10, 5, 5},                // Units are all pixels
+      30,                            // Units are pixels
       1.0 / vc.get(cv::CAP_PROP_FPS) // s/frame
   };
   kf.set_x_hat(0, 116); // 2920
