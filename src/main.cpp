@@ -15,17 +15,16 @@
 
 constexpr bool should_show = true;
 void show(std::string window_name, cv::InputArray image) {
-  if (!should_show)
-    return;
-
-  static std::map<std::string, bool> has_shown;
-  if (!has_shown[window_name])
-    cv::namedWindow(window_name, cv::WINDOW_KEEPRATIO);
-  cv::imshow(window_name, image);
-  if (!has_shown[window_name]) {
-    // Frame is too big to display on my screen
-    cv::resizeWindow(window_name, image.cols() / 4.0, image.rows() / 4.0);
-    has_shown[window_name] = true;
+  if constexpr (should_show) {
+    static std::map<std::string, bool> has_shown;
+    if (!has_shown[window_name])
+      cv::namedWindow(window_name, cv::WINDOW_KEEPRATIO);
+    cv::imshow(window_name, image);
+    if (!has_shown[window_name]) {
+      // Frame is too big to display on my screen
+      cv::resizeWindow(window_name, image.cols() / 4.0, image.rows() / 4.0);
+      has_shown[window_name] = true;
+    }
   }
 }
 
@@ -43,8 +42,8 @@ public:
         rescale_transformed_history_frames{48}, generate_weights{},
         generate_history_of_dissimilarity{}, intersect_frames{},
         union_intersected_frames{}, subtract_background{hist_frames},
-        compute_moving_foreground{hist_frames}, apply_masks{}, erode{3},
-        detect_blobs{} {}
+        compute_moving_foreground{hist_frames}, apply_masks{},
+        erode_dialate{5, 10}, detect_blobs{} {}
 
   auto process(std::uint64_t current_frame_num, frame &&bgr_frame) {
     auto drawing_frame = bgr_frame.clone();
@@ -75,7 +74,7 @@ public:
         std::move(history_of_dissimilarity), std::move(foreground),
         std::move(weights));
     apply_masks.run(&moving_foreground, std::move(transformed_masks));
-    erode.run(&moving_foreground);
+    erode_dialate.run(&moving_foreground);
     auto blobs = detect_blobs.run(std::move(moving_foreground));
 
     fmt::print("{} done\n", current_frame_num);
@@ -100,7 +99,7 @@ private:
   typename bt::subtract_background subtract_background;
   typename bt::compute_moving_foreground compute_moving_foreground;
   typename bt::apply_masks apply_masks;
-  typename bt::erode erode;
+  typename bt::erode_dilate erode_dialate;
   typename bt::detect_blobs detect_blobs;
 };
 
@@ -125,25 +124,22 @@ int main() {
 
   cv::VideoCapture vc{"./input.mp4"};
 
-  baboon_tracking::constant_velocity_kalman_filter<1> kf{
-      {20, 20, 40,
-       40}, // Units are pixels, pixels, pixels/s, pixels/s respectively
-      {10, 10, 5, 5},                // Units are all pixels
-      30,                            // Units are pixels
+  baboon_tracking::constant_velocity_kalman_filter<20> kf{
+      {9, 9, 2, 2}, // Units are pixels, pixels, pixels/s, pixels/s respectively
+      {2, 2, 5, 5}, // Units are all pixels
+      30,           // Units are pixels
       1.0 / vc.get(cv::CAP_PROP_FPS) // s/frame
   };
-  kf.set_x_hat(0, 116); // 2920
-  kf.set_x_hat(1, 109); // 1210
-  kf.set_x_hat(2, 0);
-  kf.set_x_hat(3, 0);
+  static constexpr int actual_num_baboons = 1;
+  kf.set_x_hat(0, 2920);
+  kf.set_x_hat(1, 1210);
 
   for (std::uint64_t i = 0; vc.read(image) && !image.empty(); i++) {
-    cv::Mat cropped_image = image(cv::Rect{2800, 1100, 512, 512});
-
-    auto drawing_frame = cropped_image.clone();
+    //cv::Mat cropped_image = image(cv::Rect{2800, 1100, 512, 512});
+    auto drawing_frame = image.clone();
 
     auto start = std::chrono::steady_clock::now();
-    auto bounding_boxes = pl.process(i, std::move(cropped_image));
+    auto bounding_boxes = pl.process(i, std::move(image));
     auto end = std::chrono::steady_clock::now();
 
     fmt::print(
@@ -152,20 +148,21 @@ int main() {
             .count());
 
     if (!bounding_boxes.empty()) {
-      auto x_hat = kf.run(1, bounding_boxes);
+      auto x_hat = kf.run(actual_num_baboons, bounding_boxes);
 
       static const auto bounding_box_color = cv::Scalar(255, 0, 0);
       for (auto &&bounding_box : bounding_boxes) {
         cv::rectangle(drawing_frame, bounding_box, bounding_box_color, 4);
       }
 
-      static const auto kf_translation_color = cv::Scalar(0, 255, 0);
-      cv::circle(drawing_frame,
-                 cv::Point2i{static_cast<int>(std::round(x_hat[0])),
-                             static_cast<int>(std::round(x_hat[1]))},
-                 3, kf_translation_color, 5);
-      fmt::print("kf estimate at ({}, {}) with velocity of ({}, {})\n",
-                 x_hat[0], x_hat[1], x_hat[2], x_hat[3]);
+      for (int j = 0; j < kf.states_per_baboon * actual_num_baboons; j += kf.states_per_baboon) {
+        cv::circle(drawing_frame,
+                   {static_cast<int>(std::round(x_hat[j + 0])),
+                    static_cast<int>(std::round(x_hat[j + 1]))},
+                   3, {0, 255, 0}, 5);
+        fmt::print("kf estimate at ({}, {}) with velocity of ({}, {})\n",
+                   x_hat[j + 0], x_hat[j + 1], x_hat[j + 2], x_hat[j + 3]);
+      }
 
       show("Blobs on frame", drawing_frame);
       cv::waitKey();

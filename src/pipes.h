@@ -524,26 +524,33 @@ template <typename frame> struct pipes {
     }
   };
 
-  class erode {
+  class erode_dilate {
   public:
-    erode(int erosion_size) : erosion_size{erosion_size} {};
+    erode_dilate(int erosion_size, int dilation_size)
+        : erosion_size{erosion_size}, dilation_size{dilation_size} {};
 
     void run(frame *moving_foreground) {
-      static cv::Mat element = cv::getStructuringElement(
-          cv::MORPH_RECT, cv::Size(erosion_size, erosion_size));
+      const static cv::Mat erode_element = cv::getStructuringElement(
+          cv::MORPH_ELLIPSE, {erosion_size, erosion_size});
+      const static cv::Mat dilate_element = cv::getStructuringElement(
+          cv::MORPH_ELLIPSE, {dilation_size, dilation_size});
       if (!cvs::is_cuda) {
-        cv::erode(*moving_foreground, *moving_foreground, element);
+        cv::erode(*moving_foreground, *moving_foreground, erode_element);
+        cv::dilate(*moving_foreground, *moving_foreground, dilate_element);
       } else {
 #ifdef USE_CUDA
-        static auto filter =
-            cv::cuda::createMorphologyFilter(cv::MORPH_ERODE, CV_8UC1, element);
-        filter->apply(*moving_foreground, *moving_foreground);
+        static auto erode = cv::cuda::createMorphologyFilter(
+            cv::MORPH_ERODE, CV_8UC1, erode_element);
+        static auto erode = cv::cuda::createMorphologyFilter(
+            cv::MORPH_DILATE, CV_8UC1, dilate_element);
+        erode->apply(*moving_foreground, *moving_foreground);
+        dilate->apply(*moving_foreground, *moving_foreground);
 #endif
       }
     }
 
   private:
-    int erosion_size;
+    int erosion_size, dilation_size;
   };
 
   class detect_blobs {

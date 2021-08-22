@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+
 #include "kalman/discretization.h"
 #include "kalman/kalman_filter.h"
 #include "kalman/util.h"
@@ -10,7 +12,7 @@ namespace baboon_tracking {
 // TODO: dynamic-sized matrices would *probably* be more efficient, but it's
 // also much more of a pain
 template <int MaxBaboons> class constant_velocity_kalman_filter {
-private:
+public:
   // x = [x, y, v_x, v_y, ...]
   // y = [x_k, y_k, x_{k-1}, y_{k-1}, ...]
   // No u
@@ -18,20 +20,22 @@ private:
   static constexpr int num_states = MaxBaboons * states_per_baboon;
   static constexpr int measurements_per_baboon = 4;
 
+private:
   static Eigen::Matrix<double, num_states, num_states> make_A() {
     // Remember: A is continuous—xdot = Ax
     Eigen::Matrix<double, states_per_baboon, states_per_baboon> A_sub;
     // clang-format off
       A_sub << 0, 0, 1, 0,
 	       0, 0, 0, 1,
-	       0, 0, -1, 0,
-	       0, 0, 0, -1;
+	       0, 0, 0, 0,
+	       0, 0, 0, 0;
     // clang-format on
 
-    Eigen::Matrix<double, num_states, num_states> A;
+    Eigen::Matrix<double, num_states, num_states> A =
+        Eigen::Matrix<double, num_states, num_states>::Zero();
     for (int i = 0; i < MaxBaboons; i++) {
       A.template block<states_per_baboon, states_per_baboon>(
-          i * num_states, i * num_states) = A_sub;
+          i * states_per_baboon, i * states_per_baboon) = A_sub;
     }
 
     return A;
@@ -46,23 +50,33 @@ private:
 	       1, 0, -dt, 0,
 	       0, 1, 0, -dt;
     // clang-format on
-    Eigen::Matrix<double, measurements_per_baboon, num_states> C;
+    Eigen::Matrix<double, measurements_per_baboon, num_states> C =
+        Eigen::Matrix<double, measurements_per_baboon, num_states>::Zero();
     C.template block<measurements_per_baboon, states_per_baboon>(
         0, baboon_idx * states_per_baboon) = C_sub;
 
     return C;
   }
 
+  static constexpr std::array<double, num_states>
+  make_Q(std::array<double, states_per_baboon> per_baboon_state_std_devs) {
+    std::array<double, num_states> state_std_devs;
+    for (int i = 0; i < num_states; i++) {
+      state_std_devs[i] = per_baboon_state_std_devs[i % states_per_baboon];
+    }
+    return state_std_devs;
+  }
+
 public:
   constant_velocity_kalman_filter(
-      std::array<double, num_states> state_std_devs,
+      std::array<double, states_per_baboon> per_baboon_state_std_devs,
       std::array<double, measurements_per_baboon> measurement_std_devs,
       double max_bounding_box_distance, double dt)
-      : kf{make_A(), state_std_devs, dt},
+      : kf{make_A(), make_Q(per_baboon_state_std_devs), dt},
         measurement_std_devs{measurement_std_devs},
         max_bounding_box_distance{max_bounding_box_distance}, dt{dt} {}
 
-  Eigen::Matrix<double, num_states, 1>
+  const Eigen::Matrix<double, num_states, 1> &
   run(const int actual_num_baboons,
       const std::vector<cv::Rect> &current_bounding_boxes) {
     if (actual_num_baboons > MaxBaboons)
@@ -81,14 +95,14 @@ public:
 
     Eigen::Matrix<double, 2, Eigen::Dynamic> bounding_boxes{
         2, current_bounding_boxes.size()};
+    Eigen::VectorXd bounding_boxes_radii{current_bounding_boxes.size()};
     for (std::remove_reference_t<decltype(current_bounding_boxes)>::size_type
              i = 0;
          i < current_bounding_boxes.size(); i++) {
-      bounding_boxes.template block<2, 1>(0, i) << current_bounding_boxes[i].x,
-          current_bounding_boxes[i].y;
-      // TODO: could add a third dimension corresponding to bounding box area,
-      // and then we could be comparing along that dimension with a "normal"
-      // baboon bounding box size
+      const auto &bb = current_bounding_boxes[i];
+      bounding_boxes.template block<2, 1>(0, i) << bb.x + bb.width / 2.0,
+          bb.y + bb.width / 2.0;
+      bounding_boxes_radii[i] = std::max(bb.width, bb.height) / 2.0;
     }
 
     for (int i = 0; i < actual_num_baboons; i++) {
@@ -96,17 +110,24 @@ public:
           kf.x_hat().template block<2, 1>(i * states_per_baboon, 0);
 
       Eigen::VectorXd distances =
-          ((-bounding_boxes).colwise() + predicted_baboon_center)
-              .colwise()
-              .hypotNorm()
-              .transpose();
+          (((-bounding_boxes).colwise() + predicted_baboon_center)
+               .colwise()
+               .hypotNorm()
+               .transpose() -
+           bounding_boxes_radii)
+              .unaryExpr([](double a) { return std::max(0.0, a); });
 
       Eigen::Matrix<double, measurements_per_baboon, 1> y;
       for (int j = 0; j < distances.rows(); j++) {
         if (distances[j] <= max_bounding_box_distance) {
           y << bounding_boxes.template block<2, 1>(0, j),
               x_hat_old.template block<2, 1>(i * states_per_baboon, 0);
-          kf.correct(y, make_C(i, dt), disc_R);
+
+          Eigen::Matrix<double, measurements_per_baboon,
+                        measurements_per_baboon>
+              disc_R_scaled =
+                  disc_R + disc_R * (distances[j] / max_bounding_box_distance);
+          kf.correct(y, make_C(i, dt), disc_R_scaled);
         }
       }
     }
