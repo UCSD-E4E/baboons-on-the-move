@@ -1,0 +1,132 @@
+input:
+  type: string
+  skip_learn: true
+output:
+  type: string
+  skip_learn: true
+mask_output:
+  type: string
+  skip_learn: true
+
+preprocess:
+  kernel_size:
+    type: int32
+    min: 1
+    odd: true
+    std: 1
+
+motion_detector:
+  history_frames:
+    type: int32
+    min: 1
+    std: 0.5
+
+  registration:
+    good_match_percent:
+      type: float
+      min: 0
+      max: 1
+      std: 0.1
+    ransac_max_error:
+      type: float
+      min: 0
+      max: 20
+      std: 0.1
+    ssc_num_ret_points:
+      type: int32
+      min: 0
+      max: 100000
+      std: 1
+    ssc_tolerence:
+      type: flat
+      min: 0
+      max: 2
+      std: 0.01
+
+  quantize_frames:
+    scale_factor:
+      type: int32
+      min: 0
+      std: 2
+
+  noise_reduction:
+    erode_kernel_size:
+      type: int32
+      min: 0
+      std: 0.5
+    dilate_kernel_size:
+      type: int32
+      min: 0
+      std: 1
+    combine_kernel_size:
+      type: int32
+      min: 0
+      std: 0.5
+
+  hysteresis:
+    required_motion_observations:
+      type: int32
+      min: 0
+      std: 0.5
+    required_no_motion_observations:
+      type: int32
+      min: 0
+      std: 0.5
+
+  group_filter:
+    size:
+      type: int32
+      min: 0
+      max: 8
+      std: 0.5
+
+  min_size_filter:
+    min_size:
+      type: int32
+      min: 0
+      std: 0.5
+
+dead_reckoning:
+    dist_threshold:
+      type: int32
+      min: 0
+      std: 0.5
+    same_region_threshold:
+      type: float
+      min: 0
+      std: 0.01
+
+motion_detector_stages:
+  HysteresisFilter:
+      order:
+        type: int32
+        min: 0
+        max: 100
+        std: 0.5
+      enabled:
+        type: int32
+        min: 0
+        max: 2
+        std: 0.5
+  GroupFilter:
+      order:
+        type: int32
+        min: 0
+        max: 100
+        std: 0.5
+      enabled:
+        type: int32
+        min: 0
+        max: 2
+        std: 0.5
+  DilateErodeFilter:
+      order:
+        type: int32
+        min: 0
+        max: 100
+        std: 0.5
+      enabled:
+        type: int32
+        min: 0
+        max: 2
+        std: 0.5
