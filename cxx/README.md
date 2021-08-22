@@ -26,7 +26,7 @@ This installs GCC 8 because it's the latest version available in the default Bio
 ### Arch Linux
 The project requires the following packages to be installed (or their equivalents build manually and installed system-wide):
 ```
- # pacman -Syu cmake gcc opencv
+ # pacman -Syu make cmake gcc opencv
 ```
 
 If you want to use the built-in CUDA acceleration you can either use the `opencv-cuda` package available on the AUR, or you an modify the `opencv-git` package's PKGBUILD to enable CUDA support (this will also likely require the `cuda` package to be installed.)
@@ -44,6 +44,8 @@ Then, configure CMake:
 ```
  $ cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=True
 ```
+
+You should pass `-DUSE_CUDE=True` in the above step if you want to use CUDA and your system's OpenCV install was built with CUDA.
 
 Finally, build the project with `make` (you can also tell CMake to generate build files for the Ninja build system, which may be faster):
 ```
