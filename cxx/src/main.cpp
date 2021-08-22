@@ -135,7 +135,7 @@ int main() {
   kf.set_x_hat(1, 1210);
 
   for (std::uint64_t i = 0; vc.read(image) && !image.empty(); i++) {
-    //cv::Mat cropped_image = image(cv::Rect{2800, 1100, 512, 512});
+    // cv::Mat cropped_image = image(cv::Rect{2800, 1100, 512, 512});
     auto drawing_frame = image.clone();
 
     auto start = std::chrono::steady_clock::now();
@@ -155,7 +155,8 @@ int main() {
         cv::rectangle(drawing_frame, bounding_box, bounding_box_color, 4);
       }
 
-      for (int j = 0; j < kf.states_per_baboon * actual_num_baboons; j += kf.states_per_baboon) {
+      for (int j = 0; j < kf.states_per_baboon * actual_num_baboons;
+           j += kf.states_per_baboon) {
         cv::circle(drawing_frame,
                    {static_cast<int>(std::round(x_hat[j + 0])),
                     static_cast<int>(std::round(x_hat[j + 1]))},

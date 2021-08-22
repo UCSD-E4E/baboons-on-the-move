@@ -13,9 +13,8 @@ namespace baboon_tracking {
  * @param discA Storage for discrete system matrix.
  */
 template <int States>
-void discretize_A(const Eigen::Matrix<double, States, States>& contA,
-                 double dt,
-                 Eigen::Matrix<double, States, States>* discA) {
+void discretize_A(const Eigen::Matrix<double, States, States> &contA, double dt,
+                  Eigen::Matrix<double, States, States> *discA) {
   *discA = (contA * dt).exp();
 }
 
@@ -29,11 +28,10 @@ void discretize_A(const Eigen::Matrix<double, States, States>& contA,
  * @param discQ Storage for discrete process noise covariance matrix.
  */
 template <int States>
-void discretize_AQ(const Eigen::Matrix<double, States, States>& cont_A,
-                  const Eigen::Matrix<double, States, States>& cont_Q,
-                  double dt,
-                  Eigen::Matrix<double, States, States>* disc_A,
-                  Eigen::Matrix<double, States, States>* disc_Q) {
+void discretize_AQ(const Eigen::Matrix<double, States, States> &cont_A,
+                   const Eigen::Matrix<double, States, States> &cont_Q,
+                   double dt, Eigen::Matrix<double, States, States> *disc_A,
+                   Eigen::Matrix<double, States, States> *disc_Q) {
   // Make continuous Q symmetric if it isn't already
   Eigen::Matrix<double, States, States> Q = (cont_Q + cont_Q.transpose()) / 2.0;
 
@@ -44,8 +42,7 @@ void discretize_AQ(const Eigen::Matrix<double, States, States>& cont_A,
   M.template block<States, States>(States, 0).setZero();
   M.template block<States, States>(States, States) = cont_A.transpose();
 
-  Eigen::Matrix<double, 2 * States, 2 * States> phi =
-      (M * dt).exp();
+  Eigen::Matrix<double, 2 * States, 2 *States> phi = (M * dt).exp();
 
   // Phi12 = phi[0:States,        States:2*States]
   // Phi22 = phi[States:2*States, States:2*States]
@@ -81,11 +78,11 @@ void discretize_AQ(const Eigen::Matrix<double, States, States>& cont_A,
  * @param discQ Storage for discrete process noise covariance matrix.
  */
 template <int States>
-void discretize_AQ_taylor(const Eigen::Matrix<double, States, States>& cont_A,
-                        const Eigen::Matrix<double, States, States>& cont_Q,
-                        double dt,
-                        Eigen::Matrix<double, States, States>* disc_A,
-                        Eigen::Matrix<double, States, States>* disc_Q) {
+void discretize_AQ_taylor(const Eigen::Matrix<double, States, States> &cont_A,
+                          const Eigen::Matrix<double, States, States> &cont_Q,
+                          double dt,
+                          Eigen::Matrix<double, States, States> *disc_A,
+                          Eigen::Matrix<double, States, States> *disc_Q) {
   // Make continuous Q symmetric if it isn't already
   Eigen::Matrix<double, States, States> Q = (cont_Q + cont_Q.transpose()) / 2.0;
 
@@ -122,8 +119,8 @@ void discretize_AQ_taylor(const Eigen::Matrix<double, States, States>& cont_A,
  * @param dt Discretization timestep.
  */
 template <int Outputs>
-Eigen::Matrix<double, Outputs, Outputs> discretize_R(
-    const Eigen::Matrix<double, Outputs, Outputs>& R, double dt) {
+Eigen::Matrix<double, Outputs, Outputs>
+discretize_R(const Eigen::Matrix<double, Outputs, Outputs> &R, double dt) {
   return R / dt;
 }
-}
+} // namespace baboon_tracking

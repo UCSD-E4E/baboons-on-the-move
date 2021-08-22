@@ -7,15 +7,15 @@
 #include <eigen3/Eigen/src/Cholesky/LDLT.h>
 #include <eigen3/Eigen/src/Eigenvalues/EigenSolver.h>
 
-#include "util.h"
 #include "discretization.h"
+#include "util.h"
 
 #include "../drake/math/discrete_algebraic_riccati_equation.h"
 
 namespace baboon_tracking {
 template <int States, int Inputs>
-bool is_stabilizable(const Eigen::Matrix<double, States, States>& A,
-                        const Eigen::Matrix<double, States, Inputs>& B) {
+bool is_stabilizable(const Eigen::Matrix<double, States, States> &A,
+                     const Eigen::Matrix<double, States, Inputs> &B) {
   Eigen::EigenSolver<Eigen::Matrix<double, States, States>> es(A);
 
   for (int i = 0; i < States; ++i) {
@@ -53,11 +53,12 @@ bool is_stabilizable(const Eigen::Matrix<double, States, States>& A,
  * gain is used to correct the state estimate by some amount of the difference
  * between the actual measurements and the measurements predicted by the model.
  *
- * We can compute an optimal steady-state Kalman gain by solving a DARE if we have constant measurement and process noise covariance (and therefore a constant set of measurements.)
+ * We can compute an optimal steady-state Kalman gain by solving a DARE if we
+ * have constant measurement and process noise covariance (and therefore a
+ * constant set of measurements.)
  */
-template <int States, int Outputs>
-class steady_state_kalman_filter {
- public:
+template <int States, int Outputs> class steady_state_kalman_filter {
+public:
   /**
    * Constructs a state-space observer with the given plant.
    *
@@ -67,11 +68,12 @@ class steady_state_kalman_filter {
    * @param measurementStdDevs Standard deviations of measurements.
    * @param dt                 Nominal discretization timestep (seconds).
    */
-  steady_state_kalman_filter(const Eigen::Matrix<double, States, States>& A,
-		   const Eigen::Matrix<double, Outputs, States>& C,
-                   const std::array<double, States>& state_std_devs,
-                   const std::array<double, Outputs>& measurement_std_devs,
-                   double dt) : A{A}, C{C} {
+  steady_state_kalman_filter(
+      const Eigen::Matrix<double, States, States> &A,
+      const Eigen::Matrix<double, Outputs, States> &C,
+      const std::array<double, States> &state_std_devs,
+      const std::array<double, Outputs> &measurement_std_devs, double dt)
+      : A{A}, C{C} {
     auto cont_Q = make_cov_matrix(state_std_devs);
     auto cont_R = make_cov_matrix(measurement_std_devs);
 
@@ -114,13 +116,14 @@ class steady_state_kalman_filter {
     reset();
   }
 
-  steady_state_kalman_filter(steady_state_kalman_filter&&) = default;
-  steady_state_kalman_filter& operator=(steady_state_kalman_filter&&) = default;
+  steady_state_kalman_filter(steady_state_kalman_filter &&) = default;
+  steady_state_kalman_filter &
+  operator=(steady_state_kalman_filter &&) = default;
 
   /**
    * Returns the steady-state Kalman gain matrix K.
    */
-  const Eigen::Matrix<double, States, Outputs>& K() const { return _K; }
+  const Eigen::Matrix<double, States, Outputs> &K() const { return _K; }
 
   /**
    * Returns an element of the steady-state Kalman gain matrix K.
@@ -133,7 +136,7 @@ class steady_state_kalman_filter {
   /**
    * Returns the state estimate x-hat.
    */
-  const Eigen::Matrix<double, States, 1>& x_hat() const { return _x_hat; }
+  const Eigen::Matrix<double, States, 1> &x_hat() const { return _x_hat; }
 
   /**
    * Returns an element of the state estimate x-hat.
@@ -147,7 +150,9 @@ class steady_state_kalman_filter {
    *
    * @param xHat The state estimate x-hat.
    */
-  void set_x_hat(const Eigen::Matrix<double, States, 1>& x_hat) { _x_hat = x_hat; }
+  void set_x_hat(const Eigen::Matrix<double, States, 1> &x_hat) {
+    _x_hat = x_hat;
+  }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -163,7 +168,8 @@ class steady_state_kalman_filter {
   void reset() { _x_hat.setZero(); }
 
   /**
-   * Project the model into the future. No control input—we assume a homogenous system.
+   * Project the model into the future. No control input—we assume a homogenous
+   * system.
    *
    * @param dt Timestep for prediction (seconds).
    */
@@ -176,27 +182,27 @@ class steady_state_kalman_filter {
   }
 
   /**
-   * Project the model into the future. No control input—we assume a homogenous system. This overload is for when you have a constant dt.
+   * Project the model into the future. No control input—we assume a homogenous
+   * system. This overload is for when you have a constant dt.
    */
-  void predict() {
-    _x_hat = disc_A_nominal * _x_hat;
-  }
+  void predict() { _x_hat = disc_A_nominal * _x_hat; }
 
   /**
    * Correct the state estimate x-hat using the measurements in y.
    *
    * @param y Measurement vector.
    */
-  void correct(const Eigen::Matrix<double, Outputs, 1>& y) {
+  void correct(const Eigen::Matrix<double, Outputs, 1> &y) {
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − Cx̂ₖ₊₁⁻)
     _x_hat += _K * (y - C * _x_hat);
   }
 
- private:
+private:
   Eigen::Matrix<double, States, States> A;
   Eigen::Matrix<double, Outputs, States> C;
 
-  Eigen::Matrix<double, States, States> disc_A_nominal; // A discretized for the nominal timestep
+  Eigen::Matrix<double, States, States>
+      disc_A_nominal; // A discretized for the nominal timestep
 
   /**
    * The steady-state Kalman gain matrix.
@@ -208,4 +214,4 @@ class steady_state_kalman_filter {
    */
   Eigen::Matrix<double, States, 1> _x_hat;
 };
-}
+} // namespace baboon_tracking

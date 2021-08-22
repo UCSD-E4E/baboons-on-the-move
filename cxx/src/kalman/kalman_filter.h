@@ -5,8 +5,8 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/src/Cholesky/LDLT.h>
 
-#include "util.h"
 #include "discretization.h"
+#include "util.h"
 
 namespace baboon_tracking {
 /**
@@ -21,11 +21,12 @@ namespace baboon_tracking {
  * gain is used to correct the state estimate by some amount of the difference
  * between the actual measurements and the measurements predicted by the model.
  *
- * We do not compute an optimal steady-state Kalman gain because this Kalman filter is designed to work with varying sets of measurements and varying measurement covariance.
+ * We do not compute an optimal steady-state Kalman gain because this Kalman
+ * filter is designed to work with varying sets of measurements and varying
+ * measurement covariance.
  */
-template <int States>
-class kalman_filter {
- public:
+template <int States> class kalman_filter {
+public:
   /**
    * Constructs a state-space observer with the given plant.
    *
@@ -33,27 +34,28 @@ class kalman_filter {
    * @param stateStdDevs       Standard deviations of continuous model states.
    * @param dt                 Nominal discretization timestep (seconds).
    */
-  kalman_filter(const Eigen::Matrix<double, States, States>& A,
-                   const std::array<double, States>& state_std_devs,
-                   double dt) : A{A}, dt_nominal{dt} {
+  kalman_filter(const Eigen::Matrix<double, States, States> &A,
+                const std::array<double, States> &state_std_devs, double dt)
+      : A{A}, dt_nominal{dt} {
     auto cont_Q = make_cov_matrix(state_std_devs);
-    discretize_AQ_taylor<States>(A, cont_Q, dt, &disc_A_nominal, &disc_Q_nominal);
+    discretize_AQ_taylor<States>(A, cont_Q, dt, &disc_A_nominal,
+                                 &disc_Q_nominal);
 
     reset();
   }
 
-  kalman_filter(kalman_filter&&) = default;
-  kalman_filter& operator=(kalman_filter&&) = default;
+  kalman_filter(kalman_filter &&) = default;
+  kalman_filter &operator=(kalman_filter &&) = default;
 
   /**
    * Returns the state estimate x-hat.
    */
-  const Eigen::Matrix<double, States, 1>& x_hat() const { return _x_hat; }
+  const Eigen::Matrix<double, States, 1> &x_hat() const { return _x_hat; }
 
   /**
    * Returns the error covariance P.
    */
-  const Eigen::Matrix<double, States, States>& P() const { return _P; }
+  const Eigen::Matrix<double, States, States> &P() const { return _P; }
 
   /**
    * Returns an element of the state estimate x-hat.
@@ -67,7 +69,9 @@ class kalman_filter {
    *
    * @param xHat The state estimate x-hat.
    */
-  void set_x_hat(const Eigen::Matrix<double, States, 1>& x_hat) { _x_hat = x_hat; }
+  void set_x_hat(const Eigen::Matrix<double, States, 1> &x_hat) {
+    _x_hat = x_hat;
+  }
 
   /**
    * Set an element of the initial state estimate x-hat.
@@ -83,7 +87,8 @@ class kalman_filter {
   void reset() { _x_hat.setZero(); }
 
   /**
-   * Project the model into the future. No control input—we assume a homogenous system.
+   * Project the model into the future. No control input—we assume a homogenous
+   * system.
    *
    * @param dt Timestep for prediction (seconds).
    */
@@ -98,7 +103,9 @@ class kalman_filter {
   }
 
   /**
-   * Project the model into the future. No control input—we assume a homogenous system. This overload is for when you have a constant dt (so you don't have the cost of discretizing at each timestep).
+   * Project the model into the future. No control input—we assume a homogenous
+   * system. This overload is for when you have a constant dt (so you don't have
+   * the cost of discretizing at each timestep).
    */
   void predict() {
     _x_hat = disc_A_nominal * _x_hat;
@@ -113,7 +120,9 @@ class kalman_filter {
    * @param measurement_std_devs Standard deviations of measurement noise.
    */
   template <int Outputs, std::size_t OutputsLong = Outputs>
-  void correct(const Eigen::Matrix<double, Outputs, 1>& y, const Eigen::Matrix<double, Outputs, States>& C, const Eigen::Matrix<double, Outputs, Outputs>& disc_R) {
+  void correct(const Eigen::Matrix<double, Outputs, 1> &y,
+               const Eigen::Matrix<double, Outputs, States> &C,
+               const Eigen::Matrix<double, Outputs, Outputs> &disc_R) {
     Eigen::Matrix<double, Outputs, Outputs> S = C * _P * C.transpose() + disc_R;
 
     // We want to put K = PCᵀS⁻¹ into Ax = b form so we can solve it more
@@ -128,7 +137,8 @@ class kalman_filter {
     //
     // Kᵀ = Sᵀ.solve(CPᵀ)
     // K = (Sᵀ.solve(CPᵀ))ᵀ
-    Eigen::Matrix<double, States, Outputs> K = S.transpose().ldlt().solve(C * _P.transpose()).transpose();
+    Eigen::Matrix<double, States, Outputs> K =
+        S.transpose().ldlt().solve(C * _P.transpose()).transpose();
 
     // x̂ₖ₊₁⁺ = x̂ₖ₊₁⁻ + K(y − h(x̂ₖ₊₁⁻, uₖ₊₁))
     _x_hat += K * (y - C * _x_hat);
@@ -137,13 +147,14 @@ class kalman_filter {
     _P = (Eigen::Matrix<double, States, States>::Identity() - K * C) * _P;
   }
 
- private:
+private:
   Eigen::Matrix<double, States, States> A;
-  Eigen::Matrix<double, States, States> disc_A_nominal; // A discretized for the nominal timestep
+  Eigen::Matrix<double, States, States>
+      disc_A_nominal; // A discretized for the nominal timestep
 
   Eigen::Matrix<double, States, States> Q;
-  Eigen::Matrix<double, States, States> disc_Q_nominal; // Q discretized for the nominal timestep
-
+  Eigen::Matrix<double, States, States>
+      disc_Q_nominal; // Q discretized for the nominal timestep
 
   double dt_nominal;
 
@@ -155,6 +166,7 @@ class kalman_filter {
   /**
    * The error covariance.
    */
-  Eigen::Matrix<double, States, States> _P = Eigen::Matrix<double, States, States>::Zero();
+  Eigen::Matrix<double, States, States> _P =
+      Eigen::Matrix<double, States, States>::Zero();
 };
-}
+} // namespace baboon_tracking
