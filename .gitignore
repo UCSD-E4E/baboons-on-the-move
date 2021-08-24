@@ -242,5 +242,5 @@ temp
 ### Project-specific ###
 # Dependencies
 !cxx/thirdparty/lib
-!cxx/thirdparty/lib/pkgconfig
-!cxx/thirdparty/lib/cmake
+!cxx/thirdparty/lib/*
+!cxx/thirdparty/lib/**/*
