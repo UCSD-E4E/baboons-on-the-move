@@ -6,16 +6,18 @@
 #include <fmt/format.h>
 
 #include <opencv2/core.hpp>
+#ifdef DEBUG_DRAW
 #include <opencv2/highgui.hpp>
+#endif
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/videoio.hpp>
 
 #include "constant_velocity_kalman_filter.h"
 #include "pipes.h"
 
-constexpr bool should_show = true;
+#ifdef DEBUG_DRAW
+#pragma message ("Hello?")
 void show(std::string window_name, cv::InputArray image) {
-  if constexpr (should_show) {
     static std::map<std::string, bool> has_shown;
     if (!has_shown[window_name])
       cv::namedWindow(window_name, cv::WINDOW_KEEPRATIO);
@@ -25,8 +27,8 @@ void show(std::string window_name, cv::InputArray image) {
       cv::resizeWindow(window_name, image.cols() / 4.0, image.rows() / 4.0);
       has_shown[window_name] = true;
     }
-  }
 }
+#endif
 
 template <typename frame> class pipeline {
 private:
@@ -150,6 +152,7 @@ int main() {
     if (!bounding_boxes.empty()) {
       auto x_hat = kf.run(actual_num_baboons, bounding_boxes);
 
+#ifdef DEBUG_DRAW
       static const auto bounding_box_color = cv::Scalar(255, 0, 0);
       for (auto &&bounding_box : bounding_boxes) {
         cv::rectangle(drawing_frame, bounding_box, bounding_box_color, 4);
@@ -167,6 +170,7 @@ int main() {
 
       show("Blobs on frame", drawing_frame);
       cv::waitKey();
+#endif
     }
   }
 

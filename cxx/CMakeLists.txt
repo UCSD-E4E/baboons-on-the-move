@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.12)
 project(baboon-tracking LANGUAGES CXX) # Could add CUDA here in the future
 
 option(USE_CUDA "Include CUDA headers and use CUDA-accelerated functions" OFF)
+option(STATIC_LINK_OPENCV "Statically link minimal OpenCV dependencies to create a more portable binary" OFF)
 
 # Set module path so that we can add modules to find system dependencies (we add no modules rn)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
@@ -37,11 +38,25 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 link_directories(${PROJECT_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/thirdparty/lib}")
 
 # Link dependencies to our executable target
+if (STATIC_LINK_OPENCV)
+	# In the static linking case we manually specify the exact things to statically link with so that we end up with a minimal binary
+	set(OpenCV_LIBS opencv_core opencv_calib3d opencv_features2d opencv_imgproc opencv_photo opencv_imgcodecs opencv_videoio)
+	if (USE_CUDA)
+		list(APPEND OpenCV_LIBS opencv_cudaarithm opencv_cudafeatures2d opencv_cudaimgproc opencv_cudawarping)
+	endif()
+else()
+	target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_DRAW=1)
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
+	$<$<BOOL:STATIC_LINK_OPENCV>:-static>
 	${OpenCV_LIBS}
+	$<$<BOOL:STATIC_LINK_OPENCV>:-dynamic>
 	fmt::fmt-header-only
 	pthread # Needed on Linux for std::thread
 )
+
+message(STATUS "OpenCV libs: ${OpenCV_LIBS}")
 
 # Sanitizers
 if (SANITIZE)
