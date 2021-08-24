@@ -238,3 +238,9 @@ env.yml
 .vscode/settings.json
 !web/baboon-tracking-status/build
 temp
+
+### Project-specific ###
+# Dependencies
+!cxx/thirdparty/lib
+!cxx/thirdparty/lib/pkgconfig
+!cxx/thirdparty/lib/cmake
