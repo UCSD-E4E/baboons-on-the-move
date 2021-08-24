@@ -41,7 +41,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	${OpenCV_LIBS}
 	fmt::fmt-header-only
 	pthread # Needed on Linux for std::thread
-	-v
 )
 
 # Sanitizers
