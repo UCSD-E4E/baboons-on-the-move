@@ -1,8 +1,7 @@
 #include "thread_pool.h"
 
 namespace baboon_tracking {
-thread_pool::thread_pool(std::size_t max_tasks, std::size_t thread_count)
-    : max_tasks{max_tasks} {
+thread_pool::thread_pool(std::size_t thread_count) {
   for (size_t i = 0; i < thread_count; ++i) {
     // start waiting threads. Workers listen for changes through
     //  the thread_pool member condition_variable

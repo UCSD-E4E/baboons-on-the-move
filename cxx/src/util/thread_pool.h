@@ -13,8 +13,7 @@
 namespace baboon_tracking {
 class thread_pool {
 public:
-  thread_pool(std::size_t max_task,
-              std::size_t thread_count = std::thread::hardware_concurrency());
+  thread_pool(std::size_t thread_count = std::thread::hardware_concurrency());
   ~thread_pool();
 
   // F is Callable, and invoking F with ...Args should be well-formed
@@ -31,7 +30,6 @@ public:
 
     {
       std::unique_lock lk{task_mutex};
-      // max_tasks_cv.wait(lk, [&]() { return tasks.size() < max_tasks; });
       // This lambda move-captures the packaged_task declared above. Since the
       // packaged_task type is not CopyConstructible, the function is not
       // CopyConstructible either)— hence the need for a task_container to wrap
@@ -80,8 +78,13 @@ private:
     F f;
   };
 
+  // This is a hack... GCC <= 11 erroneously doesn't support deduction guides in
+  // classes. Will fail to compile without the deduction guide if you use this
+  // class.
+#if __GNUC__ > 11
   // Deduction guide so that we can infer task_container from some callable F
   template <typename F> task_container(F) -> task_container<std::decay_t<F>>;
+#endif
 
   std::vector<std::thread> threads;
   std::queue<std::unique_ptr<task_container_base>> tasks;
@@ -90,6 +93,5 @@ private:
   bool stop_threads = false;
 
   std::condition_variable max_tasks_cv;
-  std::size_t max_tasks;
 };
 } // namespace baboon_tracking
