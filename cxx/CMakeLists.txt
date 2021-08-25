@@ -49,9 +49,9 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-	$<$<BOOL:STATIC_LINK_OPENCV>:-static>
+	$<IF:$<CONFIG:STATIC_LINK_OPENCV>,-static,-dynamic>
 	${OpenCV_LIBS}
-	$<$<BOOL:STATIC_LINK_OPENCV>:-dynamic>
+	$<IF:$<CONFIG:STATIC_LINK_OPENCV>,-dynamic,-dynamic>
 	fmt::fmt-header-only
 	pthread # Needed on Linux for std::thread
 )
