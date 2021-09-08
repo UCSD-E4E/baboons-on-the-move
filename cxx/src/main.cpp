@@ -9,14 +9,17 @@
 #ifdef DEBUG_DRAW
 #include <opencv2/highgui.hpp>
 #endif
+#ifdef USE_CUDA
+#include <opencv2/cudacodec.hpp>
+#else
 #include <opencv2/imgcodecs.hpp>
+#endif
 #include <opencv2/videoio.hpp>
 
 #include "constant_velocity_kalman_filter.h"
 #include "pipes.h"
 
 #ifdef DEBUG_DRAW
-#pragma message ("Hello?")
 void show(std::string window_name, cv::InputArray image) {
     static std::map<std::string, bool> has_shown;
     if (!has_shown[window_name])
@@ -106,7 +109,8 @@ private:
 };
 
 int main() {
-  unsigned int max_threads = 8; // TODO: put the thread pool back optionally
+  constexpr unsigned int max_threads = 8; // TODO: put the thread pool back optionally
+  constexpr auto input_file_name = "./input.mp4";
 
   // TODO: we're using USE_CUDA elsewhere to mean that CUDA headers are
   // available (an unfortunate kludge that happens because some builds of OpenCV
@@ -114,35 +118,49 @@ int main() {
   // appropriate stubbed functions). This is not with the spirit of the meaning
   // of USE_CUDA (i.e. USE_CUDA should probably only be touched here, while
   // HAS_CUDA should maybe be used elsewhere?)
+  cv::Mat frame_host;
 #ifdef USE_CUDA
-  cv::cuda::GpuMat image;
+  cv::cuda::GpuMat frame;
 #else
-  cv::Mat image;
+  cv::Mat frame = frame_host;
 #endif
+
+  cv::VideoCapture vc{};
+  if (!vc.open(input_file_name, cv::CAP_FFMPEG)) {
+    throw std::runtime_error{fmt::format("Couldn't open {}", input_file_name)};
+  }
+  const auto fps = vc.get(cv::CAP_PROP_FPS);
+
   auto hist_frames = std::make_shared<
-      baboon_tracking::historical_frames_container<decltype(image)>>(
+      baboon_tracking::historical_frames_container<decltype(frame)>>(
       9, max_threads);
   pipeline pl{hist_frames};
 
-  cv::VideoCapture vc{"./input.mp4"};
 
   baboon_tracking::constant_velocity_kalman_filter<20> kf{
       {9, 9, 2, 2}, // Units are pixels, pixels, pixels/s, pixels/s respectively
       {2, 2, 5, 5}, // Units are all pixels
       30,           // Units are pixels
-      1.0 / vc.get(cv::CAP_PROP_FPS) // s/frame
+      1.0 / fps // s/frame
   };
   static constexpr int actual_num_baboons = 1;
   kf.set_x_hat(0, 2920);
   kf.set_x_hat(1, 1210);
 
-  for (std::uint64_t i = 0; vc.read(image) && !image.empty(); i++) {
-    // cv::Mat cropped_image = image(cv::Rect{2800, 1100, 512, 512});
-    auto drawing_frame = image.clone();
+  for (std::uint64_t i = 0; vc.read(frame_host) && !frame_host.empty(); i++) {
+#ifdef USE_CUDA
+    frame.upload(frame_host);
+#endif
+
+#ifdef DEBUG_DRAW
+    auto drawing_frame = cv::Mat{frame}.clone();
+#endif
 
     auto start = std::chrono::steady_clock::now();
-    auto bounding_boxes = pl.process(i, std::move(image));
+    auto bounding_boxes = pl.process(i, std::move(frame));
     auto end = std::chrono::steady_clock::now();
+
+    frame = decltype(frame){};
 
     fmt::print(
         "Took {} ms\n",
@@ -174,7 +192,7 @@ int main() {
     }
   }
 
-  fmt::print("finished");
+  fmt::print("finished\n");
 
   return EXIT_SUCCESS;
 }

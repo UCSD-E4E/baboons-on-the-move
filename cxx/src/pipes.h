@@ -541,7 +541,7 @@ template <typename frame> struct pipes {
 #ifdef USE_CUDA
         static auto erode = cv::cuda::createMorphologyFilter(
             cv::MORPH_ERODE, CV_8UC1, erode_element);
-        static auto erode = cv::cuda::createMorphologyFilter(
+        static auto dilate = cv::cuda::createMorphologyFilter(
             cv::MORPH_DILATE, CV_8UC1, dilate_element);
         erode->apply(*moving_foreground, *moving_foreground);
         dilate->apply(*moving_foreground, *moving_foreground);

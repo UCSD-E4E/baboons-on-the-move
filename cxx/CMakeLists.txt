@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.12)
+include(CMakeDependentOption)
 
 project(baboon-tracking LANGUAGES CXX) # Could add CUDA here in the future
 
 option(USE_CUDA "Include CUDA headers and use CUDA-accelerated functions" OFF)
 option(STATIC_LINK_OPENCV "Statically link minimal OpenCV dependencies to create a more portable binary" OFF)
+cmake_dependent_option(DEBUG_DRAW "Draw and display debug images" OFF
+	"NOT STATIC_LINK_OPENCV" OFF)
 
 # Set module path so that we can add modules to find system dependencies (we add no modules rn)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" "${CMAKE_MODULE_PATH}")
@@ -44,8 +47,8 @@ if (STATIC_LINK_OPENCV)
 	if (USE_CUDA)
 		list(APPEND OpenCV_LIBS opencv_cudaarithm opencv_cudafeatures2d opencv_cudaimgproc opencv_cudawarping)
 	endif()
-else()
-	target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_DRAW=1)
+elseif (DEBUG_DRAW)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG_DRAW)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -67,7 +70,7 @@ endif()
 
 # Set the HAS_CUDA macro
 if (USE_CUDA)
-	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_CUDA=1)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE USE_CUDA)
 endif()
 
 # Set up compiler flags for just C++
