@@ -17,7 +17,7 @@ then
         curl https://pyenv.run | $SHELL
     fi
     
-    eval "$(pyenv init -)"
+    eval "$(pyenv init --path)"
     eval "$(pyenv virtualenv-init -)"
 fi
 
@@ -28,7 +28,7 @@ then
     # Add pyenv to your path.
     echo '
 export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
+eval "$(pyenv init --path)"
 eval "$(pyenv virtualenv-init -)"' >> ~/.${SHELL_NAME}rc
 fi
 
