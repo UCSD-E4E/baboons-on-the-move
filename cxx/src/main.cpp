@@ -150,6 +150,8 @@ int main() {
   for (std::uint64_t i = 0; vc.read(frame_host) && !frame_host.empty(); i++) {
 #ifdef USE_CUDA
     frame.upload(frame_host);
+#else
+    frame = frame_host;
 #endif
 
 #ifdef DEBUG_DRAW
