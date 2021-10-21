@@ -122,7 +122,7 @@ int main() {
 #ifdef USE_CUDA
   cv::cuda::GpuMat frame;
 #else
-  cv::Mat frame = frame_host;
+  cv::Mat frame;
 #endif
 
   cv::VideoCapture vc{};
