@@ -19,7 +19,7 @@ The project requires the following packages to be installed (or their equivalent
  # apt install -y cmake gcc-8 g++-8 build-essential libopencv-dev
 ```
 
-If you want to use the built-in CUDA acceleration you should build OpenCV yourself with CUDA enabled. The following build configuration has been tested:
+If you want to use the built-in CUDA acceleration you should build OpenCV yourself with CUDA enabled. The following build configuration has been tested with OpenCV 4.5.1:
 ```
  $ cmake .. -DWITH_CUDA=ON -DWITH_FFMPEG=ON -DWITH_NVCUVID=ON -DBUILD_PNG=ON -DBUILD_TBB=OFF -DBUILD_JPEG=ON -DCUDA_ARCH_BIN="5.3" -DCUDA_FAST_MATH=ON -DENABLE_NEON=ON -DOPENCV_ENABLE_NONFREE=ON -DCUDA_ARCH_PTX="" -DOPENCV_GENERATE_PKGCONFIG=ON -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr/local
 ```
