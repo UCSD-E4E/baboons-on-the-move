@@ -90,7 +90,7 @@ template <typename frame> struct pipes {
           ssc_tolerance{ssc_tolerance}, ssc_num_ret_points{ssc_num_ret_points},
           historical_frames{historical_frames} {};
 
-    std::vector<cv::Mat> run(std::uint8_t current_frame_num,
+    std::vector<cv::Mat> run(std::uint64_t current_frame_num,
                              frame &&gray_blurred_frame) {
       historical_frames->add_historical_frame(current_frame_num,
                                               std::move(gray_blurred_frame));
