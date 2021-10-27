@@ -65,6 +65,8 @@ public:
                                                std::move(homographies));
     auto transformed_rescaled_history_frames =
         rescale_transformed_history_frames.run(transformed_history_frames);
+    // Note: seems to fail in weight generation... transformed_rescaled_frames
+    // are ok, weights are not
     auto weights = generate_weights.run(transformed_rescaled_history_frames);
     auto history_of_dissimilarity = generate_history_of_dissimilarity.run(
         transformed_history_frames, transformed_rescaled_history_frames);
@@ -82,7 +84,7 @@ public:
     erode_dialate.run(&moving_foreground);
     auto blobs = detect_blobs.run(std::move(moving_foreground));
 
-    fmt::print("{} done\n", current_frame_num);
+    fmt::print("Frame {} done\n", current_frame_num);
 
     return blobs;
   }

@@ -46,10 +46,14 @@ template <typename frame> struct pipes {
         cv::GaussianBlur(gray_frame, gray_frame, {kernel_size, kernel_size}, 0,
                          0);
       } else {
-        // XXX: grid size is wrong for Jetson Nano?
-        // static auto filter = cv::cuda::createGaussianFilter(CV_8UC1, CV_8UC1,
-        // {kernel_size, kernel_size}, 0, 0); filter->apply(gray_frame,
-        // gray_frame);
+#ifdef USE_CUDA
+        // OpenCV Gaussian blur seems to have problems on the Jetson Nano... we
+        // could manually convolve with a Gaussian kernel, but that only accepts
+        // float32 images. A box blur is probably close enough.
+        static auto filter = cv::cuda::createBoxFilter(
+            CV_8UC1, CV_8UC1, {kernel_size, kernel_size});
+        filter->apply(gray_frame, gray_frame);
+#endif
       }
       return std::move(gray_frame);
     }
@@ -182,15 +186,18 @@ template <typename frame> struct pipes {
           orb_detector = cv::ORB::create();
         } else if (!fast_detector && !orb_detector) {
 #ifdef USE_CUDA
-          fast_detector = cv::cuda::FastFeatureDetector::create();
+          fast_detector = cv::cuda::FastFeatureDetector::create(
+              40, true, cv::FastFeatureDetector::TYPE_9_16, 10'000);
           orb_detector = cv::cuda::ORB::create();
+          orb_detector.staticCast<cv::cuda::ORB>()->setBlurForDescriptor(
+              false); // We pre-blur the image
 #endif
-          // TODO: we an probably turn of the GPU ORB detector's blurring
         }
 
         fast_detector->detect(fr, keypoints);
         keypoints = anms::ssc(keypoints, ssc_num_ret_points, ssc_tolerance,
                               fr.cols, fr.rows);
+
         orb_detector->compute(fr, keypoints, descriptors);
       }
 
@@ -220,6 +227,10 @@ template <typename frame> struct pipes {
         const std::vector<cv::Mat> &&homographies) {
       std::vector<frame> transformed_history_frames;
       std::vector<typename cvs::cpu_or_gpu_mat> transformed_masks;
+      transformed_history_frames.reserve(
+          historical_frames->max_historical_frames());
+      transformed_masks.reserve(historical_frames->max_historical_frames());
+
       for (std::uint64_t i = 0; i < historical_frames->max_historical_frames();
            i++) {
         auto frame_to_transform =
@@ -290,7 +301,7 @@ template <typename frame> struct pipes {
         throw std::overflow_error("Number of history frames would overflow "
                                   "intermediate storage for weights");
 
-      // Note: this static makes this not thread safe
+      // Note: static storage duration makes this not thread safe
       static typename cvs::cpu_or_gpu_mat mask{
           transformed_rescaled_history_frames[0].size(), CV_8UC1};
       for (auto iter = std::next(transformed_rescaled_history_frames.begin());
@@ -366,11 +377,10 @@ template <typename frame> struct pipes {
       std::vector<frame> intersected_frames =
           std::move(transformed_history_frames);
 
-      typename cvs::cpu_or_gpu_mat mask{transformed_history_frames[0].size(),
-                                        CV_8UC1};
-      for (typename std::remove_reference_t<
-               decltype(transformed_history_frames)>::size_type i = 0;
-           i < transformed_history_frames.size() - 1; i++) {
+      typename cvs::cpu_or_gpu_mat mask{intersected_frames[0].size(), CV_8UC1};
+      for (typename std::remove_reference_t<decltype(
+               intersected_frames)>::size_type i = 0;
+           i < intersected_frames.size() - 1; i++) {
         cvs::absdiff(transformed_rescaled_history_frames[i],
                      transformed_rescaled_history_frames[i + 1], mask);
         cvs::compare(mask, 1, mask,
