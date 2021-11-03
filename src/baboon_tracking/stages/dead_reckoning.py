@@ -1,14 +1,18 @@
+"""
+Implements a dead reckoning filter to attempt to continue to track baboons.
+"""
+
 import pathlib
 from typing import List
-from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
-from baboon_tracking.mixins.frame_mixin import FrameMixin
-from baboon_tracking.models.baboon import Baboon
-from library.region import bb_intersection_over_union
 from math import sqrt
 import shutil
 from os.path import exists
 import pickle
 
+from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
+from baboon_tracking.mixins.frame_mixin import FrameMixin
+from baboon_tracking.models.baboon import Baboon
+from library.region import bb_intersection_over_union
 from pipeline import Stage
 from pipeline.stage_result import StageResult
 from pipeline.decorators import config, stage
@@ -22,6 +26,10 @@ flatten = lambda t: [item for sublist in t for item in sublist]
 @stage("baboons")
 @stage("frame")
 class DeadReckoning(Stage, BaboonsMixin):
+    """
+    Implements a dead reckoning filter to attempt to continue to track baboons.
+    """
+
     def __init__(
         self,
         dist_threshold: int,
@@ -85,13 +93,19 @@ class DeadReckoning(Stage, BaboonsMixin):
         return (second, first, overlay)
 
     def has_frame(self, frame_number):
-        return frame_number in self._all_baboons or exists(
+        """
+        Checks if we have a list of baboons for the frame number.
+        """
+        return (frame_number in self._all_baboons) or exists(
             "./temp/dead_reckoning/{frame_number}.pickle".format(
                 frame_number=frame_number
             )
         )
 
     def get(self, frame_number: int) -> List[Baboon]:
+        """
+        Gets the list of baboons for the frame number.
+        """
         if frame_number in self._all_baboons:
             return self._all_baboons[frame_number]
 
@@ -103,7 +117,12 @@ class DeadReckoning(Stage, BaboonsMixin):
             with open(file_path, "rb") as f:
                 return pickle.load(f)
 
+        raise "Cannot find the specified frame number"
+
     def set(self, frame_number: int, baboons: List[Baboon]):
+        """
+        Sets the list of baboons for the frame number.
+        """
         self._all_baboons[frame_number] = baboons
 
         if len(self._all_baboons) > 2:
@@ -160,8 +179,8 @@ class DeadReckoning(Stage, BaboonsMixin):
             curr_ids = [b.identity for b in baboons if b.identity is not None]
 
             for id_str in curr_ids:
-            	if id_str in prev_ids:
-                	prev_ids.pop(id_str)
+                if id_str in prev_ids:
+                    prev_ids.pop(id_str)
 
             prev_items = [prev_ids[i] for i in prev_ids]
 
@@ -199,4 +218,3 @@ class DeadReckoning(Stage, BaboonsMixin):
         self.baboons = baboons
 
         return StageResult(True, True)
-
