@@ -25,6 +25,7 @@ google-auth-oauthlib = "^0.4.1"
 firebase-admin = "^4.5.1"
 numba = "^0.53.1"
 sherlock = { git = "git@github.com:KastnerRG/sherlock.git", branch = "feature/package" }
+pygit2 = "^1.7.0"
 
 
 [tool.poetry.dev-dependencies]

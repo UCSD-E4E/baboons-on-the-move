@@ -5,18 +5,14 @@ from argparse import ArgumentParser, Namespace
 from typing import Dict
 import itertools
 
-from numpy.core.numeric import Inf
 from firebase_admin import db
 from cli_plugins.cli_plugin import CliPlugin
-from library.metrics import calculate_loss, get_metrics
+from library.metrics import get_metrics
 from library.firebase import initialize_app
 from config import (
     get_config,
-    get_latest_config,
     set_config_part,
-    step_config,
     set_config,
-    save_cloud_config,
 )
 import yaml
 from config import get_config_part
@@ -25,9 +21,6 @@ import numpy as np
 import hashlib
 
 from sherlock import Sherlock
-
-
-LOSS_THRESH = 0.01
 
 
 class Optimize(CliPlugin):
@@ -127,9 +120,8 @@ class Optimize(CliPlugin):
 
         true_positive = np.sum(np.array([m.true_positive for m in metrics]))
         false_positive = np.sum(np.array([m.false_positive for m in metrics]))
-        # false_negative = np.sum(np.array([m.false_negative for m in metrics]))
 
-        return np.array([true_positive, 1000000000 - false_positive])
+        return np.array([true_positive, 1 / false_positive])
 
     def _request_output(self, y, known_idx):
         sherlock_ref = db.reference("sherlock")
@@ -163,34 +155,3 @@ class Optimize(CliPlugin):
         )
 
         sherlock.fit(self._X).predict(self._X, y)
-
-        # self._get_y(knob_names, X, y, 0)
-
-        # prev_loss = Inf
-        # loss = -Inf
-
-        # initialize_app()
-        # ref = db.reference("optimize")
-        # continue_ref = ref.child("continue")
-
-        # if continue_ref.get() is None:
-        #     continue_ref.set(True)
-
-        # # Allow optimization to be killed
-        # while continue_ref.get():
-        #     config, prev_loss, pulled_from_cloud = get_latest_config()
-        #     if pulled_from_cloud:
-        #         config = step_config(config)
-
-        #     set_config(config)
-        #     loss = calculate_loss(get_metrics())
-        #     better = loss < prev_loss
-        #     save_cloud_config(config, loss, better)
-
-        #     should_stop = abs(prev_loss - loss) < LOSS_THRESH
-
-        #     if better:
-        #         prev_loss = loss
-
-        #     if should_stop:
-        #         break
