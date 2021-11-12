@@ -43,20 +43,4 @@ then
 fi
 pyenv local $PYTHON_VERSION
 
-# Ensure pipx
-pip list | grep pipx > /dev/null
-if [ $? -ne 0 ]
-then
-    # Install pipx
-    pip install pipx
-    pipx ensurepath
-fi
-
-# Ensure that pipx is in path.
-echo $PATH | grep "$HOME/.local/bin" > /dev/null
-if [ $? -ne 0 ]
-then
-    export PATH="$PATH:$HOME/.local/bin"
-fi
-
 python ./cli.py $@
