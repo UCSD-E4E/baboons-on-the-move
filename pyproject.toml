@@ -5,9 +5,8 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "3.x.x"
+python = ">=3.7,<3.10"
 numpy = "^1.19.0"
-pillow = "^7.2.0"
 opencv-python = "^4.2.0.34"
 opencv-contrib-python = "^4.2.0.34"
 pyyaml = "^5.3.1"
@@ -24,7 +23,8 @@ google-api-python-client = "^1.12.5"
 google-auth-httplib2 = "^0.0.3"
 google-auth-oauthlib = "^0.4.1"
 firebase-admin = "^4.5.1"
-numba = "^0.53.1"
+numba = "^0.54.1"
+Pillow = "^8.4.0"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.5.3"
