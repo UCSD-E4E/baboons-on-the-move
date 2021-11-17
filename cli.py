@@ -87,11 +87,10 @@ def main():
             class_type = getattr(module, plugin["class"])
 
             cli_plugin: CliPlugin = class_type(subparser)
-            subparser.set_defaults(command=cli_plugin.execute)
+            subparser.set_defaults(run_plugin=cli_plugin.execute)
 
-    res = parser.parse_args()
-
-    res.command(res)
+    args = parser.parse_args()
+    args.run_plugin(args)
 
 
 if __name__ == "__main__":
