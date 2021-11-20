@@ -36,4 +36,4 @@ def check_if_same_region(
     """
     Tests to see if the two regions are similar enough to be considered the same.
     """
-    return bb_intersection_over_union(region_1, region_2) > 0.3
+    return bb_intersection_over_union(region_1, region_2) > 0.8

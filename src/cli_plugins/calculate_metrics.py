@@ -5,6 +5,7 @@ from argparse import ArgumentParser, Namespace
 from datetime import datetime
 
 from firebase_admin import db
+from pygit2 import Repository
 
 from cli_plugins.cli_plugin import CliPlugin
 from library.firebase import initialize_app
@@ -33,7 +34,8 @@ class CalculateMetrics(CliPlugin):
 
         ref = db.reference("metrics")
         video_ref = ref.child("input")
-        date_ref = video_ref.child(time)
+        branch_ref = video_ref.child(Repository(".").head.shorthand)
+        date_ref = branch_ref.child(time)
 
         date_ref.set(
             [
