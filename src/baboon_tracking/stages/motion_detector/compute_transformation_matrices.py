@@ -28,7 +28,8 @@ from third_party.ssc import ssc
     key="motion_detector/registration/ssc_num_ret_points",
 )
 @config(
-    parameter_name="ssc_tolerence", key="motion_detector/registration/ssc_tolerence",
+    parameter_name="ssc_tolerence",
+    key="motion_detector/registration/ssc_tolerence",
 )
 @stage("preprocessed_frame")
 @stage("history_frames")

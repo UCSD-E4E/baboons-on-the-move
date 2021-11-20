@@ -84,7 +84,8 @@ def show_result(function: Callable):
                     cv2.imshow(
                         f"{type(self).__name__}.{frame_attribute}",
                         cv2.resize(
-                            getattr(self, frame_attribute).get_frame(), im_size,
+                            getattr(self, frame_attribute).get_frame(),
+                            im_size,
                         ),
                     )
 

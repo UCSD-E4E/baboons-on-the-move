@@ -21,5 +21,9 @@ class BaboonTracker(Pipeline):
         Generates a chart representing the algorithm.
         """
 
-        img, _, _, = self.stage.flowchart_image()
+        (
+            img,
+            _,
+            _,
+        ) = self.stage.flowchart_image()
         return img

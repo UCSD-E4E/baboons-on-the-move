@@ -102,7 +102,11 @@ class Data(CliPlugin):
 
         return [
             service.files()
-            .get(fileId=file["id"], supportsTeamDrives=True, supportsAllDrives=True,)
+            .get(
+                fileId=file["id"],
+                supportsTeamDrives=True,
+                supportsAllDrives=True,
+            )
             .execute()
             for file in files
         ]

@@ -11,7 +11,8 @@ from pipeline.stage_result import StageResult
 
 
 @config(
-    parameter_name="history_frame_count", key="motion_detector/history_frames",
+    parameter_name="history_frame_count",
+    key="motion_detector/history_frames",
 )
 @stage("preprocessed_frame")
 class StoreHistoryFrame(Stage, HistoryFramesMixin):
