@@ -11,14 +11,12 @@ from typing import List
 def _get_node_executable(name: str):
     if sys.platform == "win32":
         executable = name + ".cmd"
-    elif (
-        sys.platform == "darwin" or sys.platform == "linux" or sys.platform == "linux2"
-    ):
+    elif sys.platform in ("darwin", "linux", "linux2"):
         executable = name
     else:
         executable = None
 
-    if sys.platform == "linux" or sys.platform == "linux2":
+    if sys.platform in ("linux", "linux2"):
         directory = "node-v14.15.1-linux-x64/bin"
     else:
         directory = None

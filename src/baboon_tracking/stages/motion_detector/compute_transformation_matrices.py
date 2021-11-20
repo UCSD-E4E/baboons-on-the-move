@@ -52,7 +52,7 @@ class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
         self._orb = cv2.ORB_create()
         self._fast = cv2.FastFeatureDetector_create()
         self._good_match_percent = good_match_percent
-        self._feature_hash = dict()
+        self._feature_hash = {}
         self._ransac_max_error = ransac_max_error
         self._ssc_num_ret_points = ssc_num_ret_points
         self._ssc_tolerence = ssc_tolerence

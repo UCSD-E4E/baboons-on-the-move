@@ -22,11 +22,7 @@ class Time:
         """
 
         print(
-            "{indentation}{name}: {execution_time} ms".format(
-                indentation=("  " * indentation),
-                name=self.name,
-                execution_time=round(self.execution_time * 1000, 2),
-            )
+            f"{'  ' * indentation}{self.name}: {round(self.execution_time * 1000, 2)} ms"
         )
 
         if self.children:

@@ -1,3 +1,7 @@
+"""
+Implements a base pipeline.
+"""
+
 from abc import ABC
 from typing import Callable
 from pipeline.parent_stage import ParentStage
@@ -7,6 +11,10 @@ from pipeline.stage_result import StageResult
 
 
 class Pipeline(ABC):
+    """
+    Implements a base pipeline.
+    """
+
     def __init__(self, stage: Stage):
         self.stage = stage
         self.stage.on_init()

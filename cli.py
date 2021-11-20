@@ -59,7 +59,7 @@ def main():
 
     # We import the Cli plugin list from a json file instead of yaml,
     # Python's yaml support is not built in
-    with open("./src/cli_plugins/plugins.json", "r") as f:
+    with open("./src/cli_plugins/plugins.json", "r", encoding="utf8") as f:
         plugins_dict = json.load(f)
 
     # Plugins are loaded dynamically from ./src/cli_plugins/plugins.json

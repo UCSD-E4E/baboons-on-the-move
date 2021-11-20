@@ -1,3 +1,7 @@
+"""
+Implements a treeviewer based Pipeline Viewer
+"""
+
 import tkinter as tk
 from tkinter import ttk
 from pipeline.parent_stage import ParentStage
@@ -9,10 +13,18 @@ from pipeline.stage import Stage
 
 
 class PipelineViewer:
+    """
+    Implements a treeviewer based Pipeline Viewer
+    """
+
     def __init__(self, pipeline: Pipeline):
         self._pipeline = pipeline
 
     def run(self):
+        """
+        Displays the pipeline viewer.
+        """
+
         title = type(self._pipeline).__name__
 
         root = tk.Tk()
@@ -21,11 +33,11 @@ class PipelineViewer:
         tree = ttk.Treeview(root)
         tree.pack(fill=tk.BOTH, expand=True)
 
-        self.add_stage(tree, "", self._pipeline.stage)
+        self._add_stage(tree, "", self._pipeline.stage)
 
         root.mainloop()
 
-    def add_stage(self, tree: ttk.Treeview, parent: str, stage: Stage):
+    def _add_stage(self, tree: ttk.Treeview, parent: str, stage: Stage):
         name = type(stage).__name__
 
         if isinstance(stage, ParentStage):
@@ -41,4 +53,4 @@ class PipelineViewer:
 
         if isinstance(stage, ParentStage):
             for child in stage.stages:
-                self.add_stage(tree, parent, child)
+                self._add_stage(tree, parent, child)

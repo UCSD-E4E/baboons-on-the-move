@@ -83,5 +83,5 @@ class Baseline(CliPlugin):
                 supportsTeamDrives=True,
             ).execute()
 
-        with open("baseline.txt", "w") as f:
+        with open("baseline.txt", "w", encoding="utf8") as f:
             f.write(curr_date.strftime("%Y%m%d-%H%M%S"))

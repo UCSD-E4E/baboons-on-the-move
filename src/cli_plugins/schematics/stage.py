@@ -19,14 +19,14 @@ class Stage(Schematic):
         parser.add_argument("path")
 
     def execute(self, args: Namespace):
-        path: str = os.path.realpath("./src/baboon_tracking/stages/%s" % args.path)
+        path: str = os.path.realpath(f"./src/baboon_tracking/stages/{args.path}")
 
         if not path.endswith(".py"):
-            path = "%s.py" % path
+            path = f"{path}.py"
 
         class_name = "".join(
             [
-                "%s%s" % (p[0].upper(), p[1:])
+                f"{p[0].upper()}{p[1:]}"
                 for p in os.path.basename(path).replace(".py", "").split("_")
             ]
         )
@@ -50,7 +50,7 @@ class Stage(Schematic):
         string_builder.append_line("        return StageResult(True, True)")
         string_builder.append_line("")
 
-        with open(path, "w") as f:
+        with open(path, "w", encoding="utf8") as f:
             f.write(string_builder.__str__())
 
-        os.popen("code %s" % path)
+        os.popen(f"code {path}")
