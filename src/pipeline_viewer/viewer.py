@@ -1,5 +1,5 @@
 import tkinter as tk
-import tkinter.ttk as ttk
+from tkinter import ttk
 from pipeline.parent_stage import ParentStage
 
 from pipeline.pipeline import Pipeline
