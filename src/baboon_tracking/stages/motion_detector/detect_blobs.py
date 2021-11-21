@@ -21,7 +21,10 @@ class DetectBlobs(Stage, BlobImageMixin, BaboonsMixin):
     Detect blobs using the built in OpenCV blob detector.
     """
 
-    def __init__(self, moving_foreground: MovingForegroundMixin,) -> None:
+    def __init__(
+        self,
+        moving_foreground: MovingForegroundMixin,
+    ) -> None:
         BlobImageMixin.__init__(self)
         BaboonsMixin.__init__(self)
 
@@ -50,7 +53,8 @@ class DetectBlobs(Stage, BlobImageMixin, BaboonsMixin):
             )
 
         self.blob_image = Frame(
-            blob_image, self._moving_foregrouned.moving_foreground.get_frame_number(),
+            blob_image,
+            self._moving_foregrouned.moving_foreground.get_frame_number(),
         )
 
         self.baboons = [Baboon(r) for r in rectangles]

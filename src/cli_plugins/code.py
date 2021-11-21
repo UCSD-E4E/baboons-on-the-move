@@ -32,7 +32,7 @@ class Code(CliPlugin):
 
     def _check_vscode_plugin(self, plugin: str):
         with os.popen("code --list-extensions") as f:
-            installed = any([l.strip() == plugin for l in f.readlines()])
+            installed = any(l.strip() == plugin for l in f.readlines())
 
         return installed
 
@@ -54,11 +54,13 @@ class Code(CliPlugin):
                 )
 
     def _ensure_vscode_settings(self):
-        with open("./.vscode/settings.json.default", "r") as default_settings_file:
+        with open(
+            "./.vscode/settings.json.default", "r", encoding="utf8"
+        ) as default_settings_file:
             default_settings: Dict = json.load(default_settings_file)
 
         if os.path.exists("./.vscode/settings.json"):
-            with open("./.vscode/settings.json", "r") as settings_file:
+            with open("./.vscode/settings.json", "r", encoding="utf8") as settings_file:
                 settings: Dict = json.load(settings_file)
         else:
             settings: Dict = {}
@@ -66,5 +68,5 @@ class Code(CliPlugin):
         for key, value in default_settings.items():
             settings[key] = value
 
-        with open("./.vscode/settings.json", "w") as settings_file:
+        with open("./.vscode/settings.json", "w", encoding="utf8") as settings_file:
             json.dump(settings, settings_file, indent=4)

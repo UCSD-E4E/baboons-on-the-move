@@ -32,7 +32,7 @@ def get_config() -> Dict:
     Load the config.yml file in the root of the repository.
     """
     if CONFIG_STORE is None:
-        with open(os.path.realpath("./config.yml"), "r") as stream:
+        with open(os.path.realpath("./config.yml"), "r", encoding="utf8") as stream:
             try:
                 return yaml.safe_load(stream)
 
@@ -40,6 +40,8 @@ def get_config() -> Dict:
                 print(exc)
     else:
         return CONFIG_STORE
+
+    return {}
 
 
 def get_config_part(key: str, config=None) -> Dict:
@@ -98,7 +100,9 @@ def step_config(config: Dict) -> Dict:
     """
     Steps the config file once.
     """
-    with open(os.path.realpath("./config_declaration.yml"), "r") as stream:
+    with open(
+        os.path.realpath("./config_declaration.yml"), "r", encoding="utf8"
+    ) as stream:
         declaration = yaml.safe_load(stream)
 
     _update_config(config, declaration)
@@ -157,5 +161,5 @@ def save_config(config: Dict):
     """
     Updates the config.yaml file with the specified config.
     """
-    with open("./config.yml", "w") as f:
+    with open("./config.yml", "w", encoding="utf8") as f:
         yaml.dump(config, f)

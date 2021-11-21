@@ -30,7 +30,7 @@ class BaselineBaboonTracker:
             )
             baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 
-            with open(output_file, "w") as f:
+            with open(output_file, "w", encoding="utf8") as f:
                 should_continue = True
                 frame_counter = 1
                 while should_continue:
@@ -39,10 +39,6 @@ class BaselineBaboonTracker:
                     if baboons_mixin.baboons is not None:
                         for baboon in baboons_mixin.baboons:
                             x1, y1, x2, y2 = baboon.rectangle
-                            f.write(
-                                "{0}, {1}, {2}, {3}, {4}\n".format(
-                                    x1, y1, x2, y2, frame_counter,
-                                )
-                            )
+                            f.write(f"{x1}, {y1}, {x2}, {y2}, {frame_counter}\n")
 
                     frame_counter += 1

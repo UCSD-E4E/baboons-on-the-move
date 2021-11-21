@@ -110,12 +110,15 @@ class ComputeMovingForeground(Stage, MovingForegroundMixin):
             weight_levels == 2,
             np.greater_equal(foreground_levels, dissimilarity_levels),
         ).astype(np.uint8)
-        moving_foreground = moving_foreground + np.logical_and(
-            weight_levels == 1,
-            np.logical_and(
-                dissimilarity_levels == 1,
-                np.greater(foreground_levels, dissimilarity_levels),
-            ),
-        ).astype(np.uint8)
+        moving_foreground = (
+            moving_foreground
+            + np.logical_and(
+                weight_levels == 1,
+                np.logical_and(
+                    dissimilarity_levels == 1,
+                    np.greater(foreground_levels, dissimilarity_levels),
+                ),
+            ).astype(np.uint8)
+        )
 
         return moving_foreground * 255

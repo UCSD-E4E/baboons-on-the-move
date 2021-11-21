@@ -21,8 +21,22 @@ class SaveBaboons(Stage):
 
         self._baboons = baboons
         self._frame = frame
-        self._file = open("./output/baboons.csv", "w")
-        self._file.write("x1, y1, x2, y2, frame\n")
+        self._file = None
+
+        self.__enter__()
+
+    def __del__(self):
+        self.on_destroy()
+
+    def __enter__(self):
+        if self._file is None:
+            self._file = open("./output/baboons.csv", "w", encoding="utf8")
+            self._file.write("x1, y1, x2, y2, frame\n")
+
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.on_destroy()
 
     def execute(self) -> StageResult:
         for baboon in self._baboons.baboons:
@@ -42,4 +56,6 @@ class SaveBaboons(Stage):
         return StageResult(True, True)
 
     def on_destroy(self) -> None:
-        self._file.close()
+        if self._file is not None:
+            self._file.close()
+            self._file = None

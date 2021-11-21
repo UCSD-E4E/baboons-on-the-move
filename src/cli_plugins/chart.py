@@ -5,6 +5,7 @@ from argparse import ArgumentParser, Namespace
 from baboon_tracking import BaboonTracker
 from baboon_tracking.preset_pipelines import preset_pipelines
 from cli_plugins.cli_plugin import CliPlugin
+from pipeline_viewer.viewer import PipelineViewer
 
 
 class Chart(CliPlugin):
@@ -25,4 +26,5 @@ class Chart(CliPlugin):
         )
 
     def execute(self, args: Namespace):
-        BaboonTracker(args.pipeline_name).flowchart().show()
+        pipeline = BaboonTracker(args.pipeline_name)
+        PipelineViewer(pipeline).run()

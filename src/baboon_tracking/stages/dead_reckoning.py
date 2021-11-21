@@ -97,9 +97,7 @@ class DeadReckoning(Stage, BaboonsMixin):
         Checks if we have a list of baboons for the frame number.
         """
         return (frame_number in self._all_baboons) or exists(
-            "./temp/dead_reckoning/{frame_number}.pickle".format(
-                frame_number=frame_number
-            )
+            f"./temp/dead_reckoning/{frame_number}.pickle"
         )
 
     def get(self, frame_number: int) -> List[Baboon]:
@@ -109,15 +107,13 @@ class DeadReckoning(Stage, BaboonsMixin):
         if frame_number in self._all_baboons:
             return self._all_baboons[frame_number]
 
-        file_path = "./temp/dead_reckoning/{frame_number}.pickle".format(
-            frame_number=frame_number
-        )
+        file_path = f"./temp/dead_reckoning/{frame_number}.pickle"
 
         if exists(file_path):
-            with open(file_path, "rb") as f:
+            with open(file_path, "rb", encoding="utf8") as f:
                 return pickle.load(f)
 
-        raise "Cannot find the specified frame number"
+        raise IOError("Cannot find the specified frame number")
 
     def set(self, frame_number: int, baboons: List[Baboon]):
         """
@@ -129,9 +125,7 @@ class DeadReckoning(Stage, BaboonsMixin):
             min_frame = min(self._all_baboons.keys())
             save = self._all_baboons.pop(min_frame)
 
-            file_path = "./temp/dead_reckoning/{frame_number}.pickle".format(
-                frame_number=min_frame
-            )
+            file_path = f"./temp/dead_reckoning/{min_frame}.pickle"
 
             with open(file_path, "wb") as f:
                 pickle.dump(save, f)
@@ -168,7 +162,7 @@ class DeadReckoning(Stage, BaboonsMixin):
                     for item in [
                         (p, b, d)
                         for p, b, d in dist_list
-                        if b.identity == curr.identity or p.identity == curr.identity
+                        if curr.identity in (b.identity, p.identity)
                     ]:
                         dist_list.remove(item)
 

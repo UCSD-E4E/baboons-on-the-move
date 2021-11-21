@@ -21,7 +21,9 @@ class Generate(CliPlugin):
 
         # We import the schematics list from a json file instead of yaml,
         # Python's yaml support is not built in
-        with open("./src/cli_plugins/schematics/schematics.json", "r") as f:
+        with open(
+            "./src/cli_plugins/schematics/schematics.json", "r", encoding="utf8"
+        ) as f:
             schematics_dict = json.load(f)
 
         for schematic_dict in schematics_dict["schematics"]:

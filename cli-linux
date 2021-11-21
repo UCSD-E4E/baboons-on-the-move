@@ -33,6 +33,7 @@ eval "$(pyenv virtualenv-init -)"' >> ~/.${SHELL_NAME}rc
 fi
 
 PYTHON_VERSION=3.8.12
+
 # Ensure Python is installed
 pyenv versions | grep $PYTHON_VERSION > /dev/null
 if [ $? -ne 0 ]

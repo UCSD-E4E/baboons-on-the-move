@@ -21,5 +21,9 @@ class TransformedFrames(Parallel):
 
     def __init__(self, rconfig: Dict[str, any]):
         Parallel.__init__(
-            self, "TransformedFrames", rconfig, ShiftHistoryFrames, ComputeShiftedMasks,
+            self,
+            "TransformedFrames",
+            rconfig,
+            ShiftHistoryFrames,
+            ComputeShiftedMasks,
         )
