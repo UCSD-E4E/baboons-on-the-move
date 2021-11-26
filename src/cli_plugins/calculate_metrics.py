@@ -26,6 +26,9 @@ class CalculateMetrics(CliPlugin):
         Calculate metrics for the specified video and output to Firebase.
         """
 
+        video_file = "input"
+        branch_name = Repository(".").head.shorthand.replace("/", "__slash__")
+
         initialize_app()
         config, _, _ = get_latest_config()
         set_config(config)
@@ -33,23 +36,47 @@ class CalculateMetrics(CliPlugin):
         time = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
         ref = db.reference("metrics")
-        video_ref = ref.child("input")
-        branch_ref = video_ref.child(Repository(".").head.shorthand)
+
+        video_files_ref = ref.child("video_files")
+        video_files = video_files_ref.get()
+        video_files = list(video_files) if video_files else []
+
+        if video_file not in video_files:
+            video_files.append(video_file)
+            video_files_ref.set(video_files)
+
+        video_ref = ref.child(video_file)
+        branch_ref = video_ref.child(branch_name)
         date_ref = branch_ref.child(time)
 
         date_ref.set(
-            [
-                {
-                    "true_positive": m.true_positive,
-                    "false_positive": m.false_positive,
-                    "false_negative": m.false_negative,
-                }
-                for m in get_metrics()
-            ]
+            {
+                "metrics": [
+                    {
+                        "true_positive": m.true_positive,
+                        "false_positive": m.false_positive,
+                        "false_negative": m.false_negative,
+                    }
+                    for m in get_metrics()
+                ],
+                "metric_types": ["true_positive", "false_positive", "false_negative"],
+                "tags": [],
+            }
         )
 
-        latest_ref = video_ref.child("latest")
-        latest_ref.set(time)
+        branches_ref = video_ref.child("branches")
+        branches = branches_ref.get()
+        branches = list(branches) if branches else []
 
-        # data_frame = pd.DataFrame(get_metrics())
-        # data_frame.to_csv("input_metrics.csv")
+        if branch_name not in branches:
+            branches.append(branch_name)
+            branches_ref.set(branches)
+
+        dates_ref = branch_ref.child("dates")
+        dates = dates_ref.get()
+        dates = list(dates) if dates else []
+        dates.append(time)
+        dates_ref.set(dates)
+
+        # latest_ref = video_ref.child("latest")
+        # latest_ref.set(time)

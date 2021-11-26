@@ -54,7 +54,7 @@ class MotionDetector(Serial):
             GenerateMaskSubcomponents,
             ComputeMovingForeground,
             ApplyMasks,
-            # NoiseReduction,
+            NoiseReduction,
             DetectBlobs,
             # MinSizeFilter,
         )
