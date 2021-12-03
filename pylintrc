@@ -1,5 +1,6 @@
 [GENERAL OPTIONS]
 extension-pkg-whitelist=cv2
+generated-members=numpy.* ,torch.*
 
 [MESSAGES CONTROL]
 disable=bad-continuation,too-few-public-methods,no-self-use,too-many-locals,duplicate-code,line-too-long, too-many-arguments, too-many-instance-attributes

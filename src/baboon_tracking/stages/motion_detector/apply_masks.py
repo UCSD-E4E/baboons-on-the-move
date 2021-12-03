@@ -3,6 +3,7 @@ Applies the masks to the moving foreground.
 """
 
 import numpy as np
+from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.mixins.shifted_masks_mixin import ShiftedMasksMixin
@@ -12,6 +13,7 @@ from pipeline.stage_result import StageResult
 from pipeline.decorators import stage
 
 
+@show_result
 @stage("moving_foreground")
 @stage("shifted_masks")
 @stage("frame")

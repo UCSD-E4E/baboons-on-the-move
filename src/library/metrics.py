@@ -48,7 +48,6 @@ def get_metrics() -> List[Metric]:
 
     should_continue = True
     frame_counter = 0
-    metrics: List[Metric] = []
     while should_continue:
         true_positive = 0
         false_positive = 0
@@ -82,7 +81,7 @@ def get_metrics() -> List[Metric]:
 
             false_negative = len(labeled_baboons)
 
-            metrics.append(Metric(true_positive, false_negative, false_positive))
+            yield Metric(true_positive, false_negative, false_positive)
 
             # exit()
 
@@ -93,5 +92,3 @@ def get_metrics() -> List[Metric]:
             should_continue = False
 
         frame_counter += 1
-
-    return metrics

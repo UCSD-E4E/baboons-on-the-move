@@ -2,6 +2,7 @@
 Provides an algorithm for extracting baboons from drone footage.
 """
 from typing import Dict
+from baboon_tracking.stages.backprop import Backprop
 from baboon_tracking.stages.display_progress import DisplayProgress
 from baboon_tracking.stages.draw_regions import DrawRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
@@ -34,6 +35,7 @@ def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
         MotionDetector,
         SaveBaboons,
         DrawRegions,
+        Backprop,
         TestExit,
         DisplayProgress,
     )

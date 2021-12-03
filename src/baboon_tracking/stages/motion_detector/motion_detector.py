@@ -2,6 +2,7 @@
 Implements a motion tracker pipeline.
 """
 from typing import Dict
+from baboon_tracking.stages.motion_detector.convert_to_history_colorspace import ConvertToHistoryColorspace
 
 from baboon_tracking.stages.motion_detector.detect_blobs import DetectBlobs
 from baboon_tracking.stages.motion_detector.apply_masks import ApplyMasks
@@ -47,6 +48,7 @@ class MotionDetector(Serial):
             "MotionDetector",
             rconfig,
             StoreHistoryFrame,
+            ConvertToHistoryColorspace,
             ComputeTransformationMatrices,
             TransformedFrames,
             QuantizeHistoryFrames,
@@ -54,7 +56,7 @@ class MotionDetector(Serial):
             GenerateMaskSubcomponents,
             ComputeMovingForeground,
             ApplyMasks,
-            NoiseReduction,
+            # NoiseReduction,
             DetectBlobs,
             # MinSizeFilter,
         )

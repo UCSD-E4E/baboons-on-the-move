@@ -61,26 +61,27 @@ class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
         self._preprocessed_frame = preprocessed_frame
         self._history_frames = history_frames
 
-        history_frames.history_frame_popped.subscribe(self._feature_hash.pop)
+        # history_frames.history_frame_popped.subscribe(self._feature_hash.pop)
 
     def _detect_and_compute(self, frame: Frame):
-        if frame not in self._feature_hash:
-            keypoints = self._fast.detect(frame.get_frame(), None)
-            keypoints = ssc(
-                keypoints,
-                10000,
-                0.1,
-                frame.get_frame().shape[1],
-                frame.get_frame().shape[0],
-            )
-            descriptors = self._orb.compute(frame.get_frame(), keypoints)
+        # if frame not in self._feature_hash:
+        keypoints = self._fast.detect(frame.get_frame(), None)
+        keypoints = ssc(
+            keypoints,
+            10000,
+            0.1,
+            frame.get_frame().shape[1],
+            frame.get_frame().shape[0],
+        )
+        descriptors = self._orb.compute(frame.get_frame(), keypoints)
 
-            keypoints = descriptors[0]
-            descriptors = descriptors[1]
+        keypoints = descriptors[0]
+        descriptors = descriptors[1]
 
-            self._feature_hash[frame] = (keypoints, descriptors)
+        # self._feature_hash[frame] = (keypoints, descriptors)
+        return (keypoints, descriptors)
 
-        return self._feature_hash[frame]
+        # return self._feature_hash[frame]
 
     def _register(self, frame1: Frame, frame2: Frame):
         keypoints1, descriptors1 = self._detect_and_compute(frame1)

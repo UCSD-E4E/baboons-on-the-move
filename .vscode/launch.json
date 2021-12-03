@@ -10,9 +10,17 @@
             "request": "launch",
             "program": "cli.py",
             "console": "integratedTerminal",
+            // "justMyCode": false,
             "args": [
-                "calc-metrics",
+                "run",
             ]
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
         }
     ]
 }

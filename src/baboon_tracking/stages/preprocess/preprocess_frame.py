@@ -5,6 +5,8 @@ from typing import Dict
 
 from baboon_tracking.stages.preprocess.blur_gray import BlurGray
 from baboon_tracking.stages.preprocess.convert_from_bgr2gray import ConvertFromBGR2Gray
+from baboon_tracking.stages.preprocess.convert_to_colorspace import ConvertToColorspace
+from baboon_tracking.stages.preprocess.nop import Nop
 
 # from baboon_tracking.stages.preprocess.denoise import Denoise
 from pipeline import Serial
@@ -22,7 +24,9 @@ class PreprocessFrame(Serial):
             self,
             "PreprocessFrame",
             rconfig,
-            ConvertFromBGR2Gray,
+            # ConvertToColorspace,
+            # ConvertFromBGR2Gray,
+            Nop,
             BlurGray,
             # Denoise,
         )
