@@ -4,8 +4,9 @@ Implements a base pipeline.
 
 from abc import ABC
 from typing import Callable
-from pipeline.parent_stage import ParentStage
 
+from library.caf import Caffine
+from pipeline.parent_stage import ParentStage
 from pipeline.stage import Stage
 from pipeline.stage_result import StageResult
 
@@ -34,6 +35,9 @@ class Pipeline(ABC):
         Runs the algorithm until it finishes.
         """
 
+        caf = Caffine()
+        request_id = caf.request()
+
         while True:
             result = self.step()
 
@@ -42,6 +46,7 @@ class Pipeline(ABC):
                 self.stage.get_time().print_to_console()
 
                 self.stage.on_destroy()
+                caf.release(request_id)
 
                 return
 
