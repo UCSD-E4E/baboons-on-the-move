@@ -18,6 +18,8 @@
 
 #include "constant_velocity_kalman_filter.h"
 #include "pipes.h"
+// so the compiler doesnt complain
+#define UNUSED(x) (void)(x)
 
 #ifdef DEBUG_DRAW
 void show(std::string window_name, cv::InputArray image) {
@@ -39,10 +41,11 @@ private:
 
 public:
   pipeline(std::shared_ptr<baboon_tracking::historical_frames_container<frame>>
-               hist_frames)
+               hist_frames, std::shared_ptr<baboon_tracking::keypoint_descriptor_container<frame>> kp_desc_container)
       : convert_bgr_to_gray{}, blur_gray{3}, compute_homography{0.27, 4.96,
                                                                 0.13, 10001,
-                                                                hist_frames},
+                                                                hist_frames,
+                                                                kp_desc_container},
         transform_history_frames_and_masks{hist_frames},
         rescale_transformed_history_frames{48}, generate_weights{},
         generate_history_of_dissimilarity{}, intersect_frames{},
@@ -136,7 +139,9 @@ int main() {
   auto hist_frames = std::make_shared<
       baboon_tracking::historical_frames_container<decltype(frame)>>(
       9, max_threads);
-  pipeline pl{hist_frames};
+  auto kp_desc_container = std::make_shared<
+      baboon_tracking::keypoint_descriptor_container<decltype(frame)>>(9);
+  pipeline pl{hist_frames, kp_desc_container};
 
 
   baboon_tracking::constant_velocity_kalman_filter<20> kf{
@@ -173,7 +178,8 @@ int main() {
 
     if (!bounding_boxes.empty()) {
       auto x_hat = kf.run(actual_num_baboons, bounding_boxes);
-
+      // macro so the compiler doesnt complain
+      UNUSED(x_hat);
 #ifdef DEBUG_DRAW
       static const auto bounding_box_color = cv::Scalar(255, 0, 0);
       for (auto &&bounding_box : bounding_boxes) {

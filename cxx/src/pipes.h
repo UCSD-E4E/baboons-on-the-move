@@ -3,6 +3,7 @@
 #include "cv_specializations.h"
 #include "historical_frame_container.h"
 #include "sortable_frame.h"
+#include "keypoint_descriptor_container.h"
 
 #include "ssc.h"
 
@@ -84,11 +85,13 @@ template <typename frame> struct pipes {
     compute_homography(
         double good_match_percent, double ransac_max_reproj_error,
         double ssc_tolerance, int ssc_num_ret_points,
-        std::shared_ptr<historical_frames_container<frame>> historical_frames)
+        std::shared_ptr<historical_frames_container<frame>> historical_frames,
+        std::shared_ptr<keypoint_descriptor_container<frame>> kp_desc_container)
         : good_match_percent{good_match_percent},
           ransac_max_reproj_error{ransac_max_reproj_error},
           ssc_tolerance{ssc_tolerance}, ssc_num_ret_points{ssc_num_ret_points},
-          historical_frames{historical_frames} {};
+          historical_frames{historical_frames},
+          memoized_keypoints_and_descriptors {kp_desc_container} {};
 
     std::vector<cv::Mat> run(std::uint64_t current_frame_num,
                              frame &&gray_blurred_frame) {
@@ -174,9 +177,8 @@ template <typename frame> struct pipes {
       // Check this before getting referenecs to map contents because doing so
       // will insert a new entry if one doesn't already exist
       bool already_memoized =
-          memoized_keypoint_and_descriptor_map.count(sortable_frame);
-
-      auto &ret = memoized_keypoint_and_descriptor_map[sortable_frame];
+          memoized_keypoints_and_descriptors->is_mapped(frame_num);
+      auto &ret = memoized_keypoints_and_descriptors->get_keypoint_descriptor(frame_num);
       auto &[keypoints, descriptors] = ret;
       if (!already_memoized) {
         static cv::Ptr<cv::Feature2D> fast_detector;
@@ -208,12 +210,10 @@ template <typename frame> struct pipes {
     double ransac_max_reproj_error;
     double ssc_tolerance;
     int ssc_num_ret_points;
-
-    std::map<sortable_frame<frame>, std::tuple<std::vector<cv::KeyPoint>,
-                                               typename cvs::cpu_or_gpu_mat>>
-        memoized_keypoint_and_descriptor_map;
+    
 
     std::shared_ptr<historical_frames_container<frame>> historical_frames;
+    std::shared_ptr<keypoint_descriptor_container<frame>> memoized_keypoints_and_descriptors;
   };
 
   class transform_history_frames_and_masks {
