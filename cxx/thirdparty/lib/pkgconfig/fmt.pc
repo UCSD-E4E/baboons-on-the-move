@@ -1,0 +1,11 @@
+prefix=/home/jetbot/work/src/github.com/pietroglyph/cucoslam/thirdparty
+exec_prefix=/home/jetbot/work/src/github.com/pietroglyph/cucoslam/thirdparty
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: fmt
+Description: A modern formatting library
+Version: 7.1.2
+Libs: -L${libdir} -lfmt
+Cflags: -I${includedir}
+
