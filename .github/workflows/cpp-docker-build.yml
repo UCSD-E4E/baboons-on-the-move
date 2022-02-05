@@ -21,4 +21,3 @@ jobs:
       uses: docker/setup-buildx-action@v1
       file: "{context}/Dockerfile.CPU"
       id: cpu_builder
-        
