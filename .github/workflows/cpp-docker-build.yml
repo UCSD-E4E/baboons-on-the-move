@@ -35,5 +35,6 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./cxx
-        push: false
+        push: true
         file: ./cxx/Dockerfile.CUDA
+        tags: ghcr.io/ucsd-e4e/baboon-tracking:cuda-6.1
