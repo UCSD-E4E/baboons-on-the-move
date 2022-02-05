@@ -2,7 +2,7 @@ name: C++ Docker Environment Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, feature/cpp ]
   pull_request:
     branches: [ master ]
 
