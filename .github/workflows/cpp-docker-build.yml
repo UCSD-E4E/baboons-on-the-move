@@ -25,8 +25,9 @@ jobs:
         context: ./cxx
         push: false
         file: ./cxx/Dockerfile.CPU
-    # - name: Build CUDA 6.1 Docker Container
-    #   uses: docker/setup-buildx-action@v1
-    #   with:
-    #     file: "{context}/Dockerfile.CUDA"
-    #     id: cuda_6.1_builder
+    - name: Build CUDA 6.1 Container
+      uses: docker/build-push-action@v2
+      with:
+        context: ./cxx
+        push: false
+        file: ./cxx/Dockerfile.CUDA
