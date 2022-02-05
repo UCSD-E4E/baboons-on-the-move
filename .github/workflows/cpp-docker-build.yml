@@ -28,8 +28,9 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: ./cxx
-        push: false
+        push: true
         file: ./cxx/Dockerfile.CPU
+        tags: baboon-tracking:cpu
     - name: Build CUDA 6.1 Container
       uses: docker/build-push-action@v2
       with:
