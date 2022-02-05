@@ -17,13 +17,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Build CPU Docker Container
+    - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
+    - name: Build CPU Container
+      uses: docker/build-push-activity@v2
       with:
+        context: .
+        push: false
         file: "{context}/Dockerfile.CPU"
-        id: cpu_builder
-    - name: Build CUDA 6.1 Docker Container
-      uses: docker/setup-buildx-action@v1
-      with:
-        file: "{context}/Dockerfile.CUDA"
-        id: cuda_6.1_builder
+    # - name: Build CUDA 6.1 Docker Container
+    #   uses: docker/setup-buildx-action@v1
+    #   with:
+    #     file: "{context}/Dockerfile.CUDA"
+    #     id: cuda_6.1_builder
