@@ -22,9 +22,9 @@ jobs:
     - name: Build CPU Container
       uses: docker/build-push-action@v2
       with:
-        context: .
+        context: ./cxx
         push: false
-        file: Dockerfile.CPU
+        file: ./cxx/Dockerfile.CPU
     # - name: Build CUDA 6.1 Docker Container
     #   uses: docker/setup-buildx-action@v1
     #   with:
