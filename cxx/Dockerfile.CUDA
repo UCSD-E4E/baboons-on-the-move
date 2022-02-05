@@ -1,0 +1,58 @@
+FROM nvidia/cuda:11.6.0-devel-ubuntu20.04
+
+USER root
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get -y install \
+    cmake \
+    build-essential \
+    ffmpeg \
+    gfortran \
+    git \
+    libatlas-base-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libdc1394-22-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgtk-3-dev \
+    libjpeg-dev \
+    libopenexr-dev \
+    libpng-dev \
+    libswscale-dev \
+    libtbb2 \
+    libtbb-dev \
+    libtiff-dev \
+    libv4l-dev \
+    libx264-dev \
+    libxvidcore-dev \
+    openexr \
+    pkg-config \
+    python3-dev \
+    python3-numpy
+
+WORKDIR /
+RUN mkdir /dependencies 
+
+WORKDIR /dependencies
+RUN git clone https://github.com/opencv/opencv_contrib.git
+RUN git clone https://github.com/opencv/opencv.git
+
+WORKDIR /dependencies/opencv
+RUN mkdir /dependencies/opencv/build
+
+WORKDIR /dependencies/opencv/build
+RUN cmake .. -DWITH_CUDA=ON -DWITH_FFMPEG=ON -DWITH_NVCUVID=ON -DBUILD_PNG=ON -DBUILD_TBB=OFF -DBUILD_JPEG=ON -DCUDA_ARCH_BIN="6.1" -DCUDA_FAST_MATH=ON -DOPENCV_ENABLE_NONFREE=ON -DCUDA_ARCH_PTX="" -DOPENCV_GENERATE_PKGCONFIG=ON -DOPENCV_EXTRA_MODULES_PATH=../../opencv_contrib/modules -DBUILD_TESTS=OFF -DBUILD_PERF_TESTS=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_INSTALL_PREFIX=/usr/local
+RUN make
+RUN make install
+
+COPY . /app
+
+RUN mkdir /app/build
+WORKDIR /app/build
+
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=True -DUSE_CUDA=True
+RUN make -j
+
+CMD ["./baboon-tracking"]

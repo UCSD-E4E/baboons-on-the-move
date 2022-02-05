@@ -1,0 +1,20 @@
+FROM ubuntu:20.04
+
+USER root
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update
+RUN apt-get install -y \
+    cmake \
+    build-essential \
+    libopencv-dev
+
+COPY . /app
+
+RUN mkdir /app/build
+WORKDIR /app/build
+
+RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=True
+RUN make -j
+
+CMD ["./baboon-tracking"]
