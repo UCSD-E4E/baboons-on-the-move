@@ -22,3 +22,8 @@ jobs:
       with:
         file: "{context}/Dockerfile.CPU"
         id: cpu_builder
+    - name: Build CUDA 6.1 Docker Container
+      uses: docker/setup-buildx-action@v1
+      with:
+        file: "{context}/Dockerfile.CUDA"
+        id: cuda_6.1_builder
