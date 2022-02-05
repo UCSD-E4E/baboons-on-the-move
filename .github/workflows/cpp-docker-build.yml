@@ -19,5 +19,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build CPU Docker Container
       uses: docker/setup-buildx-action@v1
-      file: "{context}/Dockerfile.CPU"
-      id: cpu_builder
+      with:
+        file: "{context}/Dockerfile.CPU"
+        id: cpu_builder
