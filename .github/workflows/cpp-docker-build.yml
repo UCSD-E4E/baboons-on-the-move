@@ -38,3 +38,14 @@ jobs:
         push: true
         file: ./cxx/Dockerfile.CUDA
         tags: ghcr.io/ucsd-e4e/baboon-tracking:cuda-6.1
+        build-args: |
+          CUDA_ARCH_BIN=6.1
+    - name: Build CUDA 7.5 Container
+      uses: docker/build-push-action@v2
+      with:
+        context: ./cxx
+        push: true
+        file: ./cxx/Dockerfile.CUDA
+        tags: ghcr.io/ucsd-e4e/baboon-tracking:cuda-7.5
+        build-args: |
+          CUDA_ARCH_BIN=7.5
