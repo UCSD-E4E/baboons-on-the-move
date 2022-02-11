@@ -18,6 +18,8 @@ def process_pool(particle_filter: ParticleFilter, baboons: BaboonsMixin):
     particle_filter.update(baboons)
     particle_filter.resample()
 
+    return particle_filter
+
 
 @stage("baboons")
 class ParticleFilterStage(Stage, BaboonsMixin):

@@ -33,15 +33,6 @@ while rows <= total_displacements:
     elif baboon != current_baboon:
         baboon += 1
 
-""""
-Debugging Code:
-​
-print(disp_data)
-print(current_baboon)
-print(baboon)
-print(len(position_data))
-print(len(disp_data))
-"""
 disp_data = np.array(disp_data)
 disp_data = disp_data.reshape(-1, 1)
 
@@ -56,5 +47,3 @@ bayesian_model = BayesianGaussianMixture(
 with open("displacement_mixture.pickle", "wb") as f:
     pickle.dump(bayesian_model, f)
 
-
-# print(bayesian_model)
