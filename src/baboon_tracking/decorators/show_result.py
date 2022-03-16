@@ -56,6 +56,10 @@ def show_result(function: Callable):
                         width = root.winfo_screenwidth()
                         height = root.winfo_screenheight()
 
+                if not width or not height:
+                    width = 1600
+                    height = 900
+
                 width = int(width)
                 height = int(height)
 

@@ -6,6 +6,7 @@ from baboon_tracking.stages.display_progress import DisplayProgress
 from baboon_tracking.stages.draw_regions import DrawRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
+from baboon_tracking.stages.overlay import Overlay
 from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
 from baboon_tracking.stages.save_baboons import SaveBaboons
 
@@ -34,6 +35,7 @@ def update_preset_pipelines(input_file="input.mp4", runtime_config=None):
         MotionDetector,
         SaveBaboons,
         DrawRegions,
+        Overlay,
         TestExit,
         DisplayProgress,
     )
