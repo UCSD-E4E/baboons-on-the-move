@@ -24,7 +24,6 @@ class SaveBaboons(Stage):
 
         self._baboons = baboons
         self._frame = frame
-        self._file = None
         self._connection = None
         self._cursor = None
 
@@ -46,10 +45,6 @@ class SaveBaboons(Stage):
                (x1 int, y1 int, x2 int, y2 int, frame int)"""
             )
 
-        if self._file is None:
-            self._file = open("./output/baboons.csv", "w", encoding="utf8")
-            self._file.write("x1, y1, x2, y2, frame\n")
-
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -62,20 +57,6 @@ class SaveBaboons(Stage):
         baboons = [(x1, y1, x2, y2, frame_number) for x1, y1, x2, y2 in baboons]
         self._cursor.executemany("INSERT INTO baboons VALUES (?, ?, ?, ?, ?)", baboons)
 
-        for baboon in self._baboons.baboons:
-            x1, y1, x2, y2 = baboon.rectangle
-
-            self._file.write(str(x1))
-            self._file.write(", ")
-            self._file.write(str(y1))
-            self._file.write(", ")
-            self._file.write(str(x2))
-            self._file.write(", ")
-            self._file.write(str(y2))
-            self._file.write(", ")
-            self._file.write(str(self._frame.frame.get_frame_number()))
-            self._file.write("\n")
-
         return StageResult(True, True)
 
     def on_destroy(self) -> None:
@@ -85,7 +66,3 @@ class SaveBaboons(Stage):
 
             self._cursor = None
             self._connection = None
-
-        if self._file is not None:
-            self._file.close()
-            self._file = None
