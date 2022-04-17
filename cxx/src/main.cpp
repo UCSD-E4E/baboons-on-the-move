@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include <tuple>
+#include <string.h>
 
 #include <fmt/format.h>
 
@@ -113,9 +114,13 @@ private:
   typename bt::detect_blobs detect_blobs;
 };
 
-int main() {
+int main(int argc, char *argv[]) {
   constexpr unsigned int max_threads = 8; // TODO: put the thread pool back optionally
-  constexpr auto input_file_name = "./input.mp4";
+  char input_file_name[256] = "./input.mp4";
+
+  if (argc == 2) {
+    strcpy(input_file_name, argv[1]);
+  }
 
   // TODO: we're using USE_CUDA elsewhere to mean that CUDA headers are
   // available (an unfortunate kludge that happens because some builds of OpenCV
