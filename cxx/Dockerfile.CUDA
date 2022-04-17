@@ -55,4 +55,4 @@ WORKDIR /app/build
 RUN cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=True -DUSE_CUDA=True
 RUN make -j
 
-CMD ["./baboon-tracking", "./data/input.mp4"]
+CMD ["./baboon-tracking", "/data/input.mp4"]

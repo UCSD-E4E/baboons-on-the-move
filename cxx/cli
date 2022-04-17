@@ -26,6 +26,10 @@ use_cpu() {
     echo "No CUDA capable device found.  Using CPU..."
 }
 
+DIR=`dirname $0`
+DIR=`realpath $DIR`
+echo $DIR
+
 lspci | grep NVIDIA > /dev/null
 if [ $? -eq 0 ]
 then
@@ -39,7 +43,17 @@ then
     else
         echo "Discovered $GPU. Using CUDA CC $CC..."
 
-        docker run -it --gpus all -v build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC"
+        case $1 in
+            run)
+                docker run -it --gpus all -v $DIR/build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC"
+                ;;
+            shell)
+                docker run -it --gpus all -v $DIR/build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC" /bin/bash
+                ;;
+            *)
+                echo help
+                ;;
+        esac
     fi
 else
     #CPU
