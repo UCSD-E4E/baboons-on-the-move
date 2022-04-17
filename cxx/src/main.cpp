@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <string>
 #include <tuple>
+#include <iostream>
 #include <string.h>
 
 #include <fmt/format.h>
@@ -119,6 +120,7 @@ int main(int argc, char *argv[]) {
   char input_file_name[256] = "./input.mp4";
 
   if (argc == 2) {
+    std::cout << "Using specified file name." << std::endl;
     strcpy(input_file_name, argv[1]);
   }
 

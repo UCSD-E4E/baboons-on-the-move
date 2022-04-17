@@ -39,7 +39,7 @@ then
     else
         echo "Discovered $GPU. Using CUDA CC $CC..."
 
-        
+        docker run -it --gpus all -v build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC"
     fi
 else
     #CPU
