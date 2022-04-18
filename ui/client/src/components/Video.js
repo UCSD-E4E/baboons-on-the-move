@@ -9,9 +9,9 @@ import sampleLabels from './sample_labels.json';
 
 const Video = () => {
   const videoPath = useLocation().state.path;
-  const DESIRED_VIDEO_WIDTH = 1400;
   const vidRef = useRef();
   const timestampWatcherRef = useRef();
+  const [isEditDisabled, setIsEditDisabled] = useState(true);
   const [focusedBaboon, setFocusedBaboon] = useState(0);
   const [{ vectorHeight, vectorWidth }, setVectorDimensions] = useState({
     vectorHeight: 0,
@@ -21,7 +21,7 @@ const Video = () => {
   const [fps, setFps] = useState(30);
   const frameLength = 1 / fps;
   const maxFrames = Math.ceil(videoDuration / frameLength);
-  const scale = DESIRED_VIDEO_WIDTH / (vectorWidth || 1);
+  const [scale, setScale] = useState(1);
 
   let idIterator = 1;
   const [frameItems, setFrameItems] = useState(sampleLabels);
@@ -82,7 +82,6 @@ const Video = () => {
     setFrameItems(prevFrameItems => {
       const nextFrameItems = prevFrameItems.concat();
       nextFrameItems[frameIndex] = fn(mostRecentItems);
-      // console.log(JSON.stringify(nextFrameItems));
       return nextFrameItems;
     });
   };
@@ -102,6 +101,8 @@ const Video = () => {
         width={width}
         x={x}
         y={y}
+        active={index === focusedBaboon}
+        disabled={isEditDisabled}
         isActual={isActualFrameItems}
         onChange={newRect => {
           setThisFrameItems(currentItems =>
@@ -115,9 +116,10 @@ const Video = () => {
           setThisFrameItems(currentItems =>
             arrayReplace(currentItems, index, [])
           );
-          if(focusedBaboon>0){setFocusedBaboon(focusedBaboon - 1)}
+          if(focusedBaboon === frameItems[frameIndex].length-1) {
+            setFocusedBaboon(focusedBaboon-1)
+          }
         }}
-        // onFocus={() => {setFocusedBaboon(index)}}
         constrainMove={constrainMove}
         constrainResize={constrainResize}
       />
@@ -168,6 +170,17 @@ const Video = () => {
     return 'Baboon '+(num+1)+': ('+b.x+', '+b.y+'), ('+x2+', '+y2+')';
   };
 
+  const calculateScale = () => {
+    const { innerWidth: width } = window;
+    const videoWidthPercentage = 0.7;
+    const videoWidthPixels = videoWidthPercentage * width;
+    if(vectorWidth === 0) {
+      return 1;
+    }
+    const scale = videoWidthPixels / vectorWidth;
+    setScale(scale);
+  }
+
   useEffect(() => {
     const keyboardHandler = e => {
       let handled = true;
@@ -186,11 +199,18 @@ const Video = () => {
         e.preventDefault();
       }
     };
+    if(scale === 1) {
+      calculateScale();
+    }
 
     window.addEventListener('keydown', keyboardHandler);
-    return () => window.removeEventListener('keydown', keyboardHandler);
+    window.addEventListener('resize', calculateScale);
+    return () => {
+      window.removeEventListener('keydown', keyboardHandler);
+      window.removeEventListener('resize', calculateScale);
+    }
   });
-
+  
   return (
     <div>
       <video
@@ -210,6 +230,7 @@ const Video = () => {
         onTimeUpdate={updateFrameIndex}
         onPlay={() => {
           startTracking();
+          setIsEditDisabled(true);
         }}
         onPause={() => {
           stopTracking();
@@ -224,22 +245,22 @@ const Video = () => {
 
       <ShapeEditor
         style={{position: 'absolute',top: 50,left: 50}}
-        vectorWidth={vectorWidth*9/10}
+        vectorWidth={vectorWidth}
         vectorHeight={vectorHeight*9/10}
         scale={scale}
       >
+        {!isEditDisabled ? 
         <DrawLayer
           onAddShape={({ x, y, width, height }) => {
             setThisFrameItems(currentItems => [
               ...currentItems,
               { id: `id${idIterator}`, x, y, width, height },
             ]);
-            setFocusedBaboon(frameItems[frameIndex].length);
             idIterator += 1;
           }}
           constrainMove={constrainMove}
           constrainResize={constrainResize}
-        />
+        /> : null}
         {shapes}
       </ShapeEditor> 
 
@@ -280,6 +301,17 @@ const Video = () => {
               <Button title="Forward one frame (d key)" onClick={() => jumpToFrame(frameIndex + 1)}>
                 <h4>&gt;</h4>
               </Button>
+            </Grid>
+
+            <Grid item xs={12}>
+              {isEditDisabled ?
+                <Button variant="outlined" title="edit shapes" onClick={() => setIsEditDisabled(!isEditDisabled)}>
+                  Edit
+                </Button> :
+                <Button variant="outlined" title="finish editing" onClick={() => setIsEditDisabled(!isEditDisabled)}>
+                  Done
+                </Button>
+              }
             </Grid>
           </Grid>
         </Grid>
