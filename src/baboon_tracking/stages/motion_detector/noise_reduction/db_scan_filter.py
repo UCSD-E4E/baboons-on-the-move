@@ -49,7 +49,7 @@ class DbScanFilter(Stage, MovingForegroundMixin):
         image[:, 1] = y
 
         # creates clusters and eliminates noise from labels and 2dframe
-        dbscan = DBSCAN(eps=4, min_samples=40).fit(image)
+        dbscan = DBSCAN(eps=3, min_samples=5).fit(image)
         labels = dbscan.labels_
         image, _ = self._eliminate_noise(labels, image)
         image = image.astype(np.uint32)

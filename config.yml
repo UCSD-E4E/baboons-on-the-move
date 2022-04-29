@@ -3,10 +3,10 @@ output: './output/output.mp4'
 mask_output: './output/mask.mp4'
 
 preprocess:
-    kernel_size: 3
+    kernel_size: 5
 
 motion_detector:
-    history_frames: 9
+    history_frames: 4
 
     registration:
         good_match_percent: 0.27
@@ -15,7 +15,7 @@ motion_detector:
         ssc_tolerence: 0.13
 
     quantize_frames:
-        scale_factor: 48
+        scale_factor: 8
 
     noise_reduction:
         erode_kernel_size: 6

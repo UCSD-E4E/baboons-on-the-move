@@ -128,5 +128,8 @@ class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
         self.transformation_matrices = [
             self._register(f, processed_frame) for f in history_frames
         ]
+        self.current_frame_transformation = self._register(
+            processed_frame, history_frames[-1]
+        )
 
         return StageResult(True, True)

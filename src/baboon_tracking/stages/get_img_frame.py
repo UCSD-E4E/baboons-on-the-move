@@ -3,6 +3,7 @@ Get an image frame from a directory
 """
 import os
 import cv2
+from baboon_tracking.decorators.save_result import save_result
 
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
@@ -21,7 +22,7 @@ class GetImgFrame(Stage, FrameMixin, CaptureMixin):
         CaptureMixin.__init__(self)
         Stage.__init__(self)
 
-        self._directory = "./data/input"
+        self._directory = "./data/img"
         self._files = os.listdir(self._directory)
         self._files.sort()
 
