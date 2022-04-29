@@ -7,9 +7,13 @@ from os.path import exists
 from sqlite3 import connect
 import git
 import json
+import numpy as np
 
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
+from baboon_tracking.mixins.transformation_matrices_mixin import (
+    TransformationMatricesMixin,
+)
 from config import get_config
 from pipeline import Stage
 from pipeline.decorators import stage
@@ -19,16 +23,24 @@ from pipeline.stage_result import StageResult
 
 @stage("baboons")
 @stage("frame")
+@stage("transformation_matricies")
 class SaveBaboons(Stage):
     """
     Saves the list of baboons in CSV format.
     """
 
-    def __init__(self, baboons: BaboonsMixin, frame: FrameMixin) -> None:
+    def __init__(
+        self,
+        baboons: BaboonsMixin,
+        frame: FrameMixin,
+        transformation_matricies: TransformationMatricesMixin,
+    ) -> None:
         Stage.__init__(self)
 
         self._baboons = baboons
         self._frame = frame
+        self._transformation_matricies = transformation_matricies
+
         self._connection = None
         self._cursor = None
 
@@ -47,7 +59,15 @@ class SaveBaboons(Stage):
 
             self._cursor.execute(
                 """CREATE TABLE motion_regions
-               (x1 int, y1 int, x2 int, y2 int, frame int)"""
+               (
+                   x1 int,
+                   y1 int,
+                   x2 int,
+                   y2 int,
+                   t11 real, t12 real, t13 real,
+                   t21 real, t22 real, t23 real,
+                   t31 real, t32 real, t33 real,
+                   frame int)"""
             )
 
             self._cursor.execute(
@@ -89,11 +109,31 @@ class SaveBaboons(Stage):
 
     def execute(self) -> StageResult:
         frame_number = self._frame.frame.get_frame_number()
+        T = self._transformation_matricies.current_frame_transformation
 
         baboons = [b.rectangle for b in self._baboons.baboons]
-        baboons = [(x1, y1, x2, y2, frame_number) for x1, y1, x2, y2 in baboons]
+        baboons = [
+            (
+                x1,
+                y1,
+                x2,
+                y2,
+                T[0, 0],
+                T[0, 1],
+                T[0, 2],
+                T[1, 0],
+                T[1, 1],
+                T[1, 2],
+                T[2, 0],
+                T[2, 1],
+                T[2, 2],
+                frame_number,
+            )
+            for x1, y1, x2, y2 in baboons
+        ]
         self._cursor.executemany(
-            "INSERT INTO motion_regions VALUES (?, ?, ?, ?, ?)", baboons
+            "INSERT INTO motion_regions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            baboons,
         )
 
         return StageResult(True, True)
