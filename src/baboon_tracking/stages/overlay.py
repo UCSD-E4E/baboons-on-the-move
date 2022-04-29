@@ -1,3 +1,8 @@
+"""
+Creates a video overlaying the blobs over the original video.
+"""
+import numpy as np
+
 from baboon_tracking.decorators.save_result import save_result
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.frame_mixin import FrameMixin
@@ -6,7 +11,6 @@ from baboon_tracking.models.frame import Frame
 from pipeline import Stage
 from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
-import numpy as np
 
 
 @show_result
@@ -14,6 +18,10 @@ import numpy as np
 @stage("frame")
 @stage("moving_foreground")
 class Overlay(Stage):
+    """
+    Creates a video overlaying the blobs over the original video.
+    """
+
     def __init__(
         self, frame: FrameMixin, moving_foreground: MovingForegroundMixin
     ) -> None:
@@ -34,7 +42,8 @@ class Overlay(Stage):
         scaled_foreground = np.swapaxes(scaled_foreground, 1, 2)
 
         self.overlay_frame = Frame(
-            (frame.get_frame() * scaled_foreground).astype(np.uint8), frame.get_frame_number()
+            (frame.get_frame() * scaled_foreground).astype(np.uint8),
+            frame.get_frame_number(),
         )
 
         return StageResult(True, True)

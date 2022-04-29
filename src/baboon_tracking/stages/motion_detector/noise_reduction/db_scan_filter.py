@@ -1,3 +1,7 @@
+"""
+Takes the DBSCAN Labeled set and the 2d frame, then returns
+the corrected frame and labels array
+"""
 from sklearn.cluster import DBSCAN
 import cv2
 import numpy as np
@@ -14,6 +18,11 @@ from pipeline.stage_result import StageResult
 @save_result
 @stage("moving_foreground")
 class DbScanFilter(Stage, MovingForegroundMixin):
+    """
+    Takes the DBSCAN Labeled set and the 2d frame, then returns
+    the corrected frame and labels array
+    """
+
     def __init__(self, moving_foreground: MovingForegroundMixin) -> None:
         Stage.__init__(self)
         MovingForegroundMixin.__init__(self)
@@ -32,19 +41,19 @@ class DbScanFilter(Stage, MovingForegroundMixin):
 
     def execute(self) -> StageResult:
         moving_foreground = self._moving_foreground.moving_foreground
-        twoD_frame = moving_foreground.get_frame()
+        two_d_frame = moving_foreground.get_frame()
 
-        x, y = np.where(twoD_frame == 255)
+        x, y = np.where(two_d_frame == 255)
         image = np.zeros((len(x), 2))
         image[:, 0] = x
         image[:, 1] = y
 
         # creates clusters and eliminates noise from labels and 2dframe
-        db = DBSCAN(eps=4, min_samples=40).fit(image)
-        labels = db.labels_
+        dbscan = DBSCAN(eps=4, min_samples=40).fit(image)
+        labels = dbscan.labels_
         image, _ = self._eliminate_noise(labels, image)
         image = image.astype(np.uint32)
-        noiseless_frame = np.zeros_like(twoD_frame)
+        noiseless_frame = np.zeros_like(two_d_frame)
         noiseless_frame[image[:, 0], image[:, 1]] = 255
 
         # applies dilate filter and saves the residual frame
