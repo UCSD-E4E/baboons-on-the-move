@@ -43,7 +43,7 @@ class StoreHistoryFrame(Stage, HistoryFramesMixin):
             frame = self.history_frames.popleft()
             self._history_frame_popped_subject.on_next(frame)
 
-        if (self._next_history_frame is not None):
+        if self._next_history_frame is not None:
             self.history_frames.append(self._next_history_frame)
 
         self._next_history_frame = self._preprocessed_frame.processed_frame

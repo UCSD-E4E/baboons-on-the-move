@@ -5,9 +5,8 @@ from datetime import datetime
 from os import remove
 from os.path import exists
 from sqlite3 import connect
-import git
 import json
-import numpy as np
+import git
 
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin

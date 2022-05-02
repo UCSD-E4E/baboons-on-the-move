@@ -1,4 +1,9 @@
-from turtle import width
+"""
+Image preprocessor that changes to a PCA based color space.
+"""
+
+import numpy as np
+from sklearn.decomposition import PCA
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
@@ -6,13 +11,15 @@ from baboon_tracking.models.frame import Frame
 from pipeline import Stage
 from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
-from sklearn.decomposition import PCA
-import numpy as np
 
 
 @stage("frame_mixin")
 @show_result
 class FeatureReductionPca(Stage, PreprocessedFrameMixin):
+    """
+    Image preprocessor that changes to a PCA based color space.
+    """
+
     def __init__(self, frame_mixin: FrameMixin) -> None:
         PreprocessedFrameMixin.__init__(self)
         Stage.__init__(self)
