@@ -30,33 +30,31 @@ DIR=`dirname $0`
 DIR=`realpath $DIR`
 echo $DIR
 
-lspci | grep NVIDIA > /dev/null
-if [ $? -eq 0 ]
+nvidia-smi > /dev/null
+if [ $? -ne 0 ]
 then
-    #NVIDIA
-    GPU=`lspci | grep NVIDIA | grep -oP "(?<=\[).+(?=\])"`
-    CC=`get_cuda_cc "$GPU"`
-
-    if  [[ $CC == "unknown" ]]
-    then
-        use_cpu
-    else
-        echo "Discovered $GPU. Using CUDA CC $CC..."
-
-        case $1 in
-            run)
-                docker run -it --gpus all -v $DIR/build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC"
-                ;;
-            shell)
-                docker run -it --gpus all -v $DIR/build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC" /bin/bash
-                ;;
-            *)
-                echo help
-                ;;
-        esac
-    fi
+  #CPU
+  use_cpu
 else
-    #CPU
-
+  #NVIDIA
+  CC=`nvidia-smi --query-gpu=compute_cap --format=csv | grep -oP "[0-9]\.[0-9]"`
+  if ([ "$CC" != "6.1" ] && [ "$CC" != "7.5" ] && [ "$CC" != "8.1" ])
+  then
+    #unsupported/unknown CC
+    echo "Unknown or unsupported CC"
     use_cpu
+  else
+    echo "Discovered GPU. Using CUDA CC $CC..."
+    case $1 in
+      run)
+          docker run -it --gpus all -v $DIR/build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC"
+          ;;
+      shell)
+          docker run -it --gpus all -v $DIR/build:/data "ghcr.io/ucsd-e4e/baboon-tracking:cuda-$CC" /bin/bash
+          ;;
+      *)
+          echo help
+          ;;
+    esac
+  fi
 fi
