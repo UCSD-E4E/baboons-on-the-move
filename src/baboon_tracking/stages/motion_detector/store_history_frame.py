@@ -33,6 +33,7 @@ class StoreHistoryFrame(Stage, HistoryFramesMixin):
 
         self._history_frame_count = history_frame_count
         self._preprocessed_frame = preprocessed_frame
+        self._next_history_frame = None
 
     def execute(self) -> StageResult:
         """
@@ -42,6 +43,9 @@ class StoreHistoryFrame(Stage, HistoryFramesMixin):
             frame = self.history_frames.popleft()
             self._history_frame_popped_subject.on_next(frame)
 
-        self.history_frames.append(self._preprocessed_frame.processed_frame)
+        if self._next_history_frame is not None:
+            self.history_frames.append(self._next_history_frame)
+
+        self._next_history_frame = self._preprocessed_frame.processed_frame
 
         return StageResult(True, True)

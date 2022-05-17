@@ -10,6 +10,7 @@ class Caffine:
     """
     Manages requests for disabling sleep.
     """
+
     def __init__(self):
         self._current_id = 0
         self._requests = []
@@ -21,7 +22,9 @@ class Caffine:
         if not file_path:
             return
 
-        self._process = Popen([file_path], stdin=PIPE)
+        self._process = Popen(  # pylint: disable=consider-using-with
+            [file_path], stdin=PIPE
+        )
         self._process.__enter__()
 
     def _kill_process(self):
