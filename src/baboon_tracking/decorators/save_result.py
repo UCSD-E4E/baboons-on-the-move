@@ -51,9 +51,7 @@ def save_result(function: Callable):
             if not frame_video_writers:
                 frame_video_writers = {
                     f: cv2.VideoWriter(
-                        "./output/{stage_name}.{frame_attribute}.mp4".format(
-                            stage_name=type(self).__name__, frame_attribute=f,
-                        ),
+                        f"./output/{type(self).__name__}.{f}.mp4",
                         cv2.VideoWriter_fourcc(*"mp4v"),
                         capture.fps,
                         (capture.frame_width, capture.frame_height),

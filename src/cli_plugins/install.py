@@ -47,32 +47,16 @@ class Install(CliPlugin):
         extensions = pathlib.Path(path).suffixes
         extension = "".join(extensions)
 
-        if extension == ".zip":
-            archive = zipfile.ZipFile(path, "r")
-        elif extension in (".tar.gz", ".tar.xz"):
-            archive = tarfile.open(path)
-        else:
-            archive = None
-
-        archive.extractall(target)
-        archive.close()
+        with (
+            zipfile.ZipFile(path, "r") if extension == ".zip" else tarfile.open(path)
+        ) as archive:
+            archive.extractall(target)
 
     def _install_global_package(self, package_name: str):
-        if os.getenv("VIRTUAL_ENV"):
-            subprocess.check_call(
-                [sys.executable, "-m", "pip", "install", package_name]
-            )
-        else:
-            subprocess.check_call(
-                [sys.executable, "-m", "pip", "install", "pipx", "--user"]
-            )
-            subprocess.check_call(
-                [sys.executable, "-m", "pipx", "install", package_name]
-            )
-            subprocess.check_call([sys.executable, "-m", "pipx", "ensurepath"])
+        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
 
     def _install_node_in_repo(self):
-        if sys.platform == "linux" or sys.platform == "linux2":
+        if sys.platform in ("linux", "linux2"):
             # Assume we are on 64 bit Intel
             url = "https://nodejs.org/dist/v14.15.1/node-v14.15.1-linux-x64.tar.xz"
             ext = "tar.xz"

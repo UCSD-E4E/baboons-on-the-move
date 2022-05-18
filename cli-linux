@@ -17,7 +17,7 @@ then
         curl https://pyenv.run | $SHELL
     fi
     
-    eval "$(pyenv init -)"
+    eval "$(pyenv init --path)"
     eval "$(pyenv virtualenv-init -)"
 fi
 
@@ -28,11 +28,11 @@ then
     # Add pyenv to your path.
     echo '
 export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
+eval "$(pyenv init --path)"
 eval "$(pyenv virtualenv-init -)"' >> ~/.${SHELL_NAME}rc
 fi
 
-PYTHON_VERSION=3.8.3
+PYTHON_VERSION=3.8.12
 
 # Ensure Python is installed
 pyenv versions | grep $PYTHON_VERSION > /dev/null
@@ -42,21 +42,5 @@ then
     pyenv install $PYTHON_VERSION
 fi
 pyenv local $PYTHON_VERSION
-
-# Ensure pipx
-pip list | grep pipx > /dev/null
-if [ $? -ne 0 ]
-then
-    # Install pipx
-    pip install pipx
-    pipx ensurepath
-fi
-
-# Ensure that pipx is in path.
-echo $PATH | grep "$HOME/.local/bin" > /dev/null
-if [ $? -ne 0 ]
-then
-    export PATH="$PATH:$HOME/.local/bin"
-fi
 
 python ./cli.py $@

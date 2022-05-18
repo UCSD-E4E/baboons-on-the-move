@@ -28,7 +28,8 @@ from third_party.ssc import ssc
     key="motion_detector/registration/ssc_num_ret_points",
 )
 @config(
-    parameter_name="ssc_tolerence", key="motion_detector/registration/ssc_tolerence",
+    parameter_name="ssc_tolerence",
+    key="motion_detector/registration/ssc_tolerence",
 )
 @stage("preprocessed_frame")
 @stage("history_frames")
@@ -52,7 +53,7 @@ class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
         self._orb = cv2.ORB_create()
         self._fast = cv2.FastFeatureDetector_create()
         self._good_match_percent = good_match_percent
-        self._feature_hash = dict()
+        self._feature_hash = {}
         self._ransac_max_error = ransac_max_error
         self._ssc_num_ret_points = ssc_num_ret_points
         self._ssc_tolerence = ssc_tolerence
@@ -89,7 +90,7 @@ class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
         matcher = cv2.DescriptorMatcher_create(
             cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING
         )
-        matches = matcher.match(descriptors1, descriptors2, None)
+        matches = list(matcher.match(descriptors1, descriptors2, None))
 
         # Sort matches by score
         matches.sort(key=lambda x: x.distance, reverse=False)
@@ -127,5 +128,8 @@ class ComputeTransformationMatrices(Stage, TransformationMatricesMixin):
         self.transformation_matrices = [
             self._register(f, processed_frame) for f in history_frames
         ]
+        self.current_frame_transformation = self._register(
+            processed_frame, history_frames[-1]
+        )
 
         return StageResult(True, True)

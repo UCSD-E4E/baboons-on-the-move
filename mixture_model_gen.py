@@ -27,7 +27,7 @@ while rows <= total_displacements:
         x_disp = float(position_data[rows, 1] - position_data[rows - 1, 1])
         y_disp = float(position_data[rows, 2] - position_data[rows - 1, 2])
 
-        disp_data[disp_row] = np.sqrt(x_disp ** 2 + y_disp ** 2)
+        disp_data[disp_row] = np.sqrt(x_disp**2 + y_disp**2)
         disp_row += 1
 
     elif baboon != current_baboon:

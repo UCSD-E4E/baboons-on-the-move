@@ -1,12 +1,19 @@
+"""
+Implements a base pipeline.
+"""
+
 from abc import ABC
 import inspect
 from typing import Callable, List
+
 from pipeline.parent_stage import ParentStage
 
 from pipeline.stage import Stage
 from pipeline.serial import Serial
 from pipeline.parallel import Parallel
 from pipeline.stage_result import StageResult
+
+from library.caf import Caffine
 
 
 class Pipeline(ABC):
@@ -44,7 +51,6 @@ class Pipeline(ABC):
                     ][0]
 
                     func(result, most_recent_mixin)
-
         self.stage.on_init()
 
     def step(self) -> StageResult:
@@ -62,6 +68,9 @@ class Pipeline(ABC):
         Runs the algorithm until it finishes.
         """
 
+        caf = Caffine()
+        request_id = caf.request()
+
         while True:
             result = self.step()
 
@@ -70,6 +79,7 @@ class Pipeline(ABC):
                 self.stage.get_time().print_to_console()
 
                 self.stage.on_destroy()
+                caf.release(request_id)
 
                 return
 

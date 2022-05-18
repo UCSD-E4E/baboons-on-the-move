@@ -47,10 +47,8 @@ class Stage(ABC):
             urllib.request.urlretrieve(url, font_archive)
 
         if not os.path.exists(font_path):
-            archive = zipfile.ZipFile(font_archive, "r")
-
-            archive.extractall(font_path)
-            archive.close()
+            with zipfile.ZipFile(font_archive, "r") as archive:
+                archive.extractall(font_path)
 
         return ImageFont.truetype(
             "tools/SpaceGrotesk/SpaceGrotesk-2.0.0/ttf/static/SpaceGrotesk-Regular.ttf",
@@ -95,7 +93,7 @@ class Stage(ABC):
 
         return Time(type(self).__name__, self._time / self._executions)
 
-    def flowchart(self):
+    def flowchart_image(self):
         """
         Generates a flowchart for the current stage.
         """

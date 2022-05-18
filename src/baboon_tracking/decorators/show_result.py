@@ -56,6 +56,10 @@ def show_result(function: Callable):
                         width = root.winfo_screenwidth()
                         height = root.winfo_screenheight()
 
+                if not width or not height:
+                    width = 1600
+                    height = 900
+
                 width = int(width)
                 height = int(height)
 
@@ -82,12 +86,10 @@ def show_result(function: Callable):
                 # Display one cv2.imshow for each frame object.
                 for frame_attribute in frame_attributes:
                     cv2.imshow(
-                        "{stage_name}.{frame_attribute}".format(
-                            stage_name=type(self).__name__,
-                            frame_attribute=frame_attribute,
-                        ),
+                        f"{type(self).__name__}.{frame_attribute}",
                         cv2.resize(
-                            getattr(self, frame_attribute).get_frame(), im_size,
+                            getattr(self, frame_attribute).get_frame(),
+                            im_size,
                         ),
                     )
 

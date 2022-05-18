@@ -59,7 +59,10 @@ class ParentStage(Stage):
 
             self.stages.append(
                 initializer(
-                    stage_type, parameters_dict, runtime_config, self.static_stages,
+                    stage_type,
+                    parameters_dict,
+                    runtime_config,
+                    self.static_stages,
                 )
             )
             self.static_stages.append(self.stages[-1])

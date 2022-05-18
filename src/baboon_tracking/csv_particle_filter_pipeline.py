@@ -27,5 +27,9 @@ class CsvParticleFilterPipeline(Pipeline):
         Generates a chart representing the algorithm.
         """
 
-        img, _, _, = self.stage.flowchart()
+        (
+            img,
+            _,
+            _,
+        ) = self.stage.flowchart()
         return img

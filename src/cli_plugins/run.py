@@ -5,7 +5,6 @@ from argparse import ArgumentParser, Namespace
 import argparse
 from baboon_tracking import BaboonTracker
 from baboon_tracking.csv_particle_filter_pipeline import CsvParticleFilterPipeline
-from baboon_tracking.preset_pipelines import preset_pipelines
 from cli_plugins.cli_plugin import CliPlugin  # pylint: disable=import-outside-toplevel
 
 
@@ -32,15 +31,6 @@ class Run(CliPlugin):
         CliPlugin.__init__(self, parser)
 
         parser.add_argument(
-            "-n",
-            "--pipeline_name",
-            type=str,
-            choices=preset_pipelines.keys(),
-            default="default",
-            help="Preset pipeline to run",
-        )
-
-        parser.add_argument(
             "-d",
             "--display",
             type=str2bool,
@@ -59,6 +49,5 @@ class Run(CliPlugin):
     def execute(self, args: Namespace):
         runtime_config = {"display": args.display, "save": args.save}
 
-        CsvParticleFilterPipeline(runtime_config).run()
-
-        # BaboonTracker(args.pipeline_name, runtime_config=runtime_config).run()
+        # CsvParticleFilterPipeline(runtime_config).run()
+        BaboonTracker("input.mp4", runtime_config=runtime_config).run()

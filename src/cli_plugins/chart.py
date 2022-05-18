@@ -4,8 +4,8 @@ Generates a chart representing the baboon tracking algorithm.
 from argparse import ArgumentParser, Namespace
 from baboon_tracking import BaboonTracker
 from baboon_tracking.csv_particle_filter_pipeline import CsvParticleFilterPipeline
-from baboon_tracking.preset_pipelines import preset_pipelines
 from cli_plugins.cli_plugin import CliPlugin
+from pipeline_viewer.viewer import PipelineViewer
 
 
 class Chart(CliPlugin):
@@ -16,16 +16,10 @@ class Chart(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-        parser.add_argument(
-            "-n",
-            "--pipeline_name",
-            type=str,
-            choices=preset_pipelines.keys(),
-            default="default",
-            help="Preset pipeline to run",
-        )
-
     def execute(self, args: Namespace):
-        CsvParticleFilterPipeline(None).flowchart().save("./temp/chart.png")
+        pipeline = BaboonTracker(args.pipeline_name)
 
-        # BaboonTracker(args.pipeline_name).flowchart().show()
+        image = pipeline.flowchart_image()
+        image.save("./output/flowchart.png")
+
+        PipelineViewer(pipeline).run()

@@ -51,7 +51,11 @@ def _execute(
     # pylint: disable=not-an-iterable
     for y in prange(height):
         for x in prange(width):
-            if _pixel_has_neighbors(curr_moving_foreground, group_size, (x, y),):
+            if _pixel_has_neighbors(
+                curr_moving_foreground,
+                group_size,
+                (x, y),
+            ):
                 moving_foreground[y, x] = 255
 
 
