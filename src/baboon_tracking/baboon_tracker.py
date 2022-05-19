@@ -1,10 +1,10 @@
 """
 Provides an algorithm for extracting baboons from drone footage.
 """
+from baboon_tracking.decorators.debug import DisplayDebugRegions
 from pipeline.pipeline import Pipeline
 from pipeline.factory import factory
 
-from baboon_tracking.stages.draw_regions import DrawRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.motion_detector.motion_detector import MotionDetector
 from baboon_tracking.stages.overlay import Overlay
@@ -27,7 +27,7 @@ class BaboonTracker(Pipeline):
             MotionDetector,
             SaveBaboons,
             Overlay,
-            DrawRegions,
+            DisplayDebugRegions,
             TestExit,
             runtime_config=runtime_config,
         )

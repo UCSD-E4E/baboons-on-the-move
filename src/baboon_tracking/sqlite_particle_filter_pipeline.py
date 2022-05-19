@@ -1,4 +1,4 @@
-from baboon_tracking.stages.draw_regions import DrawRegions
+from baboon_tracking.decorators.debug import DisplayDebugRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.get_sqlite_baboon import GetSqliteBaboon
 from baboon_tracking.stages.particle_filter import ParticleFilterStage as ParticleFilter
@@ -15,7 +15,7 @@ class SqliteParticleFilterPipeline(Pipeline):
             factory(GetVideoFrame, video_path),
             GetSqliteBaboon,
             ParticleFilter,
-            DrawRegions,
+            DisplayDebugRegions,
             TestExit,
             runtime_config=runtime_config,
         )

@@ -1,5 +1,4 @@
 from math import cos, pi, sin
-from tkinter import Toplevel
 import numpy as np
 
 from typing import Dict, List
