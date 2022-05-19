@@ -5,7 +5,6 @@ Implements a base pipeline.
 from abc import ABC
 import inspect
 from typing import Callable, List
-from numpy import int0
 from tqdm import tqdm
 
 from pipeline.parent_stage import ParentStage
@@ -19,6 +18,10 @@ from library.caf import Caffine
 
 
 class Pipeline(ABC):
+    """
+    Implements a base pipeline.
+    """
+
     iterations = 0
 
     def __init__(
@@ -57,6 +60,18 @@ class Pipeline(ABC):
 
                     func(result, most_recent_mixin)
         self.stage.on_init()
+
+    def flowchart_image(self):
+        """
+        Generates a chart representing the algorithm.
+        """
+
+        (
+            img,
+            _,
+            _,
+        ) = self.stage.flowchart_image()
+        return img
 
     def step(self) -> StageResult:
         """
@@ -102,6 +117,10 @@ class Pipeline(ABC):
         return candidate_stages[-1]
 
     def progress(self):
+        """
+        Increments the progress bar by 1.
+        """
+
         if self._progressbar is None:
             self._progressbar = tqdm(total=int(Pipeline.iterations))
 
