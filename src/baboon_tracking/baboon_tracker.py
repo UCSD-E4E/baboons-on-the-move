@@ -22,7 +22,7 @@ class BaboonTracker(Pipeline):
         Pipeline.__init__(
             self,
             "BaboonTracker",
-            factory(GetVideoFrame, "./data/" + input_file),
+            factory(GetVideoFrame, input_file),
             PreprocessFrame,
             MotionDetector,
             SaveBaboons,
@@ -31,4 +31,3 @@ class BaboonTracker(Pipeline):
             TestExit,
             runtime_config=runtime_config,
         )
-

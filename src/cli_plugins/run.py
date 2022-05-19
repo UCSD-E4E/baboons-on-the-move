@@ -46,8 +46,15 @@ class Run(CliPlugin):
             help="Indicates if should save results.",
         )
 
+        parser.add_argument(
+            "-i",
+            "--input",
+            default="./data/input.mp4",
+            help="Provides the input file for algorithm.",
+        )
+
     def execute(self, args: Namespace):
         runtime_config = {"display": args.display, "save": args.save}
 
         # CsvParticleFilterPipeline(runtime_config).run()
-        BaboonTracker("input.mp4", runtime_config=runtime_config).run()
+        BaboonTracker(args.input, runtime_config=runtime_config).run()
