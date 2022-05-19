@@ -56,5 +56,5 @@ class Run(CliPlugin):
     def execute(self, args: Namespace):
         runtime_config = {"display": args.display, "save": args.save}
 
-        # SqliteParticleFilterPipeline(args.input, runtime_config).run()
-        BaboonTracker(args.input, runtime_config=runtime_config).run()
+        SqliteParticleFilterPipeline(args.input, runtime_config).run()
+        # BaboonTracker(args.input, runtime_config=runtime_config).run()

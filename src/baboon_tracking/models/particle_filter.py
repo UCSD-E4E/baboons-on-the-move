@@ -35,7 +35,7 @@ class Particle:
         sample, _ = model.sample()
         degs = random() * 2 * pi
 
-        val = 500
+        val = 2
         half_val = val / 2.0
 
         delta_x = int(np.asscalar(np.round(sample * sin(degs))))
@@ -67,6 +67,9 @@ class Particle:
 
         if weight == 0:
             return
+
+        baboon.id_str = self.baboon.id_str
+        baboon.identity = self.baboon.identity
 
         self.weight *= weight
         self.baboon = baboon
@@ -113,9 +116,11 @@ class ParticleFilter:
             Particle(baboon, self._weight) for _ in range(particle_count)
         ]
 
-        self._update_counter = 0
         self._instance_id = ParticleFilter.instance_id
         ParticleFilter.instance_id += 1
+
+        baboon.identity = self._instance_id
+        baboon.id_str = str(self._instance_id)
 
     def transform(self, transformation: np.ndarray):
         for particle in self.particles:
@@ -126,8 +131,6 @@ class ParticleFilter:
             particle.predict(self._model)
 
     def update(self, baboons: List[Baboon]):
-        self._update_counter += 1
-
         for particle in self.particles:
             particle.update(baboons)
 

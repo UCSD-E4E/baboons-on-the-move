@@ -3,6 +3,8 @@ import concurrent.futures
 from typing import List, Set
 
 from numpy import ndarray
+from baboon_tracking.decorators.debug import debug
+from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.transformation_matrices_mixin import (
     TransformationMatricesMixin,
 )
@@ -22,15 +24,16 @@ def process_pool(
     baboons: BaboonsMixin,
     transformation_matrix: ndarray,
 ):
-    # particle_filter.predict()
+    particle_filter.predict()
 
-    # if transformation_matrix is not None:
-    #     particle_filter.transform(transformation_matrix)
+    if transformation_matrix is not None:
+        particle_filter.transform(transformation_matrix)
 
     particle_filter.update(baboons)
-    # particle_filter.resample()
+    particle_filter.resample()
 
 
+@debug(FrameMixin, (0, 0, 255))
 @stage("baboons")
 @stage("transformation_matrices")
 class ParticleFilterStage(Stage, BaboonsMixin):
@@ -46,8 +49,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._baboons = baboons
         self._transformation_matrices = transformation_matrices
         self._particle_filters: List[ParticleFilter] = []
-        self._particle_count = 500
-        self._probability_thresh = 0.5
+        self._particle_count = 5
 
     def on_destroy(self) -> None:
         self._executor.shutdown()
@@ -72,7 +74,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         ]
         probs = flatten(probs)
         probs.sort(key=lambda p: p[0], reverse=True)
-        probs = [(p, b) for p, b in probs if p >= self._probability_thresh]
+        probs = [(p, b) for p, b in probs if p > 0]
 
         used_babooons: Set[Baboon] = set()
         for _, baboon in probs:

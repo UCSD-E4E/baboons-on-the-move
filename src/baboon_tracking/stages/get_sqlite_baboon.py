@@ -1,4 +1,5 @@
 import numpy as np
+from baboon_tracking.decorators.debug import debug
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.transformation_matrices_mixin import (
@@ -11,6 +12,7 @@ from pipeline.stage_result import StageResult
 from sqlite3 import connect
 
 
+@debug(FrameMixin, (0, 255, 0))
 @stage("frame")
 class GetSqliteBaboon(Stage, BaboonsMixin, TransformationMatricesMixin):
     def __init__(self, frame: FrameMixin) -> None:
