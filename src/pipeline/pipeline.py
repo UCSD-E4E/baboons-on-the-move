@@ -5,6 +5,8 @@ Implements a base pipeline.
 from abc import ABC
 import inspect
 from typing import Callable, List
+from numpy import int0
+from tqdm import tqdm
 
 from pipeline.parent_stage import ParentStage
 
@@ -17,10 +19,13 @@ from library.caf import Caffine
 
 
 class Pipeline(ABC):
+    iterations = 0
+
     def __init__(
         self, name: str, *stage_types: List[Stage], parallel=False, runtime_config=None
     ):
         ParentStage.static_stages = []
+        self._progressbar: tqdm = None
 
         if parallel:
             self.stage = Parallel(name, runtime_config, *stage_types)
@@ -73,8 +78,11 @@ class Pipeline(ABC):
 
         while True:
             result = self.step()
+            self.progress()
 
             if not result.continue_pipeline:
+                self._progressbar.close()
+
                 print("Average Runtime per stage:")
                 self.stage.get_time().print_to_console()
 
@@ -92,3 +100,9 @@ class Pipeline(ABC):
         ]
 
         return candidate_stages[-1]
+
+    def progress(self):
+        if self._progressbar is None:
+            self._progressbar = tqdm(total=int(Pipeline.iterations))
+
+        self._progressbar.update(1)

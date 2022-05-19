@@ -29,6 +29,7 @@ class GetImgFrame(Stage, FrameMixin, CaptureMixin):
         self.frame_width, self.frame_height, _ = img.shape
         self.fps = 30
         self.frame_count = len(self._files)
+        self.name = "img"
 
         self._frame_number = 1
 

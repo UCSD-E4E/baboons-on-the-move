@@ -10,7 +10,6 @@ from baboon_tracking.stages.overlay import Overlay
 from baboon_tracking.stages.preprocess.preprocess_frame import PreprocessFrame
 from baboon_tracking.stages.save_baboons import SaveBaboons
 from baboon_tracking.stages.test_exit import TestExit
-from pipeline.serial import Serial
 from pipeline.factory import factory
 
 
@@ -30,7 +29,7 @@ class BaboonTracker(Pipeline):
             Overlay,
             DrawRegions,
             TestExit,
-            DisplayProgress,
+            # DisplayProgress,
             runtime_config=runtime_config,
         )
 

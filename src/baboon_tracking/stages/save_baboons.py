@@ -9,6 +9,7 @@ import json
 import git
 
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
+from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.transformation_matrices_mixin import (
     TransformationMatricesMixin,
@@ -22,6 +23,7 @@ from pipeline.stage_result import StageResult
 
 @stage("baboons")
 @stage("frame")
+@stage("capture")
 @stage("transformation_matricies")
 class SaveBaboons(Stage):
     """
@@ -32,12 +34,14 @@ class SaveBaboons(Stage):
         self,
         baboons: BaboonsMixin,
         frame: FrameMixin,
+        capture: CaptureMixin,
         transformation_matricies: TransformationMatricesMixin,
     ) -> None:
         Stage.__init__(self)
 
         self._baboons = baboons
         self._frame = frame
+        self._capture = capture
         self._transformation_matricies = transformation_matricies
 
         self._connection = None
@@ -87,6 +91,7 @@ class SaveBaboons(Stage):
             self._cursor.executemany(
                 "INSERT INTO metadata VALUES (?, ?)",
                 [
+                    ("file_name", self._capture.name),
                     ("start_time", datetime.utcnow()),
                     ("git_commit", sha),
                     ("config", json.dumps(get_config())),
