@@ -1,4 +1,5 @@
 from math import cos, pi, sin
+from tkinter import Toplevel
 import numpy as np
 
 from typing import Dict, List
@@ -14,11 +15,28 @@ class Particle:
         self.baboon = baboon
         self.weight = weight
 
+    def transform(self, transformation: np.ndarray):
+        x1, y1, x2, y2 = self.baboon.rectangle
+
+        top_left = np.array([x1, y1, 1])
+        bottom_right = np.array([x2, y2, 1])
+
+        top_left = np.round(np.matmul(transformation, top_left)).astype(np.int32)
+        bottom_right = np.round(np.matmul(transformation, bottom_right)).astype(
+            np.int32
+        )
+
+        self.baboon = Baboon(
+            (top_left[0], top_left[1], bottom_right[0], bottom_right[1]),
+            id_str=self.baboon.id_str,
+            identity=self.baboon.identity,
+        )
+
     def predict(self, model: BayesianGaussianMixture):
         sample, _ = model.sample()
         degs = random() * 2 * pi
 
-        val = 500.0
+        val = 500
         half_val = val / 2.0
 
         delta_x = int(np.asscalar(np.round(sample * sin(degs))))
@@ -28,6 +46,12 @@ class Particle:
         delta_y1 = int(round(random() * val - half_val))
         delta_x2 = int(round(random() * val - half_val))
         delta_y2 = int(round(random() * val - half_val))
+
+        if delta_x1 >= delta_x2:
+            delta_x2 = delta_x1
+
+        if delta_y1 >= delta_y2:
+            delta_y2 = delta_y1
 
         self.baboon = self._get_moved_baboon(
             delta_x, delta_y, delta_x1, delta_y1, delta_x2, delta_y2
@@ -77,6 +101,8 @@ class Particle:
 
 
 class ParticleFilter:
+    instance_id = 0
+
     def __init__(self, baboon: Baboon, particle_count: int):
         self._particle_count = particle_count
         self._weight = 1.0 / float(particle_count)
@@ -88,11 +114,21 @@ class ParticleFilter:
             Particle(baboon, self._weight) for _ in range(particle_count)
         ]
 
+        self._update_counter = 0
+        self._instance_id = ParticleFilter.instance_id
+        ParticleFilter.instance_id += 1
+
+    def transform(self, transformation: np.ndarray):
+        for particle in self.particles:
+            particle.transform(transformation)
+
     def predict(self):
         for particle in self.particles:
             particle.predict(self._model)
 
     def update(self, baboons: List[Baboon]):
+        self._update_counter += 1
+
         for particle in self.particles:
             particle.update(baboons)
 

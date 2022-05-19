@@ -24,13 +24,13 @@ class GetVideoFrame(Stage, FrameMixin, CaptureMixin):
         CaptureMixin.__init__(self)
         Stage.__init__(self)
 
-        frame_count = self._get_frame_count(video_path)
+        # frame_count = self._get_frame_count(video_path)
 
         self._capture = cv2.VideoCapture(video_path)
         self.frame_width = int(self._capture.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.frame_height = int(self._capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.fps = self._capture.get(cv2.CAP_PROP_FPS)
-        self.frame_count = frame_count #self._capture.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.frame_count = self._capture.get(cv2.CAP_PROP_FRAME_COUNT)
         self.name = basename(video_path)
 
         self._frame_number = 1

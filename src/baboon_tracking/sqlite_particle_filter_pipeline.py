@@ -1,19 +1,19 @@
 from baboon_tracking.stages.draw_regions import DrawRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
-from baboon_tracking.stages.get_csv_baboon import GetCsvBaboon
+from baboon_tracking.stages.get_sqlite_baboon import GetSqliteBaboon
 from baboon_tracking.stages.particle_filter import ParticleFilterStage as ParticleFilter
 from baboon_tracking.stages.test_exit import TestExit
 from pipeline.pipeline import Pipeline
 from pipeline.factory import factory
 
 
-class CsvParticleFilterPipeline(Pipeline):
-    def __init__(self, runtime_config=None):
+class SqliteParticleFilterPipeline(Pipeline):
+    def __init__(self, video_path: str, runtime_config=None):
         Pipeline.__init__(
             self,
-            "CsvParticleFilterPipeline",
-            factory(GetVideoFrame, "./data/input.mp4"),
-            GetCsvBaboon,
+            "SqliteParticleFilterPipeline",
+            factory(GetVideoFrame, video_path),
+            GetSqliteBaboon,
             ParticleFilter,
             DrawRegions,
             TestExit,

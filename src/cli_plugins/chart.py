@@ -3,7 +3,6 @@ Generates a chart representing the baboon tracking algorithm.
 """
 from argparse import ArgumentParser, Namespace
 from baboon_tracking import BaboonTracker
-from baboon_tracking.csv_particle_filter_pipeline import CsvParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
 from pipeline_viewer.viewer import PipelineViewer
 

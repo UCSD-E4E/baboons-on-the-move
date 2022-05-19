@@ -61,16 +61,22 @@ class SaveBaboons(Stage):
             self._cursor = self._connection.cursor()
 
             self._cursor.execute(
-                """CREATE TABLE motion_regions
-               (
+                """CREATE TABLE motion_regions (
                    x1 int,
                    y1 int,
                    x2 int,
                    y2 int,
+                   frame int
+                )"""
+            )
+
+            self._cursor.execute(
+                """CREATE TABLE transformations (
                    t11 real, t12 real, t13 real,
                    t21 real, t22 real, t23 real,
                    t31 real, t32 real, t33 real,
-                   frame int)"""
+                   frame int
+                )"""
             )
 
             self._cursor.execute(
@@ -122,6 +128,17 @@ class SaveBaboons(Stage):
                 y1,
                 x2,
                 y2,
+                frame_number,
+            )
+            for x1, y1, x2, y2 in baboons
+        ]
+        self._cursor.executemany(
+            "INSERT INTO motion_regions VALUES (?, ?, ?, ?, ?)",
+            baboons,
+        )
+        self._cursor.execute(
+            "INSERT INTO transformations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
                 T[0, 0],
                 T[0, 1],
                 T[0, 2],
@@ -132,12 +149,7 @@ class SaveBaboons(Stage):
                 T[2, 1],
                 T[2, 2],
                 frame_number,
-            )
-            for x1, y1, x2, y2 in baboons
-        ]
-        self._cursor.executemany(
-            "INSERT INTO motion_regions VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            baboons,
+            ),
         )
 
         return StageResult(True, True)

@@ -4,7 +4,7 @@ Starts the baboon tracker algorithm.
 from argparse import ArgumentParser, Namespace
 import argparse
 from baboon_tracking import BaboonTracker
-from baboon_tracking.csv_particle_filter_pipeline import CsvParticleFilterPipeline
+from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin  # pylint: disable=import-outside-toplevel
 
 
@@ -56,5 +56,5 @@ class Run(CliPlugin):
     def execute(self, args: Namespace):
         runtime_config = {"display": args.display, "save": args.save}
 
-        # CsvParticleFilterPipeline(runtime_config).run()
-        BaboonTracker(args.input, runtime_config=runtime_config).run()
+        SqliteParticleFilterPipeline(args.input, runtime_config).run()
+        # BaboonTracker(args.input, runtime_config=runtime_config).run()
