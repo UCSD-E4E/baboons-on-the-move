@@ -1,4 +1,4 @@
-from math import cos, pi, sin
+from math import cos, pi, sin, sqrt
 import numpy as np
 
 from typing import Dict, List
@@ -31,11 +31,16 @@ class Particle:
             identity=self.baboon.identity,
         )
 
-    def predict(self, model: BayesianGaussianMixture):
-        sample, _ = model.sample()
+    def predict(self):
+        x1, y1, x2, y2 = self.baboon.rectangle
+        width = x2 - x1
+        height = y2 - y1
+        length = sqrt(width**2 + height**2)
+
+        sample = np.abs(np.random.normal(scale=0.01)) * length
         degs = random() * 2 * pi
 
-        val = 2
+        val = 1
         half_val = val / 2.0
 
         delta_x = int(np.asscalar(np.round(sample * sin(degs))))
@@ -109,9 +114,6 @@ class ParticleFilter:
         self._particle_count = particle_count
         self._weight = 1.0 / float(particle_count)
 
-        with open("./displacement_mixture.pickle", "rb") as f:
-            self._model: BayesianGaussianMixture = load(f)
-
         self.particles: List[Particle] = [
             Particle(baboon, self._weight) for _ in range(particle_count)
         ]
@@ -128,7 +130,7 @@ class ParticleFilter:
 
     def predict(self):
         for particle in self.particles:
-            particle.predict(self._model)
+            particle.predict()
 
     def update(self, baboons: List[Baboon]):
         for particle in self.particles:
