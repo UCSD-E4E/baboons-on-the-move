@@ -15,7 +15,9 @@
                 "--save",
                 "no",
                 "--display",
-                "yes"
+                "yes",
+                "--pipeline",
+                "ParticleFilter"
             ]
         },
         {

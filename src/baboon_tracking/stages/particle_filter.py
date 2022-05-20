@@ -50,6 +50,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._transformation_matrices = transformation_matrices
         self._particle_filters: List[ParticleFilter] = []
         self._particle_count = 5
+        self._probability_thresh = 0
 
     def on_destroy(self) -> None:
         self._executor.shutdown()
@@ -74,7 +75,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         ]
         probs = flatten(probs)
         probs.sort(key=lambda p: p[0], reverse=True)
-        probs = [(p, b) for p, b in probs if p > 0]
+        probs = [(p, b) for p, b in probs if p > self._probability_thresh]
 
         used_babooons: Set[Baboon] = set()
         for _, baboon in probs:
