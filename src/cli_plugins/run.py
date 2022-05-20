@@ -24,6 +24,10 @@ def str2bool(value):
 
 
 def str2factory(*factories: List[Callable]):
+    """
+    Sets up a command line argument that can be converted to a stage factory.
+    """
+
     def get_name(factory: Callable):
         name_parts = factory.__name__.split("_")
         return "".join([n.capitalize() for n in name_parts if n != "factory"])
@@ -42,15 +46,27 @@ def str2factory(*factories: List[Callable]):
 
 
 def get_runtime_config(args: Namespace):
+    """
+    Converts parsed arguments to a runtime config dictionary.
+    """
+
     return {"display": args.display, "save": args.save}
 
 
 def particle_filter_factory(args: Namespace):
+    """
+    Handles creating a particle filter.
+    """
+
     runtime_config = get_runtime_config(args)
     return SqliteParticleFilterPipeline(args.input, runtime_config=runtime_config)
 
 
 def baboon_tracker_factory(args: Namespace):
+    """
+    Handles creating a baboon tracker.
+    """
+
     runtime_config = get_runtime_config(args)
     return BaboonTracker(args.input, runtime_config=runtime_config)
 
@@ -95,9 +111,4 @@ class Run(CliPlugin):
         )
 
     def execute(self, args: Namespace):
-        # runtime_config = {"display": args.display, "save": args.save}
-
-        # SqliteParticleFilterPipeline(args.input, runtime_config).run()
-        # BaboonTracker(args.input, runtime_config=runtime_config).run()
-
         args.pipeline(args).run()
