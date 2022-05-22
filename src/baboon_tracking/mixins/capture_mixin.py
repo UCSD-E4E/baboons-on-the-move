@@ -13,6 +13,7 @@ class CaptureMixin:
         self.frame_height = 0
         self.fps = 0
         self.frame_count = 0
+        self.name = ""
 
     def get_video_length(self):
         """

@@ -3,7 +3,9 @@ Starts the baboon tracker algorithm.
 """
 from argparse import ArgumentParser, Namespace
 import argparse
+from typing import Callable, List
 from baboon_tracking import BaboonTracker
+from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin  # pylint: disable=import-outside-toplevel
 
 
@@ -19,6 +21,54 @@ def str2bool(value):
         return False
 
     raise argparse.ArgumentTypeError("Boolen value expected.")
+
+
+def str2factory(*factories: List[Callable]):
+    """
+    Sets up a command line argument that can be converted to a stage factory.
+    """
+
+    def get_name(factory: Callable):
+        name_parts = factory.__name__.split("_")
+        return "".join([n.capitalize() for n in name_parts if n != "factory"])
+
+    def internal(value: str):
+        factory_names = {get_name(f): f for f in factories}
+
+        if value in factory_names:
+            return factory_names[value]
+
+        raise argparse.ArgumentTypeError(
+            f"{', '.join(factory_names)} value expected, recieved '{value}' instead."
+        )
+
+    return internal
+
+
+def get_runtime_config(args: Namespace):
+    """
+    Converts parsed arguments to a runtime config dictionary.
+    """
+
+    return {"display": args.display, "save": args.save}
+
+
+def particle_filter_factory(args: Namespace):
+    """
+    Handles creating a particle filter.
+    """
+
+    runtime_config = get_runtime_config(args)
+    return SqliteParticleFilterPipeline(args.input, runtime_config=runtime_config)
+
+
+def baboon_tracker_factory(args: Namespace):
+    """
+    Handles creating a baboon tracker.
+    """
+
+    runtime_config = get_runtime_config(args)
+    return BaboonTracker(args.input, runtime_config=runtime_config)
 
 
 class Run(CliPlugin):
@@ -45,7 +95,20 @@ class Run(CliPlugin):
             help="Indicates if should save results.",
         )
 
-    def execute(self, args: Namespace):
-        runtime_config = {"display": args.display, "save": args.save}
+        parser.add_argument(
+            "-i",
+            "--input",
+            default="./data/input.mp4",
+            help="Provides the input file for algorithm.",
+        )
 
-        BaboonTracker("input.mp4", runtime_config=runtime_config).run()
+        parser.add_argument(
+            "-p",
+            "--pipeline",
+            type=str2factory(baboon_tracker_factory, particle_filter_factory),
+            default="BaboonTracker",
+            help="Indicates which pipeline should be run.",
+        )
+
+    def execute(self, args: Namespace):
+        args.pipeline(args).run()

@@ -57,15 +57,17 @@ class ParentStage(Stage):
 
                     parameters_dict[parameter] = runtime_config
 
-            self.stages.append(
-                initializer(
-                    stage_type,
-                    parameters_dict,
-                    runtime_config,
-                    self.static_stages,
-                )
+            stage = initializer(
+                stage_type,
+                parameters_dict,
+                runtime_config,
+                self.static_stages,
             )
-            self.static_stages.append(self.stages[-1])
+
+            stage.before_init()
+
+            self.stages.append(stage)
+            self.static_stages.append(stage)
 
     def get_time(self) -> Time:
         """

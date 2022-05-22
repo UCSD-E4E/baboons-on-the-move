@@ -76,6 +76,11 @@ class Stage(ABC):
         When implemented in a child class, processes the provided state and returns a new state.
         """
 
+    def before_init(self) -> None:
+        """
+        Called immediately after instructor is called.
+        """
+
     def on_init(self) -> None:
         """
         Called when the application is started.  Just before the pipeline begins.

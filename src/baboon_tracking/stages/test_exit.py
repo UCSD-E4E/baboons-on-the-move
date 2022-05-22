@@ -21,7 +21,7 @@ class TestExit(Stage):
         Tests for the press of the "Q" key or the end of the video.
         """
 
-        if cv2.waitKey(25) & 0xFF == ord("q"):
+        if cv2.waitKey(50) & 0xFF == ord("q"):
             return StageResult(False, None)
 
         return StageResult(True, True)

@@ -40,9 +40,7 @@ def get_metrics() -> List[Metric]:
     tqdm.write("testing on input")
     baboon_labels = get_regions_from_xml("./data/input.xml")
 
-    baboon_tracker = BaboonTracker(
-        input_file="./input.mp4", runtime_config=runtime_config
-    )
+    baboon_tracker = BaboonTracker("./data/input.mp4", runtime_config=runtime_config)
     tqdm.write("tracker opened")
     baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 
