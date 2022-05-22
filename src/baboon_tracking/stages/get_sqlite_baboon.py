@@ -1,4 +1,11 @@
+"""
+Gets regions from a Sqlite database.
+"""
+
+from sqlite3 import connect
+
 import numpy as np
+
 from baboon_tracking.decorators.debug import debug
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
@@ -9,12 +16,15 @@ from baboon_tracking.models.baboon import Baboon
 from pipeline import Stage
 from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
-from sqlite3 import connect
 
 
 @debug(FrameMixin, (0, 255, 0))
 @stage("frame")
 class GetSqliteBaboon(Stage, BaboonsMixin, TransformationMatricesMixin):
+    """
+    Gets regions from a Sqlite database.
+    """
+
     def __init__(self, frame: FrameMixin) -> None:
         Stage.__init__(self)
         BaboonsMixin.__init__(self)
@@ -58,6 +68,8 @@ class GetSqliteBaboon(Stage, BaboonsMixin, TransformationMatricesMixin):
                 [[t11, t12, t13], [t21, t22, t23], [t31, t32, t33]]
             )
 
-            return StageResult(True, True)
+            result = StageResult(True, True)
         else:
-            return StageResult(True, False)
+            result = StageResult(True, False)
+
+        return result

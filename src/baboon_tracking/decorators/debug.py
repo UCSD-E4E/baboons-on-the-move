@@ -1,17 +1,28 @@
+"""
+Implements a debug tool which allows for rendering regions on top of a specified datasource.
+"""
+
 from typing import Callable, Dict, List, Tuple
+
+import cv2
+
 from baboon_tracking.decorators.save_result import save_result
 from baboon_tracking.decorators.show_result import show_result
+from baboon_tracking.models.baboon import Baboon
 from baboon_tracking.models.frame import Frame
 from pipeline.parent_stage import ParentStage
 
 from pipeline.stage import Stage
 from pipeline.stage_result import StageResult
-import cv2
 
 
 @show_result
 @save_result
 class DisplayDebugRegions(Stage):
+    """
+    Implements a debug tool which allows for rendering regions on top of a specified datasource.
+    """
+
     stage_debug_map: Dict[Stage, List[Tuple[Stage, Tuple[int, int, int]]]] = {}
 
     def __init__(self):
@@ -49,28 +60,7 @@ class DisplayDebugRegions(Stage):
 
                 for debug_stage, color, _ in debug_stage_list:
                     if debug_stage.baboons:
-                        rectangles = [
-                            (b.rectangle, b.id_str) for b in debug_stage.baboons
-                        ]
-                        for rect, id_str in rectangles:
-                            debug_frame = cv2.rectangle(
-                                debug_frame,
-                                (rect[0], rect[1]),
-                                (rect[2], rect[3]),
-                                color,
-                                2,
-                            )
-
-                            if id_str is not None:
-                                cv2.putText(
-                                    debug_frame,
-                                    id_str,
-                                    (rect[0], rect[1] - 10),
-                                    cv2.FONT_HERSHEY_SIMPLEX,
-                                    0.5,
-                                    color,
-                                    2,
-                                )
+                        self._draw_regions(color, debug_stage.baboons)
 
                 setattr(
                     self, data_attribute, Frame(debug_frame, frame.get_frame_number())
@@ -78,8 +68,34 @@ class DisplayDebugRegions(Stage):
 
         return StageResult(True, True)
 
+    def _draw_regions(self, color: Tuple[int, int, int], baboons: List[Baboon]):
+        rectangles = [(b.rectangle, b.id_str) for b in baboons]
+        for rect, id_str in rectangles:
+            debug_frame = cv2.rectangle(
+                debug_frame,
+                (rect[0], rect[1]),
+                (rect[2], rect[3]),
+                color,
+                2,
+            )
+
+            if id_str is not None:
+                cv2.putText(
+                    debug_frame,
+                    id_str,
+                    (rect[0], rect[1] - 10),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    color,
+                    2,
+                )
+
 
 def debug(frame_mixin: Callable, color: Tuple[int, int, int], priority=0):
+    """
+    Adds the regions from this step onto the frame from the specified data.
+    """
+
     def inner_function(function: Callable):
         prev_before_init = function.before_init
         prev_on_init = function.on_init

@@ -1,3 +1,7 @@
+"""
+Defines a stage which uses a paticle filter to fill in missing regions.
+"""
+
 import concurrent.futures
 
 from typing import List, Set
@@ -24,6 +28,10 @@ def process_pool(
     baboons: BaboonsMixin,
     transformation_matrix: ndarray,
 ):
+    """
+    Runs particle filter steps.
+    """
+
     particle_filter.predict()
 
     if transformation_matrix is not None:
@@ -37,6 +45,10 @@ def process_pool(
 @stage("baboons")
 @stage("transformation_matrices")
 class ParticleFilterStage(Stage, BaboonsMixin):
+    """
+    Defines a stage which uses a paticle filter to fill in missing regions.
+    """
+
     def __init__(
         self,
         baboons: BaboonsMixin,

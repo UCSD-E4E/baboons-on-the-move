@@ -1,7 +1,6 @@
 """
 Saves the list of baboons in Sqlite database.
 """
-from datetime import datetime
 from os import remove
 from os.path import exists
 

@@ -1,3 +1,6 @@
+"""
+Provides a pipeline that takes regions in a Sqlite database and uses the particle filter.
+"""
 from baboon_tracking.decorators.debug import DisplayDebugRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.get_sqlite_baboon import GetSqliteBaboon
@@ -9,6 +12,10 @@ from pipeline.factory import factory
 
 
 class SqliteParticleFilterPipeline(Pipeline):
+    """
+    Provides a pipeline that takes regions in a Sqlite database and uses the particle filter.
+    """
+
     def __init__(self, video_path: str, runtime_config=None):
         Pipeline.__init__(
             self,

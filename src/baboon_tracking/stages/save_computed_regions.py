@@ -1,3 +1,7 @@
+"""
+Saves the computed, identity regions into a Sqlite database.
+"""
+
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.stages.save_regions_base import SaveRegionsBase
@@ -8,6 +12,10 @@ from pipeline.stage_result import StageResult
 @stage("baboons")
 @stage("frame")
 class SaveComputedRegions(SaveRegionsBase):
+    """
+    Saves the computed, identity regions into a Sqlite database.
+    """
+
     def __init__(self, baboons: BaboonsMixin, frame: FrameMixin) -> None:
         SaveRegionsBase.__init__(self, "computed_regions")
 

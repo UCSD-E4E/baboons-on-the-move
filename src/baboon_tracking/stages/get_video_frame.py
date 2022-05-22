@@ -65,9 +65,11 @@ class GetVideoFrame(Stage, FrameMixin, CaptureMixin):
         """
 
         if self._is_video_file:
-            return self._execute_video_file()
+            result = self._execute_video_file()
         else:
-            return self._execute_image_directory()
+            result = self._execute_image_directory()
+
+        return result
 
     def _execute_video_file(self) -> StageResult:
         success, frame = self._capture.read()

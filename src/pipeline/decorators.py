@@ -58,7 +58,7 @@ def stage_from_previous_iteration(parameter: str, is_property=True):
     """
 
     if not is_property:
-        raise "This operation does not support constructor injection."
+        raise Exception("This operation does not support constructor injection.")
 
     def inner_function(function: Callable):
         if not hasattr(function, "stages_from_prev_iter"):

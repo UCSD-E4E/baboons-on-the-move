@@ -1,20 +1,30 @@
+"""
+Implements a particle filter.
+"""
+
 from math import cos, pi, sin, sqrt
+from random import random
+from typing import Dict, List
 import numpy as np
 
-from typing import Dict, List
-from pickle import load
 from baboon_tracking.models.baboon import Baboon
 from library.region import bb_intersection_over_union
-from sklearn.mixture import BayesianGaussianMixture
-from random import random
 
 
 class Particle:
+    """
+    Implements a particle for a particle filter.
+    """
+
     def __init__(self, baboon: Baboon, weight: float):
         self.baboon = baboon
         self.weight = weight
 
     def transform(self, transformation: np.ndarray):
+        """
+        Transforms the location of the particle using the specified transform.
+        """
+
         x1, y1, x2, y2 = self.baboon.rectangle
 
         top_left = np.array([x1, y1, 1])
@@ -32,6 +42,10 @@ class Particle:
         )
 
     def predict(self):
+        """
+        Moves the particle using our best guess of where we expect the region to be.
+        """
+
         x1, y1, x2, y2 = self.baboon.rectangle
         width = x2 - x1
         height = y2 - y1
@@ -62,6 +76,10 @@ class Particle:
         )
 
     def update(self, baboons: List[Baboon]):
+        """
+        Moves the region based on our observations.
+        """
+
         baboons = [
             (bb_intersection_over_union(self.baboon.rectangle, b.rectangle), b)
             for b in baboons
@@ -108,6 +126,10 @@ class Particle:
 
 
 class ParticleFilter:
+    """
+    Implements a particle filter.
+    """
+
     instance_id = 0
 
     def __init__(self, baboon: Baboon, particle_count: int):
@@ -125,18 +147,30 @@ class ParticleFilter:
         baboon.id_str = str(self._instance_id)
 
     def transform(self, transformation: np.ndarray):
+        """
+        Transforms each particle using the specified transformation matrix.
+        """
         for particle in self.particles:
             particle.transform(transformation)
 
     def predict(self):
+        """
+        Performs the predict step on each of the particles.
+        """
         for particle in self.particles:
             particle.predict()
 
     def update(self, baboons: List[Baboon]):
+        """
+        Performs the update step on each of the particles.
+        """
         for particle in self.particles:
             particle.update(baboons)
 
     def resample(self):
+        """
+        Resamples the particles to have the required weights.
+        """
         baboon_weights: Dict[Baboon, float] = {}
 
         for particle in self.particles:
@@ -145,8 +179,8 @@ class ParticleFilter:
 
             baboon_weights[particle.baboon] += particle.weight
 
-        normalizer = np.sum(np.array([baboon_weights[b] for b in baboon_weights]))
-        baboons_weights = [(b, baboon_weights[b]) for b in baboon_weights]
+        normalizer = np.sum(np.array([w for _, w in baboon_weights.items()]))
+        baboons_weights = list((b, w) for b, w in baboon_weights.items())
         baboons_weights.sort(key=lambda x: x[1], reverse=True)
 
         self.particles = []
@@ -169,6 +203,10 @@ class ParticleFilter:
             count = len(self.particles)
 
     def get_baboon(self):
+        """
+        Gets the most likely baboon from the particle filter.
+        """
+
         baboon_weights: Dict[Baboon, float] = {}
 
         for particle in self.particles:
@@ -177,12 +215,16 @@ class ParticleFilter:
 
             baboon_weights[particle.baboon] += particle.weight
 
-        weights_and_baboons = [(baboon_weights[b], b) for b in baboon_weights]
+        weights_and_baboons = [(w, b) for b, w in baboon_weights.items()]
         _, baboon = max(weights_and_baboons, key=lambda x: x[0])
 
         return baboon
 
     def get_probability(self, baboon: Baboon):
+        """
+        Gets the probability that this baboon is represented by the particle filter.
+        """
+
         return np.sum(
             (
                 np.array(

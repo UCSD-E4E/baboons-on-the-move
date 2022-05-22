@@ -1,15 +1,24 @@
+"""
+Base class for saving regions to Sqlite database.
+"""
+
+from abc import ABC
 from sqlite3 import Connection, Cursor, connect
+from datetime import datetime
+import json
+import git
 
 from pipeline import Stage
 from pipeline.stage_result import StageResult
-import json
-import git
-from config import get_config
 from pipeline.parent_stage import ParentStage
-from datetime import datetime
+from config import get_config
 
 
-class SaveRegionsBase(Stage):
+class SaveRegionsBase(Stage, ABC):
+    """
+    Base class for saving regions to Sqlite database.
+    """
+
     def __init__(self, run_key: str) -> None:
         Stage.__init__(self)
 
@@ -79,16 +88,22 @@ class SaveRegionsBase(Stage):
             self.on_database_create()
 
     def before_database_create(self) -> None:
-        pass
+        """
+        Called before the database file is created.
+        """
 
     def on_database_create(self) -> None:
-        pass
+        """
+        Called when the database file is created.
+        """
 
     def execute(self) -> StageResult:
         return StageResult(True, True)
 
     def before_database_close(self) -> None:
-        pass
+        """
+        Called just before the connection to the database is closed.
+        """
 
     def on_destroy(self) -> None:
         if self.connection is not None:
