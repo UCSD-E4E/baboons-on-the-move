@@ -67,7 +67,7 @@ class DisplayDebugRegions(Stage):
                                     id_str,
                                     (rect[0], rect[1] - 10),
                                     cv2.FONT_HERSHEY_SIMPLEX,
-                                    0.9,
+                                    0.5,
                                     color,
                                     2,
                                 )
