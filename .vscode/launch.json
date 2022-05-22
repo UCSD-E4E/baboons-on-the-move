@@ -11,8 +11,23 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                "run"
+                "run",
+                "--save",
+                "no",
+                "--display",
+                "yes",
+                "--input",
+                "./data/img"
+                // "--pipeline",
+                // "ParticleFilter"
             ]
+        },
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
         }
     ]
 }
