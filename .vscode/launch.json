@@ -11,16 +11,16 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                // "run",
+                "run",
                 // "--save",
                 // "no",
-                // "--display",
-                // "yes",
-                // "--input",
-                // "./data/img"
+                "--display",
+                "yes",
+                "--input",
+                "./data/img"
                 // // "--pipeline",
                 // // "ParticleFilter"
-                "calc-metrics",
+                // "calc-metrics",
             ]
         },
         {

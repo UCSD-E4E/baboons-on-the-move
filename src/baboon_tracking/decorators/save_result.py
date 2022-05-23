@@ -2,7 +2,8 @@
 Provides a decorator for automatically saving the results of current stage to a video file.
 """
 
-from typing import Callable, Dict
+from ast import Tuple
+from typing import Callable, Dict, List
 import pathlib
 import cv2
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
@@ -20,7 +21,7 @@ def save_result(function: Callable):
     prev_execute = function.execute
     prev_on_destroy = function.on_destroy
     save = True
-    frame_video_writers = []
+    frame_video_writers = {}
     capture = None
     frame_attributes = []
 
@@ -45,35 +46,78 @@ def save_result(function: Callable):
         if save:
             if not frame_attributes:
                 frame_attributes = [
-                    a for a in dir(self) if isinstance(getattr(self, a), Frame)
+                    a for a in dir(self) if isinstance(getattr(self, a), (Frame, list))
                 ]
 
-            if not frame_video_writers:
-                frame_video_writers = {
-                    f: cv2.VideoWriter(
-                        f"./output/{type(self).__name__}.{f}.mp4",
-                        cv2.VideoWriter_fourcc(*"mp4v"),
-                        capture.fps,
-                        (capture.frame_width, capture.frame_height),
-                    )
-                    for f in frame_attributes
-                }
+            # if not frame_video_writers:
+            #     frame_video_writers = {
+            #         f: cv2.VideoWriter(
+            #             f"./output/{type(self).__name__}.{f}.mp4",
+            #             cv2.VideoWriter_fourcc(*"mp4v"),
+            #             capture.fps,
+            #             (capture.frame_width, capture.frame_height),
+            #         )
+            #         for f in frame_attributes
+            #     }
 
             # Write one frame to the video for each frame object.
             for frame_attribute in frame_attributes:
-                frame = getattr(self, frame_attribute).get_frame()
-                if len(frame.shape) == 2:
-                    frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
-
-                frame_video_writers[frame_attribute].write(frame)
+                frame = getattr(self, frame_attribute)
+                videowrite(
+                    f"{type(self).__name__}.{frame_attribute}",
+                    frame,
+                    frame_video_writers,
+                )
 
         return result
+
+    def videowrite(
+        name: str,
+        frame: Frame or List[Frame],
+        frame_video_writers: Dict[str, cv2.VideoWriter],
+    ):
+        if isinstance(frame, Frame):
+            videowrite_img(name, frame, frame_video_writers)
+        else:
+            videowrite_list(name, frame, frame_video_writers)
+
+    def videowrite_list(
+        name: str, frames: List[Frame], frame_video_writers: Dict[str, cv2.VideoWriter]
+    ):
+        if not isinstance_list(frames, Frame):
+            return
+
+        for i, frame in enumerate(frames):
+            videowrite_img(f"{name}[{i}]", frame, frame_video_writers)
+
+    def videowrite_img(
+        name: str, frame: Frame, frame_video_writers: Dict[str, cv2.VideoWriter]
+    ):
+        if name not in frame_video_writers:
+            frame_video_writers[name] = cv2.VideoWriter(
+                f"./output/{name.replace('[', '_').replace(']', '_')}.mp4",
+                cv2.VideoWriter_fourcc(*"mp4v"),
+                capture.fps,
+                (capture.frame_width, capture.frame_height),
+            )
+
+        frame = frame.get_frame()
+        if len(frame.shape) == 2:
+            frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
+
+        frame_video_writers[name].write(frame)
+
+    def isinstance_list(instance: any, class_or_tuple: type or Tuple):
+        if isinstance(instance, list):
+            return all(isinstance(i, class_or_tuple) for i in instance)
+
+        return False
 
     def on_destroy(self) -> None:
         prev_on_destroy(self)
 
-        for frame_attribute in frame_attributes:
-            frame_video_writers[frame_attribute].release()
+        for _, frame_video_writer in frame_video_writers.items():
+            frame_video_writer.release()
 
     function.execute = execute
     function.on_destroy = on_destroy

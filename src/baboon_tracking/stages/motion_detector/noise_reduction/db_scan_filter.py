@@ -10,12 +10,15 @@ from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.models.frame import Frame
 from pipeline import Stage
-from pipeline.decorators import stage
+from pipeline.decorators import config, stage
 from pipeline.stage_result import StageResult
 
 
 @show_result
 @save_result
+@config(parameter_name="dbscan_eps", key="motion_detector/dbscan/eps")
+@config(parameter_name="dbscan_min_samples", key="motion_detector/dbscan/min_samples")
+@config(parameter_name="kernel", key="motion_detector/dbscan/kernel")
 @stage("moving_foreground")
 class DbScanFilter(Stage, MovingForegroundMixin):
     """
@@ -23,9 +26,19 @@ class DbScanFilter(Stage, MovingForegroundMixin):
     the corrected frame and labels array
     """
 
-    def __init__(self, moving_foreground: MovingForegroundMixin) -> None:
+    def __init__(
+        self,
+        dbscan_eps: int,
+        dbscan_min_samples: int,
+        kernel: int,
+        moving_foreground: MovingForegroundMixin,
+    ) -> None:
         Stage.__init__(self)
         MovingForegroundMixin.__init__(self)
+
+        self._dbscan_eps = dbscan_eps
+        self._dbscan_min_samples = dbscan_min_samples
+        self._kernel = kernel
 
         self._moving_foreground = moving_foreground
 
@@ -49,7 +62,9 @@ class DbScanFilter(Stage, MovingForegroundMixin):
         image[:, 1] = y
 
         # creates clusters and eliminates noise from labels and 2dframe
-        dbscan = DBSCAN(eps=3, min_samples=5).fit(image)
+        dbscan = DBSCAN(eps=self._dbscan_eps, min_samples=self._dbscan_min_samples).fit(
+            image
+        )
         labels = dbscan.labels_
         image, _ = self._eliminate_noise(labels, image)
         image = image.astype(np.uint32)
@@ -57,7 +72,7 @@ class DbScanFilter(Stage, MovingForegroundMixin):
         noiseless_frame[image[:, 0], image[:, 1]] = 255
 
         # applies dilate filter and saves the residual frame
-        kernel = np.ones((5, 5), np.uint8)
+        kernel = np.ones((self._kernel, self._kernel), np.uint8)
         self.moving_foreground = Frame(
             cv2.dilate(noiseless_frame, kernel, iterations=1),
             moving_foreground.get_frame_number(),

@@ -17,32 +17,37 @@ motion_detector:
     quantize_frames:
         scale_factor: 10
 
-    noise_reduction:
-        erode_kernel_size: 6
-        dilate_kernel_size: 24
-        combine_kernel_size: 14
+    # noise_reduction:
+    #     erode_kernel_size: 6
+    #     dilate_kernel_size: 24
+    #     combine_kernel_size: 14
 
-    hysteresis:
-        required_motion_observations: 1
-        required_no_motion_observations: 4
+    # hysteresis:
+    #     required_motion_observations: 1
+    #     required_no_motion_observations: 4
 
-    group_filter:
-        size: 1
+    # group_filter:
+    #     size: 1
 
-    min_size_filter:
-        min_size: 5
+    # min_size_filter:
+    #     min_size: 5
 
-dead_reckoning:
-    dist_threshold: 30
-    same_region_threshold: 0.3
+    dbscan:
+        eps: 3
+        min_samples: 5
+        kernel: 5
 
-motion_detector_stages:
-    HysteresisFilter:
-        order: 0
-        enabled: 1
-    GroupFilter:
-        order: 1
-        enabled: 0
-    DilateErodeFilter:
-        order: 2
-        enabled: 1
+# dead_reckoning:
+#     dist_threshold: 30
+#     same_region_threshold: 0.3
+
+# motion_detector_stages:
+#     HysteresisFilter:
+#         order: 0
+#         enabled: 1
+#     GroupFilter:
+#         order: 1
+#         enabled: 0
+#     DilateErodeFilter:
+#         order: 2
+#         enabled: 1

@@ -61,5 +61,5 @@ class MotionDetector(Serial):
             DbScanFilter,
             # NoiseReduction,
             DetectBlobs,
-            MinSizeFilter,
+            # MinSizeFilter,
         )

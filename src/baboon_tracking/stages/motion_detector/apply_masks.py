@@ -42,7 +42,8 @@ class ApplyMasks(Stage, MovingForegroundMixin):
         for mask in self._shifted_masks.shifted_masks:
             self.moving_foreground = Frame(
                 np.multiply(
-                    self._moving_foreground.moving_foreground.get_frame(), mask
+                    self._moving_foreground.moving_foreground.get_frame(),
+                    mask.get_frame(),
                 ),
                 self._frame.frame.get_frame_number(),
             )
