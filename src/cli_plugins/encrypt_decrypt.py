@@ -13,7 +13,11 @@ BUFFER_SIZE = 64 * 1024
 
 
 def _get_password():
-    return getpass.getpass(prompt="Encryption Key: ")
+    password = os.getenv("ENCRYPTION_KEY")
+    if not password:
+        password = getpass.getpass(prompt="Encryption Key: ")
+
+    return password
 
 
 class Encrypt(CliPlugin):
@@ -25,9 +29,7 @@ class Encrypt(CliPlugin):
         CliPlugin.__init__(self, parser)
 
     def execute(self, args: Namespace):
-        password = os.getenv("ENCRYPTION_KEY")
-        if not password:
-            password = _get_password()
+        password = _get_password()
 
         files = [
             f
@@ -56,9 +58,7 @@ class Decrypt(CliPlugin):
         if not os.path.exists("./decrypted"):
             os.makedirs("./decrypted")
 
-        password = os.getenv("ENCRYPTION_KEY")
-        if not password:
-            password = _get_password()
+        password = _get_password()
 
         files = [
             f

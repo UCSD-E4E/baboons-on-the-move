@@ -7,7 +7,8 @@ from typing import Callable, List
 from baboon_tracking import BaboonTracker
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
-from config import set_config_path  # pylint: disable=import-outside-toplevel
+from config import set_config_path
+from library.dataset import get_dataset_path  # pylint: disable=import-outside-toplevel
 
 
 def str2bool(value):
@@ -120,5 +121,8 @@ class Run(CliPlugin):
 
     def execute(self, args: Namespace):
         set_config_path(args.config)
+
+        if args.input.startswith("d:"):
+            args.input = get_dataset_path(args.input[2:])
 
         args.pipeline(args).run()
