@@ -15,6 +15,16 @@ from library.firebase import initialize_app
 
 
 CONFIG_STORE = None
+CONFIG_PATH = "./config.yml"
+
+
+def set_config_path(config_path: str):
+    # pylint: disable=global-statement
+    global CONFIG_STORE
+    global CONFIG_PATH
+
+    CONFIG_STORE = None
+    CONFIG_PATH = config_path
 
 
 def set_config(config: Dict):

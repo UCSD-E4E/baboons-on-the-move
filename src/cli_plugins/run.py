@@ -6,7 +6,8 @@ import argparse
 from typing import Callable, List
 from baboon_tracking import BaboonTracker
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
-from cli_plugins.cli_plugin import CliPlugin  # pylint: disable=import-outside-toplevel
+from cli_plugins.cli_plugin import CliPlugin
+from config import set_config_path  # pylint: disable=import-outside-toplevel
 
 
 def str2bool(value):
@@ -110,5 +111,14 @@ class Run(CliPlugin):
             help="Indicates which pipeline should be run.",
         )
 
+        parser.add_argument(
+            "-c",
+            "--config",
+            default="./config.yml",
+            help="The configuration file used for this run.",
+        )
+
     def execute(self, args: Namespace):
+        set_config_path(args.config)
+
         args.pipeline(args).run()
