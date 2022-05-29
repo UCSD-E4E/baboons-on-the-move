@@ -6,16 +6,16 @@ preprocess:
     kernel_size: 5
 
 motion_detector:
-    history_frames: 4
+    history_frames: 5
 
     registration:
-        good_match_percent: 0.27
-        ransac_max_error: 4.96
-        ssc_num_ret_points: 10001
-        ssc_tolerence: 0.13
+        good_match_percent: 0.3
+        ransac_max_error: 3
+        ssc_num_ret_points: 1000
+        ssc_tolerence: 0.1
 
     quantize_frames:
-        scale_factor: 10
+        scale_factor: 15
 
     # noise_reduction:
     #     erode_kernel_size: 6

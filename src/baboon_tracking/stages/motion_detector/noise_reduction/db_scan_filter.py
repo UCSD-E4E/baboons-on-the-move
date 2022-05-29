@@ -73,8 +73,9 @@ class DbScanFilter(Stage, MovingForegroundMixin):
 
         # applies dilate filter and saves the residual frame
         kernel = np.ones((self._kernel, self._kernel), np.uint8)
+        dilated = cv2.dilate(noiseless_frame, kernel, iterations=1)
         self.moving_foreground = Frame(
-            cv2.dilate(noiseless_frame, kernel, iterations=1),
+            cv2.erode(dilated, kernel, iterations=1),
             moving_foreground.get_frame_number(),
         )
 

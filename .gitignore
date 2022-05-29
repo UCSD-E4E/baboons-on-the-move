@@ -217,6 +217,7 @@ data/
 
 google_drive_token.pickle
 nas_token.pickle
+dataset_cache.pickle
 
 decrypted/
 output

@@ -28,6 +28,7 @@ class Pipeline(ABC):
         self, name: str, *stage_types: List[Stage], parallel=False, runtime_config=None
     ):
         ParentStage.static_stages = []
+        self._runtime_config = runtime_config
         self._progressbar: tqdm = None
 
         if parallel:
@@ -98,8 +99,12 @@ class Pipeline(ABC):
             if not result.continue_pipeline:
                 self._progressbar.close()
 
-                print("Average Runtime per stage:")
-                self.stage.get_time().print_to_console()
+                if (
+                    "timings" in self._runtime_config
+                    and self._runtime_config["timings"]
+                ):
+                    print("Average Runtime per stage:")
+                    self.stage.get_time().print_to_console()
 
                 self.stage.on_destroy()
                 caf.release(request_id)

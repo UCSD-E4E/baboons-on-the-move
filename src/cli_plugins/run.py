@@ -52,7 +52,7 @@ def get_runtime_config(args: Namespace):
     Converts parsed arguments to a runtime config dictionary.
     """
 
-    return {"display": args.display, "save": args.save}
+    return {"display": args.display, "save": args.save, "timings": True}
 
 
 def particle_filter_factory(args: Namespace):

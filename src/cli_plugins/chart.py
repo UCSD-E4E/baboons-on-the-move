@@ -16,7 +16,7 @@ class Chart(CliPlugin):
         CliPlugin.__init__(self, parser)
 
     def execute(self, args: Namespace):
-        pipeline = BaboonTracker(args.pipeline_name)
+        pipeline = BaboonTracker("")
 
         image = pipeline.flowchart_image()
         image.save("./output/flowchart.png")
