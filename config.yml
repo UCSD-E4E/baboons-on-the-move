@@ -3,19 +3,19 @@ output: './output/output.mp4'
 mask_output: './output/mask.mp4'
 
 preprocess:
-    kernel_size: 5
+    kernel_size: 7
 
 motion_detector:
-    history_frames: 5
+    history_frames: 3
 
     registration:
         good_match_percent: 0.3
-        ransac_max_error: 3
+        ransac_max_error: 5
         ssc_num_ret_points: 1000
         ssc_tolerence: 0.1
 
     quantize_frames:
-        scale_factor: 15
+        scale_factor: 18
 
     # noise_reduction:
     #     erode_kernel_size: 6
@@ -33,9 +33,9 @@ motion_detector:
     #     min_size: 5
 
     dbscan:
-        eps: 3
-        min_samples: 5
-        kernel: 5
+        eps: 2
+        min_samples: 8
+        kernel: 3
 
 # dead_reckoning:
 #     dist_threshold: 30
