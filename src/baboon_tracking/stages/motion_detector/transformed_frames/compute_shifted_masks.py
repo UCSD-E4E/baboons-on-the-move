@@ -3,8 +3,6 @@ Compute shifted masks for use in throwing pixels not common between frames.
 """
 import cv2
 import numpy as np
-from baboon_tracking.decorators.save_result import save_result
-from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
 
@@ -18,8 +16,6 @@ from pipeline.stage import Stage
 from pipeline.stage_result import StageResult
 
 
-# @save_result
-# @show_result
 @stage("transformation_matrices")
 @stage("history_frames")
 @stage("frame")
