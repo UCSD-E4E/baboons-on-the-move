@@ -12,15 +12,12 @@
             "console": "integratedTerminal",
             "args": [
                 "run",
-                // "--save",
-                // "no",
+                "--save",
+                "no",
                 "--display",
                 "yes",
                 "--input",
-                "./data/img"
-                // // "--pipeline",
-                // // "ParticleFilter"
-                // "calc-metrics",
+                "d:VISO/car/001"
             ]
         },
         {
