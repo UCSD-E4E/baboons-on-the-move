@@ -10,9 +10,11 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
+from pytest import approx
 import yaml
 
 from sherlock import Sherlock
+from sherlock.utils import approximate_pareto
 from tqdm import tqdm
 
 from baboon_tracking import BaboonTracker
@@ -297,7 +299,7 @@ class Optimize(CliPlugin):
             )
             y = np.zeros((X.shape[0], 3))
 
-            percent = 0.31
+            percent = 0.001
             budget = int(X.shape[0] * percent)
             self._progressbar = tqdm(total=budget)
             sherlock = Sherlock(
@@ -321,6 +323,7 @@ class Optimize(CliPlugin):
             )
 
             sherlock.fit(X).predict(X, y)
+            pareto_solutions, pareto_idx, pareto_scores = approximate_pareto(y)
 
-            tqdm.write(sherlock.known_idx)
+            tqdm.write(str(pareto_solutions))
             self._progressbar.close()
