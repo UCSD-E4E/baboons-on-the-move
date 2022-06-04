@@ -4,6 +4,8 @@ Module for interacting with regions.
 
 from typing import Tuple
 
+import numpy as np
+
 
 def bb_intersection_over_union(
     box_a: Tuple[int, int, int, int], box_b: Tuple[int, int, int, int]
@@ -16,16 +18,28 @@ def bb_intersection_over_union(
     y_a = max(box_a[1], box_b[1])
     x_b = min(box_a[2], box_b[2])
     y_b = min(box_a[3], box_b[3])
+
     # compute the area of intersection rectangle
-    inter_area = max(0, x_b - x_a + 1) * max(0, y_b - y_a + 1)
+    inter_area = abs(max((x_b - x_a, 0)) * max((y_b - y_a), 0))
+    if inter_area == 0:
+        return 0
     # compute the area of both the prediction and ground-truth
     # rectangles
-    box_a_area = (box_a[2] - box_a[0] + 1) * (box_a[3] - box_a[1] + 1)
-    box_b_area = (box_b[2] - box_b[0] + 1) * (box_b[3] - box_b[1] + 1)
+    box_a_area = abs((box_a[2] - box_a[0]) * (box_a[3] - box_a[1]))
+    box_b_area = abs((box_b[2] - box_b[0]) * (box_b[3] - box_b[1]))
+
     # compute the intersection over union by taking the intersection
     # area and dividing it by the sum of prediction + ground-truth
     # areas - the interesection area
-    iou = inter_area / float(box_a_area + box_b_area - inter_area)
+
+    box_a = np.array(box_a)
+    box_b = np.array(box_b)
+
+    if np.all(box_a == box_b):
+        iou = 1
+    else:
+        iou = inter_area / float(box_a_area + box_b_area - inter_area)
+
     # return the intersection over union value
     return iou
 

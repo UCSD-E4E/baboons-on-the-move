@@ -103,7 +103,8 @@ class Pipeline(ABC):
             curr += 1
 
             if not result.continue_pipeline or (iterations and curr >= iterations + 1):
-                self._progressbar.close()
+                if self._progressbar:
+                    self._progressbar.close()
 
                 if (
                     "timings" in self._runtime_config
@@ -131,6 +132,12 @@ class Pipeline(ABC):
         """
         Increments the progress bar by 1.
         """
+
+        if (
+            "progress" not in self._runtime_config
+            or not self._runtime_config["progress"]
+        ):
+            return
 
         if self._progressbar is None:
             self._progressbar = tqdm(total=int(Pipeline.iterations))

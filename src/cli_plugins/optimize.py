@@ -13,12 +13,12 @@ import pandas as pd
 import yaml
 
 from sherlock import Sherlock
-from sherlock.utils import adrs
+from tqdm import tqdm
 
 from baboon_tracking import BaboonTracker
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
-from library.config import get_config, set_config_part
+from library.config import set_config_part
 from library.dataset import get_dataset_path
 from library.region import bb_intersection_over_union
 
@@ -30,17 +30,28 @@ class Optimize(CliPlugin):
 
     VIDEO_FILES = [
         "VISO/car/003",  # Video 1
-        # "VISO/car/009", # Video 7
+        # "VISO/car/004",  # Video 2
+        # "VISO/car/005",  # Video 3
+        # "VISO/car/006",  # Video 4
+        # "VISO/car/007",  # Video 5
+        # "VISO/car/008",  # Video 6
+        # "VISO/car/009",  # Video 7
     ]
 
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
-        self._score_count = 0
-        self._runtime_config = {"display": False, "save": True, "timings": False}
+        self._runtime_config = {
+            "display": False,
+            "save": True,
+            "timings": False,
+            "progress": False,
+        }
         self._max_precision = (0, 0, 0)
         self._max_recall = (0, 0, 0)
         self._max_f1 = (0, 0, 0)
+
+        self._progressbar: tqdm = None
 
     def _extend(self, target: Dict[str, Any], source: Dict[str, Any]):
         for key, value in source.items():
@@ -179,6 +190,8 @@ class Optimize(CliPlugin):
         video_file: str,
         config_options: List[Tuple[str, np.ndarray]],
     ):
+        tqdm.write(str(known_idx))
+
         if exists("./score_cache.pickle"):
             with open("./score_cache.pickle", "rb") as f:
                 score_cache = pickle.load(f)
@@ -250,23 +263,24 @@ class Optimize(CliPlugin):
                 self._max_f1 = (recall, precision, f1)
                 f1_color = "\033[93m"
 
-            self._score_count += 1
-            print(
-                f"\033[1mCompleted ({self._score_count / X.shape[0] * 100:.2f}%): {idx:} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+            tqdm.write(
+                f"\033[1mCompleted {idx:} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_recall
-            print(
+            tqdm.write(
                 f"{recall_color}Max Recall: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_precision
-            print(
+            tqdm.write(
                 f"{precision_color}Max Precision: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_f1
-            print(
+            tqdm.write(
                 f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
-            print("=" * 10)
+            tqdm.write("=" * 10)
+
+            self._progressbar.update(1)
 
     def execute(self, args: Namespace):
         for video_file in Optimize.VIDEO_FILES:
@@ -283,9 +297,12 @@ class Optimize(CliPlugin):
             )
             y = np.zeros((X.shape[0], 3))
 
+            percent = 0.31
+            budget = int(X.shape[0] * percent)
+            self._progressbar = tqdm(total=budget)
             sherlock = Sherlock(
                 n_init=5,
-                budget=int(X.shape[0] * 0.2),
+                budget=budget,
                 surrogate_type="rbfthin_plate-rbf_multiquadric-randomforest-gpy",
                 kernel="matern",
                 num_restarts=0,
@@ -305,4 +322,5 @@ class Optimize(CliPlugin):
 
             sherlock.fit(X).predict(X, y)
 
-            print(sherlock.known_idx)
+            tqdm.write(sherlock.known_idx)
+            self._progressbar.close()
