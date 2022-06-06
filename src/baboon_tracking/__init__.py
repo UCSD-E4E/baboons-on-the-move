@@ -2,6 +2,6 @@
 Entry point for the baboon tracker.
 """
 
-from .baboon_tracker import BaboonTracker
+from .motion_tracker_pipeline import MotionTrackerPipeline
 
 from .mixins import *

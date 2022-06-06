@@ -10,8 +10,10 @@ from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.transformation_matrices_mixin import (
     TransformationMatricesMixin,
 )
-from baboon_tracking.stages.save_regions_base import SaveRegionsBase
+from baboon_tracking.stages.save_regions import SaveRegions
+from baboon_tracking.stages.sqlite_base import SqliteBase
 from pipeline.decorators import stage
+from pipeline.pipeline import Pipeline
 from pipeline.stage_result import StageResult
 
 
@@ -19,7 +21,7 @@ from pipeline.stage_result import StageResult
 @stage("frame")
 @stage("capture")
 @stage("transformation_matricies")
-class SaveMotionRegions(SaveRegionsBase):
+class SaveMotionRegions(SaveRegions):
     """
     Saves the list of baboons in Sqlite database.
     """
@@ -31,10 +33,8 @@ class SaveMotionRegions(SaveRegionsBase):
         capture: CaptureMixin,
         transformation_matricies: TransformationMatricesMixin,
     ) -> None:
-        SaveRegionsBase.__init__(self, "motion_regions")
+        SaveRegions.__init__(self, baboons, frame)
 
-        self._baboons = baboons
-        self._frame = frame
         self._capture = capture
         self._transformation_matricies = transformation_matricies
 
@@ -46,7 +46,7 @@ class SaveMotionRegions(SaveRegionsBase):
             remove(self.file_name)
 
     def on_database_create(self) -> None:
-        self.cursor.execute(
+        SqliteBase.cursor.execute(
             """CREATE TABLE motion_regions (
                 x1 int,
                 y1 int,
@@ -56,7 +56,7 @@ class SaveMotionRegions(SaveRegionsBase):
             )"""
         )
 
-        self.cursor.execute(
+        SqliteBase.cursor.execute(
             """CREATE TABLE transformations (
                 t11 real, t12 real, t13 real,
                 t21 real, t22 real, t23 real,
@@ -65,16 +65,20 @@ class SaveMotionRegions(SaveRegionsBase):
             )"""
         )
 
-        self.connection.commit()
+        SqliteBase.connection.commit()
 
-        self.cursor.execute(
+        SqliteBase.cursor.execute(
             "INSERT INTO metadata VALUES (?, ?, ?)",
-            (self.run_key, "file_name", self._capture.name),
+            (Pipeline.instance.name, "file_name", self._capture.name),
         )
 
-        self.connection.commit()
+        SqliteBase.connection.commit()
+
+        return super().on_database_create()
 
     def execute(self) -> StageResult:
+        stage_result = super().execute()
+
         frame_number = self._frame.frame.get_frame_number()
         T = self._transformation_matricies.current_frame_transformation
 
@@ -89,11 +93,11 @@ class SaveMotionRegions(SaveRegionsBase):
             )
             for x1, y1, x2, y2 in baboons
         ]
-        self.cursor.executemany(
+        SqliteBase.cursor.executemany(
             "INSERT INTO motion_regions VALUES (?, ?, ?, ?, ?)",
             baboons,
         )
-        self.cursor.execute(
+        SqliteBase.cursor.execute(
             "INSERT INTO transformations VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 T[0, 0],
@@ -109,4 +113,4 @@ class SaveMotionRegions(SaveRegionsBase):
             ),
         )
 
-        return StageResult(True, True)
+        return stage_result

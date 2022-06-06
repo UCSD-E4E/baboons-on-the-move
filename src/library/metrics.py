@@ -5,7 +5,7 @@ from typing import List
 import numpy as np
 from tqdm import tqdm
 
-from baboon_tracking import BaboonTracker
+from baboon_tracking import MotionTrackerPipeline
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from library.labeled_data import get_regions_from_xml
 from library.region import check_if_same_region
@@ -40,7 +40,9 @@ def get_metrics() -> List[Metric]:
     tqdm.write("testing on input")
     baboon_labels = get_regions_from_xml("./data/input.xml")
 
-    baboon_tracker = BaboonTracker("./data/input.mp4", runtime_config=runtime_config)
+    baboon_tracker = MotionTrackerPipeline(
+        "./data/input.mp4", runtime_config=runtime_config
+    )
     tqdm.write("tracker opened")
     baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 

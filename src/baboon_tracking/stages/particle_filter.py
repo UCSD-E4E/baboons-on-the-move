@@ -12,7 +12,7 @@ from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.transformation_matrices_mixin import (
     TransformationMatricesMixin,
 )
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Region
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.particle_filter import ParticleFilter
 from pipeline import Stage
@@ -89,7 +89,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         probs.sort(key=lambda p: p[0], reverse=True)
         probs = [(p, b) for p, b in probs if p > self._probability_thresh]
 
-        used_babooons: Set[Baboon] = set()
+        used_babooons: Set[Region] = set()
         for _, baboon in probs:
             if baboon in used_babooons:
                 continue

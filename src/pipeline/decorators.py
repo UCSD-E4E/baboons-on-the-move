@@ -4,6 +4,9 @@ Reusable decorators for the pipeline.
 from typing import Callable
 
 
+STAGE_MAP = {}
+
+
 def config(parameter_name: str, key: str):
     """
     Satisfies a parameter with a value from config.yml
@@ -42,10 +45,12 @@ def stage(parameter: str, is_property=False):
     """
 
     def inner_function(function: Callable):
-        if not hasattr(function, "stages"):
-            function.stages = []
+        global STAGE_MAP
 
-        function.stages.append((parameter, is_property))
+        if not function in STAGE_MAP:
+            STAGE_MAP[function] = []
+
+        STAGE_MAP[function].append((parameter, is_property))
 
         return function
 

@@ -26,6 +26,8 @@ class Stage(ABC):
         self._time = 0
         self._executions = 0
 
+        self.pipeline = None
+
     def _array2tuple(self, array: np.array) -> Tuple[int, int]:
         return (array[0], array[1])
 

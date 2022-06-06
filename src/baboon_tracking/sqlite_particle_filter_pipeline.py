@@ -6,6 +6,7 @@ from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.get_sqlite_baboon import GetSqliteBaboon
 from baboon_tracking.stages.particle_filter import ParticleFilterStage as ParticleFilter
 from baboon_tracking.stages.save_computed_regions import SaveComputedRegions
+from baboon_tracking.stages.save_hysteresis_regions import SaveHysteresisRegions
 from baboon_tracking.stages.test_exit import TestExit
 from pipeline.pipeline import Pipeline
 from pipeline.factory import factory
@@ -24,6 +25,7 @@ class SqliteParticleFilterPipeline(Pipeline):
             GetSqliteBaboon,
             ParticleFilter,
             SaveComputedRegions,
+            SaveHysteresisRegions,
             DisplayDebugRegions,
             TestExit,
             runtime_config=runtime_config,

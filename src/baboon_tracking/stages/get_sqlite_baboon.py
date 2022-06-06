@@ -12,7 +12,7 @@ from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.transformation_matrices_mixin import (
     TransformationMatricesMixin,
 )
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Region
 from pipeline import Stage
 from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
@@ -62,7 +62,7 @@ class GetSqliteBaboon(Stage, BaboonsMixin, TransformationMatricesMixin):
         )
 
         if regions and matrix_results:
-            self.baboons = [Baboon(r) for r in regions]
+            self.baboons = [Region(r) for r in regions]
             t11, t12, t13, t21, t22, t23, t31, t32, t33 = matrix_results[0]
             self.current_frame_transformation = np.array(
                 [[t11, t12, t13], [t21, t22, t23], [t31, t32, t33]]

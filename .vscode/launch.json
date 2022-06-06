@@ -11,14 +11,20 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                // "run",
-                // "--save",
-                // "no",
-                // "--display",
-                // "yes",
-                // "--input",
-                // "d:VISO/car/003"
-                "optimize"
+                "run",
+                "--save",
+                "no",
+                "--display",
+                "yes",
+                "--input",
+                "d:VISO/car/001",
+                "--pipeline",
+                "ParticleFilter"
+                // "optimize",
+                // "-d",
+                // "VISO/car/001",
+                // "-c",
+                // "10"
             ]
         },
         {

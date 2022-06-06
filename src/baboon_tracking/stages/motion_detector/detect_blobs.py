@@ -6,7 +6,7 @@ from baboon_tracking.decorators.debug import debug
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Region
 
 from pipeline import Stage
 from pipeline.decorators import stage
@@ -45,5 +45,5 @@ class DetectBlobs(Stage, BaboonsMixin):
         rectangles = [cv2.boundingRect(c) for c in contours]
         rectangles = [(r[0], r[1], r[0] + r[2], r[1] + r[3]) for r in rectangles]
 
-        self.baboons = [Baboon(r) for r in rectangles]
+        self.baboons = [Region(r) for r in rectangles]
         return StageResult(True, True)

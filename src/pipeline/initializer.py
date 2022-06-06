@@ -5,6 +5,7 @@ import inspect
 from typing import Callable, Dict, List
 from library.config import get_config_part
 from pipeline.stage import Stage
+from pipeline.decorators import STAGE_MAP
 
 
 def initializer(
@@ -30,8 +31,8 @@ def initializer(
         ]
     )
 
-    if hasattr(function, "stages"):
-        for stage, is_property in function.stages:
+    if function in STAGE_MAP:
+        for stage, is_property in STAGE_MAP[function]:
             if not is_property:
                 continue
 

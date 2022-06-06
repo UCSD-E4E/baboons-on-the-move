@@ -94,7 +94,7 @@ def get_dataset_path(name: str):
 
         _download_folder(f"/baboons/Datasets/{name}", dataset_root, file_station)
 
-    return f"{dataset_root}/img"
+    return dataset_root
 
 
 def _find_leaf_nodes(path: str, file_station: filestation.FileStation):

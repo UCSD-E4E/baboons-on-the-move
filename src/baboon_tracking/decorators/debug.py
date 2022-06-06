@@ -9,7 +9,7 @@ from numpy import ndarray
 
 from baboon_tracking.decorators.save_result import save_result
 from baboon_tracking.decorators.show_result import show_result
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Region
 from baboon_tracking.models.frame import Frame
 from pipeline.parent_stage import ParentStage
 
@@ -70,7 +70,7 @@ class DisplayDebugRegions(Stage):
         return StageResult(True, True)
 
     def _draw_regions(
-        self, debug_frame: ndarray, color: Tuple[int, int, int], baboons: List[Baboon]
+        self, debug_frame: ndarray, color: Tuple[int, int, int], baboons: List[Region]
     ):
         rectangles = [(b.rectangle, b.id_str) for b in baboons]
         for rect, id_str in rectangles:
