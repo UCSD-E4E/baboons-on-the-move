@@ -92,8 +92,9 @@ class SqliteBase(Stage, ABC):
         SqliteBase.inserted_metadata = True
 
     def on_init(self) -> None:
+        self.before_database_create()
+
         if SqliteBase.connection is None:
-            self.before_database_create()
 
             SqliteBase.connection = connect(self.file_name)
             SqliteBase.cursor = self.connection.cursor()
@@ -101,7 +102,7 @@ class SqliteBase(Stage, ABC):
             self._create_metadata_tables()
             self._insert_start_metadata()
 
-            self.on_database_create()
+        self.on_database_create()
 
     def before_database_close(self) -> None:
         """
@@ -124,3 +125,5 @@ class SqliteBase(Stage, ABC):
 
             SqliteBase.cursor = None
             SqliteBase.connection = None
+            SqliteBase.created_metadata = False
+            SqliteBase.inserted_metadata = False
