@@ -46,6 +46,8 @@ class SaveMotionRegions(SaveRegions):
             remove(self.file_name)
 
     def on_database_create(self) -> None:
+        super().on_database_create()
+
         SqliteBase.cursor.execute(
             """CREATE TABLE motion_regions (
                 x1 int,
@@ -73,8 +75,6 @@ class SaveMotionRegions(SaveRegions):
         )
 
         SqliteBase.connection.commit()
-
-        return super().on_database_create()
 
     def execute(self) -> StageResult:
         stage_result = super().execute()

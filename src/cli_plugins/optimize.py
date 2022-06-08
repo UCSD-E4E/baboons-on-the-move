@@ -130,20 +130,24 @@ class Optimize(CliPlugin):
             cursor = connection.cursor()
 
             ground_truth = pd.read_csv(ground_truth_path).to_numpy()
-            # found_regions = cursor.execute(
-            #     "SELECT x1, y1, x2, y2, identity, frame FROM computed_regions WHERE observed = 1 ORDER BY frame"
-            # )
+            found_regions = cursor.execute(
+                "SELECT x1, y1, x2, y2, identity, frame FROM bayesian_filter_regions WHERE observed = 1 ORDER BY frame"
+            )
 
-            # counts = {}
-            # for x1, y1, x2, y2, identity, frame in found_regions:
-            #     if identity not in counts:
-            #         counts[identity] = 0
+            counts = {}
+            for x1, y1, x2, y2, identity, frame in found_regions:
+                if identity not in counts:
+                    counts[identity] = 0
 
-            #     counts[identity] += 1
+                counts[identity] += 1
 
             found_regions = cursor.execute(
-                "SELECT x1, y1, x2, y2, identity, frame FROM computed_regions WHERE observed = 1 ORDER BY frame"
+                "SELECT x1, y1, x2, y2, identity, frame FROM bayesian_filter_regions WHERE observed = 1 ORDER BY frame"
             )
+
+            # found_regions = cursor.execute(
+            #     "SELECT x1, y1, x2, y2, identity, frame FROM regions ORDER BY frame"
+            # )
 
             curr_frame = -1
             true_positive = 0
@@ -166,8 +170,8 @@ class Optimize(CliPlugin):
                     curr_frame = frame
 
                 # Skip regions that only show up for one frame
-                # if counts[identity] == 1:
-                #     continue
+                if counts[identity] == 1:
+                    continue
 
                 current = (x1, y1, x2, y2)
                 matches = np.array(
@@ -332,7 +336,7 @@ class Optimize(CliPlugin):
 
         design_space_size_ref.set(X.shape[0])
 
-        percent = 0.001
+        percent = 0.02
         budget = int(X.shape[0] * percent)
         self._progressbar = tqdm(total=budget)
         sherlock = Sherlock(

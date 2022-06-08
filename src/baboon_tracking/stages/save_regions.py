@@ -26,8 +26,9 @@ class SaveRegions(SqliteBase):
         self._frame = frame
 
     def on_database_create(self) -> None:
-        SqliteBase.cursor.execute("DROP TABLE IF EXISTS regions")
+        super().on_database_create()
 
+        SqliteBase.cursor.execute("DROP TABLE IF EXISTS regions")
         SqliteBase.cursor.execute(
             """CREATE TABLE regions (
                 x1 int,
@@ -41,8 +42,6 @@ class SaveRegions(SqliteBase):
         )
 
         self.connection.commit()
-
-        return super().on_database_create()
 
     def execute(self) -> StageResult:
         frame_number = self._frame.frame.get_frame_number()
