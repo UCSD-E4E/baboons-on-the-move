@@ -35,6 +35,14 @@
             "description": "Opens VSCode with designated plugins"
         },
         {
+            "module": "compare",
+            "class": "Compare",
+            "subcommands": [
+                "compare"
+            ],
+            "description": "Compares two results databases and produces the difference"
+        },
+        {
             "module": "data",
             "class": "Data",
             "subcommands": [

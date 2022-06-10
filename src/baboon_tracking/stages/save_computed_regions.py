@@ -22,6 +22,9 @@ class SaveComputedRegions(SqliteBase):
         self._baboons = baboons
         self._frame = frame
 
+    def before_database_close(self) -> None:
+        self.save_hash("SaveComputedRegions")
+
     def on_database_create(self) -> None:
         SqliteBase.cursor.execute("DROP TABLE IF EXISTS bayesian_filter_regions")
 
@@ -60,10 +63,15 @@ class SaveComputedRegions(SqliteBase):
             )
             for (x1, y1, x2, y2), identity, id_str, observed in baboons
         ]
+        baboons.sort(key=lambda b: b[0])
         SqliteBase.cursor.executemany(
             "INSERT INTO bayesian_filter_regions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             baboons,
         )
+
+        for baboon in baboons:
+            for data in baboon[:4]:
+                self.md5.update(str(data).encode())
 
         SqliteBase.connection.commit()
 
