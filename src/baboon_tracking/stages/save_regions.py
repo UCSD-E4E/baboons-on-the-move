@@ -43,6 +43,9 @@ class SaveRegions(SqliteBase):
 
         self.connection.commit()
 
+    def before_database_close(self) -> None:
+        self.save_hash("SaveRegions")
+
     def execute(self) -> StageResult:
         frame_number = self._frame.frame.get_frame_number()
         self._save_baboons_for_frame(self._baboons.baboons, frame_number)
@@ -57,13 +60,18 @@ class SaveRegions(SqliteBase):
                 y1,
                 x2,
                 y2,
-                id_str,
                 identity,
+                id_str,
                 frame_number,
             )
             for (x1, y1, x2, y2), id_str, identity in baboons
         ]
+        baboons.sort(key=lambda b: b[0])
         SqliteBase.cursor.executemany(
             "INSERT INTO regions VALUES (?, ?, ?, ?, ?, ?, ?)",
             baboons,
         )
+
+        for baboon in baboons:
+            for data in baboon[:4]:
+                self.md5.update(str(data).encode())

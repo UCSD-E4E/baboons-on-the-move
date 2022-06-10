@@ -25,7 +25,7 @@ flatten = lambda t: [item for sublist in t for item in sublist]
 
 def process_pool(
     particle_filter: ParticleFilter,
-    baboons: BaboonsMixin,
+    baboons: List[Region],
     transformation_matrix: ndarray,
 ):
     """
@@ -39,6 +39,8 @@ def process_pool(
 
     particle_filter.update(baboons)
     particle_filter.resample()
+
+    return particle_filter
 
 
 @debug(FrameMixin, (0, 0, 255))
@@ -68,18 +70,16 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._executor.shutdown()
 
     def execute(self) -> StageResult:
-        # self._executor.map(
-        #     process_pool,
-        #     self._particle_filters,
-        #     [self._baboons.baboons for _ in self._particle_filters],
-        #     [self._transformation_matrices for _ in self._particle_filters],
-        # )
-        for particle_filter in self._particle_filters:
-            process_pool(
-                particle_filter,
+        futures = [
+            self._executor.submit(
+                process_pool,
+                p,
                 self._baboons.baboons,
                 self._transformation_matrices.current_frame_transformation,
             )
+            for p in self._particle_filters
+        ]
+        self._particle_filters = [f.result() for f in futures]
 
         probs = [
             [(p.get_probability(b), b) for b in self._baboons.baboons]

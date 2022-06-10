@@ -11,20 +11,27 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                "run",
-                "--save",
-                "no",
-                "--display",
-                "yes",
-                "--input",
-                "d:VISO/car/001",
-                "--pipeline",
-                "ParticleFilter"
+                // "run",
+                // "--save",
+                // "no",
+                // "--display",
+                // "yes",
+                // "--input",
+                // "d:VISO/car/001",
+                // "--pipeline",
+                // "ParticleFilter"
+                // --------
                 // "optimize",
                 // "-d",
-                // "VISO/car/001",
+                // "VISO/car/003",
                 // "-c",
-                // "10"
+                // "20"
+                // --------
+                "compare",
+                "-1",
+                "./output/results_serial.db",
+                "-2",
+                "./output/results_parallel.db"
             ]
         },
         {

@@ -1,6 +1,7 @@
 from abc import ABC
 from datetime import datetime
 import json
+import hashlib
 from sqlite3 import Connection, Cursor, connect
 
 import git
@@ -21,6 +22,7 @@ class SqliteBase(Stage, ABC):
         Stage.__init__(self)
 
         self.file_name = "./output/results.db"
+        self.md5 = hashlib.md5()
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.on_destroy()
@@ -41,23 +43,23 @@ class SqliteBase(Stage, ABC):
 
         SqliteBase.cursor.execute(
             """CREATE TABLE IF NOT EXISTS metadata
-                (run_key text, key text, value text)"""
+                (pipeline text, key text, value text)"""
         )
 
         SqliteBase.cursor.execute(
             """CREATE TABLE IF NOT EXISTS stages
-                (run_key text, name text, sort_order int)"""
+                (pipeline text, name text, sort_order int)"""
         )
 
         SqliteBase.cursor.execute(
             """DELETE FROM metadata
-                WHERE run_key = ?""",
+                WHERE pipeline = ?""",
             (Pipeline.instance.name,),
         )
 
         SqliteBase.cursor.execute(
             """DELETE FROM stages
-                WHERE run_key = ?""",
+                WHERE pipeline = ?""",
             (Pipeline.instance.name,),
         )
 
@@ -127,3 +129,9 @@ class SqliteBase(Stage, ABC):
             SqliteBase.connection = None
             SqliteBase.created_metadata = False
             SqliteBase.inserted_metadata = False
+
+    def save_hash(self, hash_key: str):
+        SqliteBase.cursor.execute(
+            "INSERT INTO metadata VALUES (?, ?, ?)",
+            (Pipeline.instance.name, hash_key, self.md5.hexdigest()),
+        )
