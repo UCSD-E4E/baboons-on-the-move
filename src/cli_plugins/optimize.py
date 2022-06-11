@@ -130,20 +130,6 @@ class Optimize(CliPlugin):
             cursor = connection.cursor()
 
             ground_truth = pd.read_csv(ground_truth_path).to_numpy()
-            # found_regions = cursor.execute(
-            #     "SELECT x1, y1, x2, y2, identity, frame FROM bayesian_filter_regions WHERE observed = 1 ORDER BY frame"
-            # )
-
-            # counts = {}
-            # for x1, y1, x2, y2, identity, frame in found_regions:
-            #     if identity not in counts:
-            #         counts[identity] = 0
-
-            #     counts[identity] += 1
-
-            # found_regions = cursor.execute(
-            #     "SELECT x1, y1, x2, y2, identity, frame FROM bayesian_filter_regions WHERE observed = 1 ORDER BY frame"
-            # )
 
             found_regions = cursor.execute(
                 "SELECT x1, y1, x2, y2, identity, frame FROM regions ORDER BY frame"
@@ -154,6 +140,7 @@ class Optimize(CliPlugin):
             false_negative = 0
             false_positive = 0
             truth = None
+            identity_map = {}
             for x1, y1, x2, y2, identity, frame in found_regions:
                 if curr_frame != frame:
                     if truth is not None:
@@ -161,26 +148,33 @@ class Optimize(CliPlugin):
 
                     truth = np.array(
                         [
-                            (x1, y1, x1 + width, y1 + height)
-                            for x1, y1, width, height in ground_truth[
-                                ground_truth[:, 0] == frame, 2:6
+                            (truth_identity, x1, y1, x1 + width, y1 + height)
+                            for truth_identity, x1, y1, width, height in ground_truth[
+                                ground_truth[:, 0] == frame, 1:6
                             ]
                         ]
                     )
                     curr_frame = frame
 
-                # Skip regions that only show up for one frame
-                # if counts[identity] == 1:
-                #     continue
-
                 current = (x1, y1, x2, y2)
-                matches = np.array(
-                    [bb_intersection_over_union(current, t) for t in truth]
-                )
+                if identity not in identity_map:
+                    matches = np.array(
+                        [bb_intersection_over_union(current, t[1:]) for t in truth]
+                    )
+                    match_idx = np.argmax(matches)
+                    score = matches[match_idx]
+                    truth_identity = truth[match_idx, 0]
 
-                if np.sum(matches) > 0:
+                    if score > 0:
+                        identity_map[identity] = truth_identity
+                else:
+                    truth_identity = identity_map[identity]
+                    match_idx = np.argmax(truth[:, 0] == truth_identity)
+                    score = bb_intersection_over_union(current, truth[match_idx, 1:])
+
+                if score > 0:
                     true_positive += 1
-                    truth = truth[np.logical_not(matches == np.max(matches))]
+                    truth = np.delete(truth, match_idx, 0)
                 else:
                     false_positive += 1
 

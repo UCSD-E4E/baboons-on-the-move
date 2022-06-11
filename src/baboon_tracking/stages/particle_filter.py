@@ -62,7 +62,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._executor = concurrent.futures.ProcessPoolExecutor()
         self._baboons = baboons
         self._transformation_matrices = transformation_matrices
-        self._particle_filters: List[ParticleFilter] = []
+        self._particle_filters: Set[ParticleFilter] = {}
         self._particle_count = 5
         self._probability_thresh = 0
 
@@ -79,18 +79,26 @@ class ParticleFilterStage(Stage, BaboonsMixin):
             )
             for p in self._particle_filters
         ]
-        self._particle_filters = [f.result() for f in futures]
+        self._particle_filters = {f.result() for f in futures}
 
         probs = [
-            [(p.get_probability(b), b) for b in self._baboons.baboons]
+            [(p.get_probability(b), b, p) for b in self._baboons.baboons]
             for p in self._particle_filters
         ]
         probs = flatten(probs)
         probs.sort(key=lambda p: p[0], reverse=True)
-        probs = [(p, b) for p, b in probs if p > self._probability_thresh]
 
+        used_particle_filters = {
+            pf for p, _, pf in probs if p > self._probability_thresh
+        }
+        unused_particle_filters = [
+            p for p in self._particle_filters if p not in used_particle_filters
+        ]
+        self._particle_filters.difference_update(unused_particle_filters)
+
+        thresh_probs = [(p, b) for p, b, _ in probs if p > self._probability_thresh]
         used_babooons: Set[Region] = set()
-        for _, baboon in probs:
+        for _, baboon in thresh_probs:
             if baboon in used_babooons:
                 continue
 
@@ -98,8 +106,8 @@ class ParticleFilterStage(Stage, BaboonsMixin):
 
         unused_baboons = [b for b in self._baboons.baboons if not b in used_babooons]
 
-        self._particle_filters.extend(
-            [ParticleFilter(b, self._particle_count) for b in unused_baboons]
+        self._particle_filters.update(
+            ParticleFilter(b, self._particle_count) for b in unused_baboons
         )
 
         self.baboons = [p.get_baboon() for p in self._particle_filters]
