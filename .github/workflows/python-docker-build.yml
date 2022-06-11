@@ -1,4 +1,4 @@
-name: C++ Docker Environment Build
+name: Python Docker Environment Build
 
 on:
   push:
