@@ -330,7 +330,7 @@ class Optimize(CliPlugin):
 
         design_space_size_ref.set(X.shape[0])
 
-        percent = 0.02
+        percent = 0.3
         budget = int(X.shape[0] * percent)
         self._progressbar = tqdm(total=budget)
         sherlock = Sherlock(
