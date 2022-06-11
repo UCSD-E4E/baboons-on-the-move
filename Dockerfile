@@ -23,4 +23,5 @@ RUN poetry export --without-hashes -f requirements.txt --output requirements.txt
 FROM base
 COPY --from=requirements /app/requirements.txt /app
 RUN pip install -r requirements.txt
+ENV CLI_ACTIVE=1
 CMD ["python3", "./cli.py", "run"]
