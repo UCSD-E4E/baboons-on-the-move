@@ -1,6 +1,7 @@
 """
 CLI Plugin for performing optimization.
 """
+from datetime import datetime
 import hashlib
 from argparse import ArgumentParser, Namespace
 from sqlite3 import connect
@@ -231,10 +232,13 @@ class Optimize(CliPlugin):
         config_options: List[Tuple[str, np.ndarray]],
         count: int,
         storage_ref: db.Reference,
+        current_idx: List[int],
     ):
         self._print(str(known_idx))
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
+        current_idx_ref = storage_ref.child("current_idx")
+        last_update_ref = storage_ref.child("last_update")
 
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
@@ -278,6 +282,8 @@ class Optimize(CliPlugin):
             else:
                 self._print("Using Cache...")
                 recall, precision, f1 = cache_result
+
+            current_idx.append(int(idx))
 
             y[idx, :] = np.array([recall, precision, f1])
             if np.sum(y[idx, :]) == 0:
@@ -324,6 +330,8 @@ class Optimize(CliPlugin):
             max_recall_ref.set(self._max_recall)
             max_precision_ref.set(self._max_precision)
             max_f1_ref.set(self._max_f1)
+            current_idx_ref.set(current_idx)
+            last_update_ref.set(datetime.utcnow().isoformat())
 
             if self._progress:
                 self._progressbar.update(1)
@@ -356,6 +364,7 @@ class Optimize(CliPlugin):
             persist_ref = tracking_ref.child("persist_disabled")
 
         frame_count_ref = persist_ref.child(args.count)
+        current_idx = []
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
@@ -398,6 +407,7 @@ class Optimize(CliPlugin):
                 config_options,
                 int(args.count),
                 frame_count_ref,
+                current_idx,
             ),
             action_only=None,
             n_hint_init=0,
