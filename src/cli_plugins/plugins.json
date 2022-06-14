@@ -139,6 +139,14 @@
                 "test"
             ],
             "description": "Runs pytest unit and integration tests"
+        },
+        {
+            "module": "plot",
+            "class": "Plot",
+            "subcommands": [
+                "plot"
+            ],
+            "description": "Plots graphs for the IEEE paper"
         }
     ]
 }
