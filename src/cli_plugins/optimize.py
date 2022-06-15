@@ -242,6 +242,7 @@ class Optimize(CliPlugin):
         requested_idx_ref = storage_ref.child("requested_idx")
         requested_idx = requested_idx_ref.get() or []
         requested_idx.extend(known_idx)
+        requested_idx = np.array(requested_idx)
         self._print(str(requested_idx))
 
         max_recall_ref = storage_ref.child("max_recall")
@@ -338,7 +339,12 @@ class Optimize(CliPlugin):
             max_f1_ref.set(self._max_f1)
             current_idx_ref.set(current_idx)
             last_update_ref.set(datetime.utcnow().isoformat())
-            requested_idx_ref.set([])
+
+            requested_idx = {int(r) for r in requested_idx}
+            requested_idx_new = [
+                r for r in requested_idx_ref.get() if r not in requested_idx
+            ]
+            requested_idx_ref.set(requested_idx_new)
 
             if self._progress:
                 self._progressbar.update(1)

@@ -168,7 +168,7 @@ class Plot(CliPlugin):
         # known_X = X[known_idx, :]
         ypredict, ypredict_idx, _ = approximate_pareto(known_outputs)
 
-        return known_outputs, known_idx, ypredict, ypredict_idx, frame_count_ref
+        return y, known_outputs, known_idx, ypredict, ypredict_idx, frame_count_ref
 
     def _get_results(
         self,
@@ -185,6 +185,7 @@ class Plot(CliPlugin):
         video_idx = Plot.VIDEO_FILES.index(f"VISO/car/{video_name}")
 
         (
+            y,
             known_outputs,
             known_idx,
             ypredict,
@@ -207,22 +208,26 @@ class Plot(CliPlugin):
         )
 
         if video_idx != reference_video_idx:
-            _, _, _, ref_ypredict_idx, _ = self._get_design_space(
+            _, _, _, _, ref_ypredict_idx, _ = self._get_design_space(
                 reference_video_name, enable_tracking, enable_persist
             )
 
             filtered_idx = [idx for idx in ref_ypredict_idx if idx in known_idx]
-            requested_idx = [int(idx) for idx in ref_ypredict_idx if idx not in known_idx]
+            requested_idx = [
+                int(idx) for idx in ref_ypredict_idx if idx not in known_idx
+            ]
 
             if requested_idx:
                 requested_idx_ref = storage_ref.child("requested_idx")
-                requested_idx_ref.set(requested_idx)
+                requested_idx_all = requested_idx_ref.get() or []
+                requested_idx_all.extend(requested_idx)
+                requested_idx_ref.set(requested_idx_all)
 
             ax.scatter(
-                known_outputs[filtered_idx, 0],
-                known_outputs[filtered_idx, 1],
-                c="green",
-                label=f"Predicted Pareto designs for Video {reference_video_idx}",
+                y[filtered_idx, 0],
+                y[filtered_idx, 1],
+                c="orange",
+                label=f"Predicted Pareto designs for Video {reference_video_idx + 1}",
             )
 
         ax.set_title(
@@ -260,7 +265,7 @@ class Plot(CliPlugin):
             self._get_results(video_file, True, False, axs[r, c])
             # self._get_results(video_file, False, True)
 
-        handles, labels = axs[1, 0].get_legend_handles_labels()
+        handles, labels = axs[0, 0].get_legend_handles_labels()
         fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
 
         plt.show()
