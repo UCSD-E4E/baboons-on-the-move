@@ -221,7 +221,7 @@ class Plot(CliPlugin):
                 requested_idx_ref = storage_ref.child("requested_idx")
                 requested_idx_all = requested_idx_ref.get() or []
                 requested_idx_all.extend(requested_idx)
-                requested_idx_ref.set(requested_idx_all)
+                requested_idx_ref.set(list(set(requested_idx_all)))
 
             ax.scatter(
                 y[filtered_idx, 0],
