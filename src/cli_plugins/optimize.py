@@ -343,7 +343,7 @@ class Optimize(CliPlugin):
             requested_idx = {int(r) for r in requested_idx}
             requested_idx_new = requested_idx_ref.get() or []
             requested_idx_new = [r for r in requested_idx_new if r not in requested_idx]
-            requested_idx_ref.set(requested_idx_new)
+            requested_idx_ref.set(list(set(requested_idx_new)))
 
             if self._progress:
                 self._progressbar.update(1)
