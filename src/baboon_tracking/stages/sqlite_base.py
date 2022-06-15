@@ -24,6 +24,7 @@ class SqliteBase(Stage, ABC):
 
         self.file_name = "./output/results.db"
         self.md5 = hashlib.md5()
+        self._pipeline_name: str = None
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.on_destroy()
@@ -39,6 +40,8 @@ class SqliteBase(Stage, ABC):
         """
 
     def _create_metadata_tables(self):
+        self._pipeline_name = Pipeline.instance.name
+
         if SqliteBase.created_metadata:
             return
 
@@ -55,13 +58,13 @@ class SqliteBase(Stage, ABC):
         SqliteBase.cursor.execute(
             """DELETE FROM metadata
                 WHERE pipeline = ?""",
-            (Pipeline.instance.name,),
+            (self._pipeline_name,),
         )
 
         SqliteBase.cursor.execute(
             """DELETE FROM stages
                 WHERE pipeline = ?""",
-            (Pipeline.instance.name,),
+            (self._pipeline_name,),
         )
 
         SqliteBase.connection.commit()
@@ -78,16 +81,16 @@ class SqliteBase(Stage, ABC):
         SqliteBase.cursor.executemany(
             "INSERT INTO metadata VALUES (?, ?, ?)",
             [
-                (Pipeline.instance.name, "start_time", datetime.utcnow()),
-                (Pipeline.instance.name, "git_commit", sha),
-                (Pipeline.instance.name, "config", json.dumps(get_config())),
+                (self._pipeline_name, "start_time", datetime.utcnow()),
+                (self._pipeline_name, "git_commit", sha),
+                (self._pipeline_name, "config", json.dumps(get_config())),
             ],
         )
 
         SqliteBase.cursor.executemany(
             "INSERT INTO stages VALUES (?, ?, ?)",
             [
-                (Pipeline.instance.name, s.__class__.__name__, i)
+                (self._pipeline_name, s.__class__.__name__, i)
                 for i, s in enumerate(ParentStage.static_stages)
             ],
         )
@@ -123,7 +126,7 @@ class SqliteBase(Stage, ABC):
 
             SqliteBase.cursor.execute(
                 "INSERT INTO metadata VALUES (?, ?, ?)",
-                (Pipeline.instance.name, "end_time", datetime.utcnow()),
+                (self._pipeline_name, "end_time", datetime.utcnow()),
             )
 
             SqliteBase.connection.commit()
@@ -138,5 +141,5 @@ class SqliteBase(Stage, ABC):
     def save_hash(self, hash_key: str):
         SqliteBase.cursor.execute(
             "INSERT INTO metadata VALUES (?, ?, ?)",
-            (Pipeline.instance.name, hash_key, self.md5.hexdigest()),
+            (self._pipeline_name, hash_key, self.md5.hexdigest()),
         )
