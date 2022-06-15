@@ -175,9 +175,9 @@ class Plot(CliPlugin):
         video_file: str,
         enable_tracking: bool,
         enable_persist: bool,
+        reference_video_name: str,
         ax: Axes,
     ):
-        reference_video_name = "003"
         reference_video_idx = Plot.VIDEO_FILES.index(f"VISO/car/{reference_video_name}")
 
         dataset_path = get_dataset_path(video_file)
@@ -256,16 +256,20 @@ class Plot(CliPlugin):
     def execute(self, args: Namespace):
         initialize_app()
 
-        fig, axs = plt.subplots(nrows=3, ncols=3)
-        fig.delaxes(axs[2][1])
-        fig.delaxes(axs[2][2])
-        for i, video_file in enumerate(Plot.VIDEO_FILES):
-            r, c = self._get_row_col(i)
+        for video_file in Plot.VIDEO_FILES:
+            dataset_path = get_dataset_path(video_file)
+            ref_video_name = dataset_path.split("/")[-1]
 
-            self._get_results(video_file, True, False, axs[r, c])
-            # self._get_results(video_file, False, True)
+            fig, axs = plt.subplots(nrows=3, ncols=3)
+            fig.delaxes(axs[2][1])
+            fig.delaxes(axs[2][2])
+            for i, video_file in enumerate(Plot.VIDEO_FILES):
+                r, c = self._get_row_col(i)
 
-        handles, labels = axs[0, 0].get_legend_handles_labels()
-        fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
+                self._get_results(video_file, True, False, ref_video_name, axs[r, c])
+                # self._get_results(video_file, False, True)
 
-        plt.show()
+            handles, labels = axs[0, 0].get_legend_handles_labels()
+            fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
+
+            # plt.show()

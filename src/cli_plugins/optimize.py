@@ -341,9 +341,8 @@ class Optimize(CliPlugin):
             last_update_ref.set(datetime.utcnow().isoformat())
 
             requested_idx = {int(r) for r in requested_idx}
-            requested_idx_new = [
-                r for r in requested_idx_ref.get() if r not in requested_idx
-            ]
+            requested_idx_new = requested_idx_ref.get() or []
+            requested_idx_new = [r for r in requested_idx_new if r not in requested_idx]
             requested_idx_ref.set(requested_idx_new)
 
             if self._progress:
