@@ -234,7 +234,6 @@ class Optimize(CliPlugin):
         storage_ref: db.Reference,
         current_idx: List[int],
     ):
-        self._print(str(known_idx))
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
         current_idx_ref = storage_ref.child("current_idx")
@@ -243,6 +242,7 @@ class Optimize(CliPlugin):
         requested_idx_ref = storage_ref.child("requested_idx")
         requested_idx = requested_idx_ref.get() or []
         requested_idx.extend(known_idx)
+        self._print(str(requested_idx))
 
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
