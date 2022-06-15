@@ -338,6 +338,7 @@ class Optimize(CliPlugin):
             max_f1_ref.set(self._max_f1)
             current_idx_ref.set(current_idx)
             last_update_ref.set(datetime.utcnow().isoformat())
+            requested_idx_ref.set([])
 
             if self._progress:
                 self._progressbar.update(1)
