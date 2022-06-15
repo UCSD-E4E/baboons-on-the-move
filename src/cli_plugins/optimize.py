@@ -240,13 +240,18 @@ class Optimize(CliPlugin):
         current_idx_ref = storage_ref.child("current_idx")
         last_update_ref = storage_ref.child("last_update")
 
+        requested_idx_ref = storage_ref.child("requested_idx")
+        requested_idx = requested_idx_ref.get() or []
+        requested_idx.extend(known_idx)
+
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
         max_f1_ref = storage_ref.child("max_f1")
 
         path = f"{dataset_path}/img"
         ground_truth_path = f"{dataset_path}/gt/gt.txt"
-        for idx in known_idx:
+
+        for idx in requested_idx:
             cache_result_ref = storage_ref.child(str(idx))
             cache_result = cache_result_ref.get()
 
@@ -283,7 +288,8 @@ class Optimize(CliPlugin):
                 self._print("Using Cache...")
                 recall, precision, f1 = cache_result
 
-            current_idx.append(int(idx))
+            if idx in known_idx:
+                current_idx.append(int(idx))
 
             y[idx, :] = np.array([recall, precision, f1])
             if np.sum(y[idx, :]) == 0:

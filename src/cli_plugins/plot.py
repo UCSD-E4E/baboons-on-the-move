@@ -1,6 +1,10 @@
 from argparse import ArgumentParser, Namespace
 import hashlib
+import math
 from firebase_admin import db
+from matplotlib.axes import Axes
+from matplotlib.axis import Axis
+from matplotlib.figure import Figure
 import yaml
 from cli_plugins.cli_plugin import CliPlugin
 from library.dataset import get_dataset_path
@@ -85,8 +89,8 @@ class Plot(CliPlugin):
 
         return leaf_nodes
 
-    def _get_results(
-        self, video_file: str, enable_tracking: bool, enable_persist: bool
+    def _get_design_space(
+        self, video_name: str, enable_tracking: bool, enable_persist: bool
     ):
         cache_path = "./output/plot_cache.pickle"
         cache: Dict[
@@ -116,8 +120,6 @@ class Plot(CliPlugin):
             config_hash = hashlib.md5(f.read()).hexdigest()
 
         sherlock_ref = db.reference("sherlock")
-        dataset_path = get_dataset_path(video_file)
-        video_name = dataset_path.split("/")[-1]
 
         video_name_ref = sherlock_ref.child(video_name)
         config_declaration_ref = video_name_ref.child(config_hash)
@@ -134,6 +136,7 @@ class Plot(CliPlugin):
 
         frame_count_ref = persist_ref.child("20")
         known_idx_ref = frame_count_ref.child("known_idx")
+        # known_idx_ref = frame_count_ref.child("current_idx")
 
         updated_cache = False
         known_idx = known_idx_ref.get()
@@ -163,27 +166,101 @@ class Plot(CliPlugin):
 
         known_outputs = y[known_idx, :]
         # known_X = X[known_idx, :]
-        kpareto, kpareto_idx, _ = approximate_pareto(known_outputs)
+        ypredict, ypredict_idx, _ = approximate_pareto(known_outputs)
 
-        plt.scatter(
+        return known_outputs, known_idx, ypredict, ypredict_idx, frame_count_ref
+
+    def _get_results(
+        self,
+        video_file: str,
+        enable_tracking: bool,
+        enable_persist: bool,
+        ax: Axes,
+    ):
+        reference_video_name = "003"
+        reference_video_idx = Plot.VIDEO_FILES.index(f"VISO/car/{reference_video_name}")
+
+        dataset_path = get_dataset_path(video_file)
+        video_name = dataset_path.split("/")[-1]
+        video_idx = Plot.VIDEO_FILES.index(f"VISO/car/{video_name}")
+
+        (
+            known_outputs,
+            known_idx,
+            ypredict,
+            ypredict_idx,
+            storage_ref,
+        ) = self._get_design_space(video_name, enable_tracking, enable_persist)
+
+        ax.scatter(
             known_outputs[:, 0],
             known_outputs[:, 1],
             c="blue",
             marker="^",
             label="Sampled designs",
         )
-        plt.scatter(
-            kpareto[:, 0], kpareto[:, 1], c="red", label="Pareto optimal designs"
+        ax.scatter(
+            ypredict[:, 0],
+            ypredict[:, 1],
+            c="red",
+            label="Predicted Pareto designs",
         )
-        plt.legend(bbox_to_anchor=(1.05, 1.05))
-        # plt.set_xlim(y[:, 0].min(), y[:, 0].max())
-        # plt.set_ylim(y[:, 1].min(), y[:, 1].max())
 
-        plt.show()
+        if video_idx != reference_video_idx:
+            _, _, _, ref_ypredict_idx, _ = self._get_design_space(
+                reference_video_name, enable_tracking, enable_persist
+            )
+
+            filtered_idx = [idx for idx in ref_ypredict_idx if idx in known_idx]
+            requested_idx = [int(idx) for idx in ref_ypredict_idx if idx not in known_idx]
+
+            if requested_idx:
+                requested_idx_ref = storage_ref.child("requested_idx")
+                requested_idx_ref.set(requested_idx)
+
+            ax.scatter(
+                known_outputs[filtered_idx, 0],
+                known_outputs[filtered_idx, 1],
+                c="green",
+                label=f"Predicted Pareto designs for Video {reference_video_idx}",
+            )
+
+        ax.set_title(
+            f"Video {video_idx + 1}"
+            # + f" with Tracking {'Enabled' if enable_tracking else 'Disabled'}"
+            # + f" and Persistence {'Enabled' if enable_persist else 'Disabled'}"
+            # + " Design Space"
+        )
+        ax.set(xlabel="Recall", ylabel="Precision")
+        # ax.label_outer()
+        # ax.legend()
+        # plt.legend(bbox_to_anchor=(1.05, 1.05))
+        # plt.xlabel("Recall")
+        # plt.ylabel("Precision")
+        ax.set_xlim(known_outputs[:, 0].min(), known_outputs[:, 0].max())
+        ax.set_ylim(known_outputs[:, 1].min(), known_outputs[:, 1].max())
+
+        # plt.show()
+
+    def _get_row_col(self, i: int):
+        col = i % 3
+        row = math.floor(i / 3)
+
+        return (row, col)
 
     def execute(self, args: Namespace):
         initialize_app()
 
-        for video_file in Plot.VIDEO_FILES:
-            self._get_results(video_file, True, False)
+        fig, axs = plt.subplots(nrows=3, ncols=3)
+        fig.delaxes(axs[2][1])
+        fig.delaxes(axs[2][2])
+        for i, video_file in enumerate(Plot.VIDEO_FILES):
+            r, c = self._get_row_col(i)
+
+            self._get_results(video_file, True, False, axs[r, c])
             # self._get_results(video_file, False, True)
+
+        handles, labels = axs[1, 0].get_legend_handles_labels()
+        fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
+
+        plt.show()
