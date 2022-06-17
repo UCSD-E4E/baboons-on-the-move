@@ -15,6 +15,7 @@ import matplotlib.pyplot as plt
 from sherlock.utils import approximate_pareto
 from os.path import exists
 import pickle
+from os import makedirs
 
 
 class Plot(CliPlugin):
@@ -178,7 +179,10 @@ class Plot(CliPlugin):
         reference_video_name: str,
         ax: Axes,
     ):
-        reference_video_idx = Plot.VIDEO_FILES.index(f"VISO/car/{reference_video_name}")
+        if reference_video_name:
+            reference_video_idx = Plot.VIDEO_FILES.index(
+                f"VISO/car/{reference_video_name}"
+            )
 
         dataset_path = get_dataset_path(video_file)
         video_name = dataset_path.split("/")[-1]
@@ -207,7 +211,7 @@ class Plot(CliPlugin):
             label="Predicted Pareto designs",
         )
 
-        if video_idx != reference_video_idx:
+        if reference_video_name and video_idx != reference_video_idx:
             _, _, _, _, ref_ypredict_idx, _ = self._get_design_space(
                 reference_video_name, enable_tracking, enable_persist
             )
@@ -256,20 +260,72 @@ class Plot(CliPlugin):
     def execute(self, args: Namespace):
         initialize_app()
 
-        for video_file in Plot.VIDEO_FILES:
-            dataset_path = get_dataset_path(video_file)
-            ref_video_name = dataset_path.split("/")[-1]
+        enable_tracking = True
+        enable_persist = False
 
-            fig, axs = plt.subplots(nrows=3, ncols=3)
-            fig.delaxes(axs[2][1])
-            fig.delaxes(axs[2][2])
-            for i, video_file in enumerate(Plot.VIDEO_FILES):
-                r, c = self._get_row_col(i)
+        video_files = [""]
+        video_files.extend(Plot.VIDEO_FILES)
 
-                self._get_results(video_file, True, False, ref_video_name, axs[r, c])
-                # self._get_results(video_file, False, True)
+        with open("./output/pareto_front.csv", "w", encoding="utf8") as f:
+            for ref_idx, ref_video_file in enumerate(video_files):
+                ref_idx -= 1
+                ref_video_name = None
+                if ref_idx != -1:
+                    ref_r, ref_c = self._get_row_col(ref_idx)
 
-            handles, labels = axs[0, 0].get_legend_handles_labels()
-            fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
+                    if ref_r == 0 and ref_c == 0:
+                        ref_r = 1
 
-            # plt.show()
+                    dataset_path = get_dataset_path(ref_video_file)
+                    ref_video_name = dataset_path.split("/")[-1]
+
+                plt.clf()
+                fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(12, 8))
+                fig.delaxes(axs[2][1])
+                fig.delaxes(axs[2][2])
+                for i, video_file in enumerate(Plot.VIDEO_FILES):
+                    r, c = self._get_row_col(i)
+
+                    self._get_results(
+                        video_file, True, False, ref_video_name, axs[r, c]
+                    )
+                    # self._get_results(video_file, False, True)
+
+                if ref_idx == -1:
+                    ref_r = 0
+
+                handles, labels = axs[ref_r, 0].get_legend_handles_labels()
+                fig.tight_layout()
+                fig.legend(
+                    handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15)
+                )
+
+                makedirs("./output/figures", exist_ok=True)
+
+                if ref_idx == -1:
+                    path = f"./output/figures/fig_{'tracking' if enable_tracking else 'detection'}_pareto.pdf"
+                else:
+                    path = f"./output/figures/fig_{'tracking' if enable_tracking else 'detection'}_pareto_ref{ref_idx + 1}.pdf"
+
+                plt.savefig(path, format="pdf")
+
+                if ref_idx != -1:
+                    (
+                        y,
+                        known_outputs,
+                        known_idx,
+                        ypredict,
+                        ypredict_idx,
+                        storage_ref,
+                    ) = self._get_design_space(
+                        ref_video_name, enable_tracking, enable_persist
+                    )
+
+                    # print(f"Video {ref_idx + 1}")
+                    for idx, (recall, precision, f1) in zip(known_idx, known_outputs):
+                        f.write(
+                            f"Video {ref_idx + 1},{idx},{recall},{precision},{f1}\n"
+                        )
+                        # print(f"{idx}: {recall},{precision},{f1}")
+
+                # plt.show()
