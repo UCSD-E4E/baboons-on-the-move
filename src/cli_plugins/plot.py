@@ -3,7 +3,6 @@ import hashlib
 import math
 from firebase_admin import db
 from matplotlib.axes import Axes
-from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 import yaml
 from cli_plugins.cli_plugin import CliPlugin

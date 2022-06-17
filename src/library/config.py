@@ -10,6 +10,7 @@ from typing import Any, Dict, Tuple
 from firebase_admin import db
 from numpy.core.numeric import Inf
 import yaml
+import numpy as np
 
 from library.firebase import initialize_app
 
@@ -179,3 +180,62 @@ def save_config(config: Dict):
     """
     with open("./config.yml", "w", encoding="utf8") as f:
         yaml.dump(config, f)
+
+
+def get_config_options(config_declaration: Dict[str, Any]):
+    type_value = None
+    if config_declaration["type"] == "int32":
+        type_value = np.int32
+    elif config_declaration["type"] == "float":
+        type_value = np.float32
+
+    if "step" in config_declaration:
+        step = config_declaration["step"]
+    else:
+        step = 1
+
+    if "min" in config_declaration:
+        min_value = config_declaration["min"]
+    else:
+        min_value = 0
+
+    if "max" in config_declaration:
+        max_value = config_declaration["max"]
+    else:
+        max_value = 100
+
+    if "odd" in config_declaration:
+        is_odd = config_declaration["odd"]
+    else:
+        is_odd = False
+
+    if is_odd:
+        min_value -= 1
+        max_value = max_value / 2
+
+    values = np.arange(min_value, max_value, step=step, dtype=type_value)
+    if is_odd:
+        values = values * 2 + 1
+
+    return values
+
+
+def _extend(target: Dict[str, Any], source: Dict[str, Any]):
+    for key, value in source.items():
+        target[key] = value
+
+    return target
+
+
+def get_config_declaration(root: str, config_declaration: Dict[str, Any]):
+    leaf_nodes = {}
+
+    for key, value in config_declaration.items():
+        if isinstance(value, dict):
+            _extend(leaf_nodes, get_config_declaration(f"{root}/{key}", value))
+            continue
+
+    if not leaf_nodes.keys():
+        leaf_nodes[root] = config_declaration
+
+    return leaf_nodes
