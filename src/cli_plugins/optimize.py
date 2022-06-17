@@ -19,7 +19,7 @@ from cli_plugins.run import str2bool
 from baboon_tracking.motion_tracker_pipeline import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
-from library.config import set_config_part
+from library.config import set_config_part, get_config_declaration, get_config_options
 from library.dataset import get_dataset_path
 from library.firebase import initialize_app
 from library.region import bb_intersection_over_union
@@ -95,64 +95,6 @@ class Optimize(CliPlugin):
             tqdm.write(output)
         else:
             print(output)
-
-    def _extend(self, target: Dict[str, Any], source: Dict[str, Any]):
-        for key, value in source.items():
-            target[key] = value
-
-        return target
-
-    def _get_config_declaration(self, root: str, config_declaration: Dict[str, Any]):
-        leaf_nodes = {}
-
-        for key, value in config_declaration.items():
-            if isinstance(value, dict):
-                self._extend(
-                    leaf_nodes, self._get_config_declaration(f"{root}/{key}", value)
-                )
-                continue
-
-        if not leaf_nodes.keys():
-            leaf_nodes[root] = config_declaration
-
-        return leaf_nodes
-
-    def _get_config_options(self, config_declaration: Dict[str, Any]):
-        type_value = None
-        if config_declaration["type"] == "int32":
-            type_value = np.int32
-        elif config_declaration["type"] == "float":
-            type_value = np.float32
-
-        if "step" in config_declaration:
-            step = config_declaration["step"]
-        else:
-            step = 1
-
-        if "min" in config_declaration:
-            min_value = config_declaration["min"]
-        else:
-            min_value = 0
-
-        if "max" in config_declaration:
-            max_value = config_declaration["max"]
-        else:
-            max_value = 100
-
-        if "odd" in config_declaration:
-            is_odd = config_declaration["odd"]
-        else:
-            is_odd = False
-
-        if is_odd:
-            min_value -= 1
-            max_value = max_value / 2
-
-        values = np.arange(min_value, max_value, step=step, dtype=type_value)
-        if is_odd:
-            values = values * 2 + 1
-
-        return values
 
     def _get_metrics(self, results_db_path: str, ground_truth_path: str):
         with connect(results_db_path) as connection:
@@ -380,11 +322,11 @@ class Optimize(CliPlugin):
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
-            config_declaration = self._get_config_declaration("", yaml.safe_load(f))
+            config_declaration = get_config_declaration("", yaml.safe_load(f))
             f.seek(0)
 
         config_options = [
-            (k, self._get_config_options(i), i["type"])
+            (k, get_config_options(i), i["type"])
             for k, i in config_declaration.items()
             if "skip_learn" not in i or not i["skip_learn"]
         ]
