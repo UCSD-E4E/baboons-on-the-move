@@ -291,6 +291,8 @@ class Optimize(CliPlugin):
                 self._progressbar.update(1)
 
     def execute(self, args: Namespace):
+        np.random.seed(1234)  # Allow our caching to be more effective
+
         initialize_app()
 
         self._runtime_config["enable_tracking"] = args.enable_tracking
