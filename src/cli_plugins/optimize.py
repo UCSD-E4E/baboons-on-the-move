@@ -77,7 +77,7 @@ class Optimize(CliPlugin):
 
         self._runtime_config = {
             "display": False,
-            "save": True,
+            "save": False,
             "timings": False,
             "progress": False,
         }
