@@ -7,6 +7,7 @@ import argparse
 import importlib
 import json
 import os
+import platform
 import subprocess
 import sys
 
@@ -62,9 +63,10 @@ def main():
     with open("./src/cli_plugins/plugins.json", "r", encoding="utf8") as f:
         plugins_dict = json.load(f)
 
+    is_arm = platform.machine() == "aarch64"
     # Plugins are loaded dynamically from ./src/cli_plugins/plugins.json
     for plugin in plugins_dict["plugins"]:
-        if "support_arm" in plugin and not plugin["support_arm"]:
+        if is_arm and "support_arm" in plugin and not plugin["support_arm"]:
             continue
 
         for subcommand in plugin["subcommands"]:
