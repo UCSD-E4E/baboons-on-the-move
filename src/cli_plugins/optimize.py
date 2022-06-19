@@ -260,7 +260,7 @@ class Optimize(CliPlugin):
                 f1_color = "\033[93m"
 
             self._print(
-                f"\033[1mCompleted {idx:} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+                f"\033[1mCompleted {idx:} at {datetime.utcnow().isoformat()} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_recall
             self._print(
