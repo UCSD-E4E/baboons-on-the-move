@@ -143,6 +143,6 @@ class Pipeline(ABC):
             return
 
         if self._progressbar is None:
-            self._progressbar = tqdm(total=int(Pipeline.iterations))
+            self._progressbar = tqdm(total=int(Pipeline.iterations), position=0)
 
         self._progressbar.update(1)

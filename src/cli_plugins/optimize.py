@@ -79,7 +79,7 @@ class Optimize(CliPlugin):
             "display": False,
             "save": False,
             "timings": False,
-            "progress": False,
+            "progress": True,
         }
         self._max_precision = (0, 0, 0)
         self._max_recall = (0, 0, 0)
@@ -343,7 +343,7 @@ class Optimize(CliPlugin):
         budget = int(X.shape[0] * percent)
 
         if self._progress:
-            self._progressbar = tqdm(total=budget)
+            self._progressbar = tqdm(total=budget, position=1)
 
         sherlock = Sherlock(
             n_init=5,
