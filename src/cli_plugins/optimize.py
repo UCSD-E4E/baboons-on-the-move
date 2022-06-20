@@ -363,7 +363,7 @@ class Optimize(CliPlugin):
         known_idx_ref = frame_count_ref.child("current_idx")
 
         updated_cache = False
-        known_idx = known_idx_ref.get()
+        known_idx = known_idx_ref.get() or []
         for idx in known_idx:
             cache_key = (
                 config_hash,
