@@ -372,6 +372,11 @@ class Optimize(CliPlugin):
 
         return X, y, known_idx
 
+    def _unpack(self, array: np.ndarray):
+        recall, precision, f1 = array
+
+        return float(recall), float(precision), float(f1)
+
     def execute(self, args: Namespace):
         np.random.seed(1234)  # Allow our caching to be more effective
 
@@ -460,9 +465,9 @@ class Optimize(CliPlugin):
         max_precision_idx = np.argmax(y[:, 1])
         max_f1_idx = np.argmax(y[:, 2])
 
-        self._max_precision = y[max_recall_idx, :]
-        self._max_recall = y[max_precision_idx, :]
-        self._max_f1 = y[max_f1_idx, :]
+        self._max_precision = self._unpack(y[max_recall_idx, :])
+        self._max_recall = self._unpack(y[max_precision_idx, :])
+        self._max_f1 = self._unpack(y[max_f1_idx, :])
 
         sherlock.fit(X).predict(X, y, input_known_idx=np.array(current_idx).astype(int))
 
