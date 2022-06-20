@@ -231,7 +231,7 @@ class Optimize(CliPlugin):
                     self._save_results(video_name, idx, config_hash)
                 except ValueError:
                     errors = errors_ref.get() or []
-                    errors.append(idx)
+                    errors.append(int(idx))
 
                     errors_ref.set(errors)
 
