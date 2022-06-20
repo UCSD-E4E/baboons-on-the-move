@@ -376,7 +376,7 @@ class Optimize(CliPlugin):
         if self._progress:
             self._progressbar.update(len(current_idx))
 
-        sherlock.fit(X).predict(X, y, input_known_idx=np.array(current_idx))
+        sherlock.fit(X).predict(X, y, input_known_idx=np.array(current_idx).astype(int))
 
         if self._progress:
             self._progressbar.close()
