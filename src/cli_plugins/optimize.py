@@ -2,8 +2,10 @@
 CLI Plugin for performing optimization.
 """
 from datetime import datetime
+from genericpath import exists
 import hashlib
 from argparse import ArgumentParser, Namespace
+import pickle
 from sqlite3 import connect
 from typing import Any, Dict, List, Tuple
 
@@ -290,39 +292,22 @@ class Optimize(CliPlugin):
             if self._progress and idx in known_idx:
                 self._progressbar.update(1)
 
-    def execute(self, args: Namespace):
-        np.random.seed(1234)  # Allow our caching to be more effective
-
-        initialize_app()
-
-        self._runtime_config["enable_tracking"] = args.enable_tracking
-        self._runtime_config["enable_persist"] = args.enable_persist
-        self._tracking_enabled = args.enable_tracking
-
-        with open("./config_declaration.yml", "rb") as f:
-            config_hash = hashlib.md5(f.read()).hexdigest()
-
-        dataset_path = get_dataset_path(args.dataset)
-        video_file = dataset_path.split("/")[-1]
-
-        sherlock_ref = db.reference("sherlock")
-        video_file_ref = sherlock_ref.child(video_file)
-        config_declaration_ref = video_file_ref.child(config_hash)
-
-        if args.enable_tracking:
-            tracking_ref = config_declaration_ref.child("tracking_enabled")
+    def _get_design_space(
+        self,
+        video_name: str,
+        frame_count: int,
+        enable_tracking: bool,
+        enable_persist: bool,
+    ):
+        cache_path = "./output/plot_cache.pickle"
+        cache: Dict[
+            Tuple[str, int, str, bool, bool, int], Tuple[float, float, float]
+        ] = None
+        if exists(cache_path):
+            with open(cache_path, "rb") as f:
+                cache = pickle.load(f)
         else:
-            tracking_ref = config_declaration_ref.child("tracking_disabled")
-
-        if args.enable_persist:
-            persist_ref = tracking_ref.child("persist_enabled")
-        else:
-            persist_ref = tracking_ref.child("persist_disabled")
-
-        frame_count_ref = persist_ref.child(args.count)
-        current_idx_ref = frame_count_ref.child("current_idx")
-        current_idx = current_idx_ref.get() or []
-        design_space_size_ref = config_declaration_ref.child("design_space_size")
+            cache = {}
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
             config_declaration = get_config_declaration("", yaml.safe_load(f))
@@ -337,6 +322,101 @@ class Optimize(CliPlugin):
             -1, len(config_options)
         )
         y = np.zeros((X.shape[0], 3))
+
+        with open("./config_declaration.yml", "rb") as f:
+            config_hash = hashlib.md5(f.read()).hexdigest()
+
+        sherlock_ref = db.reference("sherlock")
+
+        video_name_ref = sherlock_ref.child(video_name)
+        config_declaration_ref = video_name_ref.child(config_hash)
+
+        if enable_tracking:
+            tracking_ref = config_declaration_ref.child("tracking_enabled")
+        else:
+            tracking_ref = config_declaration_ref.child("tracking_disabled")
+
+        if enable_persist:
+            persist_ref = tracking_ref.child("persist_enabled")
+        else:
+            persist_ref = tracking_ref.child("persist_disabled")
+
+        frame_count_ref = persist_ref.child(str(frame_count))
+        known_idx_ref = frame_count_ref.child("current_idx")
+
+        updated_cache = False
+        known_idx = known_idx_ref.get()
+        for idx in known_idx:
+            cache_key = (
+                config_hash,
+                frame_count,
+                video_name,
+                enable_tracking,
+                enable_persist,
+                idx,
+            )
+
+            if cache_key in cache:
+                recall, precision, f1 = cache[cache_key]
+            else:
+                idx_ref = frame_count_ref.child(str(idx))
+                recall, precision, f1 = idx_ref.get()
+                cache[cache_key] = (recall, precision, f1)
+                updated_cache = True
+
+            y[idx, :] = np.array([recall, precision, f1])
+
+        if updated_cache:
+            with open(cache_path, "wb") as f:
+                pickle.dump(cache, f)
+
+        return X, y, known_idx
+
+    def execute(self, args: Namespace):
+        np.random.seed(1234)  # Allow our caching to be more effective
+
+        initialize_app()
+
+        self._runtime_config["enable_tracking"] = args.enable_tracking
+        self._runtime_config["enable_persist"] = args.enable_persist
+        self._tracking_enabled = args.enable_tracking
+
+        with open("./config_declaration.yml", "rb") as f:
+            config_hash = hashlib.md5(f.read()).hexdigest()
+
+        dataset_path = get_dataset_path(args.dataset)
+        video_name = dataset_path.split("/")[-1]
+
+        sherlock_ref = db.reference("sherlock")
+        video_name_ref = sherlock_ref.child(video_name)
+        config_declaration_ref = video_name_ref.child(config_hash)
+
+        if args.enable_tracking:
+            tracking_ref = config_declaration_ref.child("tracking_enabled")
+        else:
+            tracking_ref = config_declaration_ref.child("tracking_disabled")
+
+        if args.enable_persist:
+            persist_ref = tracking_ref.child("persist_enabled")
+        else:
+            persist_ref = tracking_ref.child("persist_disabled")
+
+        frame_count_ref = persist_ref.child(args.count)
+        design_space_size_ref = config_declaration_ref.child("design_space_size")
+
+        X, y, current_idx = self._get_design_space(
+            video_name, args.count, args.enable_tracking, args.enable_persist
+        )
+
+        with open("./config_declaration.yml", "r", encoding="utf8") as f:
+            config_declaration = get_config_declaration("", yaml.safe_load(f))
+            f.seek(0)
+
+        config_options = [
+            (k, get_config_options(i), i["type"])
+            for k, i in config_declaration.items()
+            if "skip_learn" not in i or not i["skip_learn"]
+        ]
 
         design_space_size_ref.set(X.shape[0])
 
@@ -375,6 +455,14 @@ class Optimize(CliPlugin):
 
         if self._progress:
             self._progressbar.update(len(current_idx))
+
+        max_recall_idx = np.argmax(y[:, 0])
+        max_precision_idx = np.argmax(y[:, 1])
+        max_f1_idx = np.argmax(y[:, 2])
+
+        self._max_precision = y[max_recall_idx, :]
+        self._max_recall = y[max_precision_idx, :]
+        self._max_f1 = y[max_f1_idx, :]
 
         sherlock.fit(X).predict(X, y, input_known_idx=np.array(current_idx).astype(int))
 
