@@ -106,8 +106,9 @@ class CalculateMetrics(CliPlugin):
         requested_idx_ref = storage_ref.child("requested_idx")
 
         requested_idx = set(requested_idx_ref.get() or [])
-        requested_idx.remove(idx)
-        requested_idx_ref.set(list(requested_idx))
+        if idx in requested_idx:
+            requested_idx.remove(idx)
+            requested_idx_ref.set(list(requested_idx))
 
     def _set_config(self, idx: int, X: np.ndarray, config_options):
         for i, (key, _, value_type) in enumerate(config_options):
