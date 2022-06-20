@@ -240,6 +240,7 @@ class CalculateMetrics(CliPlugin):
         requests = self._get_requests(config_hash)
         while flatten(r for _, r in requests.items()):
             video_name, idx = self._get_request(requests)
+            print(f"{video_name}: {idx}")
 
             # Remove the requested idx we are going to start work on.
             self._remove_requested_idx(video_name, idx, config_hash)
