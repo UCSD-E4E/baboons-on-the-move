@@ -372,7 +372,13 @@ class Optimize(CliPlugin):
             model_selection_type="mab10",
         )
 
-        sherlock.fit(X).predict(X, y)
+        current_idx_ref = frame_count_ref.child("current_idx")
+        current_idx = current_idx_ref.get() or []
+
+        if self._progress:
+            self._progressbar.update(len(current_idx))
+
+        sherlock.fit(X).predict(X, y, input_known_idx=current_idx)
 
         if self._progress:
             self._progressbar.close()
