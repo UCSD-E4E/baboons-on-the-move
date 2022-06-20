@@ -195,6 +195,8 @@ class Optimize(CliPlugin):
         requested_idx = np.array(requested_idx)
         self._print(str(requested_idx))
 
+        errors_ref = storage_ref.child("errors")
+
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
         max_f1_ref = storage_ref.child("max_f1")
@@ -228,6 +230,11 @@ class Optimize(CliPlugin):
 
                     self._save_results(video_name, idx, config_hash)
                 except ValueError:
+                    errors = errors_ref.get() or []
+                    errors.append(idx)
+
+                    errors_ref.set(errors)
+
                     recall, precision, f1 = 0, 0, 0
 
                 cache_result_ref.set((recall, precision, f1))
