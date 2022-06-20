@@ -11,6 +11,7 @@ from typing import Any, Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
+import py7zr
 import yaml
 
 from firebase_admin import db
@@ -24,6 +25,7 @@ from cli_plugins.cli_plugin import CliPlugin
 from library.config import set_config_part, get_config_declaration, get_config_options
 from library.dataset import get_dataset_path
 from library.firebase import initialize_app
+from library.nas import NAS
 from library.region import bb_intersection_over_union
 
 
@@ -167,6 +169,16 @@ class Optimize(CliPlugin):
 
         return recall, precision, f1
 
+    def _save_results(self, video_name: str, idx: int, config_hash: str):
+        with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
+            archive.write("./output/results.db")
+
+        nas = NAS()
+        nas.upload_file(
+            f"/baboons/Results/VISO/car/{video_name}/{config_hash}/{idx}",
+            "./output/results.db.7z",
+        )
+
     def _get_score(
         self,
         X: np.ndarray,
@@ -177,6 +189,9 @@ class Optimize(CliPlugin):
         count: int,
         storage_ref: db.Reference,
         current_idx: List[int],
+        video_name: str,
+        config_hash: str,
+        save_result: bool,
     ):
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
@@ -222,6 +237,9 @@ class Optimize(CliPlugin):
                     recall, precision, f1 = self._get_metrics(
                         "./output/results.db", ground_truth_path
                     )
+
+                    if save_result:
+                        self._save_results(video_name, idx, config_hash)
                 except ValueError:
                     recall, precision, f1 = 0, 0, 0
 
@@ -450,6 +468,9 @@ class Optimize(CliPlugin):
                 int(args.count),
                 frame_count_ref,
                 current_idx,
+                video_name,
+                config_hash,
+                args.count == -1,
             ),
             action_only=None,
             n_hint_init=0,
