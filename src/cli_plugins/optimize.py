@@ -373,12 +373,12 @@ class Optimize(CliPlugin):
         )
 
         current_idx_ref = frame_count_ref.child("current_idx")
-        current_idx = np.array(current_idx_ref.get() or []).astype(int)
+        input_idx = np.array(current_idx_ref.get() or []).astype(int)
 
         if self._progress:
-            self._progressbar.update(len(current_idx))
+            self._progressbar.update(len(input_idx))
 
-        sherlock.fit(X).predict(X, y, input_known_idx=current_idx)
+        sherlock.fit(X).predict(X, y, input_known_idx=input_idx)
 
         if self._progress:
             self._progressbar.close()
