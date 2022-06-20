@@ -287,7 +287,7 @@ class Optimize(CliPlugin):
             requested_idx_new = [r for r in requested_idx_new if r not in requested_idx]
             requested_idx_ref.set(list(set(requested_idx_new)))
 
-            if self._progress:
+            if self._progress and idx in known_idx:
                 self._progressbar.update(1)
 
     def execute(self, args: Namespace):
