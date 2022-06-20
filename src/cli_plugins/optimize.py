@@ -320,7 +320,8 @@ class Optimize(CliPlugin):
             persist_ref = tracking_ref.child("persist_disabled")
 
         frame_count_ref = persist_ref.child(args.count)
-        current_idx = []
+        current_idx_ref = frame_count_ref.child("current_idx")
+        current_idx = current_idx_ref.get() or []
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
@@ -372,13 +373,10 @@ class Optimize(CliPlugin):
             model_selection_type="mab10",
         )
 
-        current_idx_ref = frame_count_ref.child("current_idx")
-        input_idx = np.array(current_idx_ref.get() or []).astype(int)
-
         if self._progress:
-            self._progressbar.update(len(input_idx))
+            self._progressbar.update(len(current_idx))
 
-        sherlock.fit(X).predict(X, y, input_known_idx=input_idx)
+        sherlock.fit(X).predict(X, y, input_known_idx=np.array(current_idx))
 
         if self._progress:
             self._progressbar.close()
