@@ -195,7 +195,7 @@ class Optimize(CliPlugin):
         ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
         for idx in requested_idx:
-            cache_result_ref = storage_ref.child(str(int(idx)))
+            cache_result_ref = storage_ref.child(str(idx))
             cache_result = cache_result_ref.get()
 
             if not cache_result:
@@ -373,7 +373,7 @@ class Optimize(CliPlugin):
         )
 
         current_idx_ref = frame_count_ref.child("current_idx")
-        current_idx = current_idx_ref.get() or []
+        current_idx = np.array(current_idx_ref.get() or []).astype(int)
 
         if self._progress:
             self._progressbar.update(len(current_idx))
