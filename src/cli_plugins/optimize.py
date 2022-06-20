@@ -57,13 +57,6 @@ class Optimize(CliPlugin):
         )
 
         parser.add_argument(
-            "-c",
-            "--count",
-            default="-1",
-            help="The number of frames to use for the video processing. -1 reprsents all frames.",
-        )
-
-        parser.add_argument(
             "-t",
             "--enable-tracking",
             default="yes",
@@ -186,12 +179,10 @@ class Optimize(CliPlugin):
         known_idx: np.ndarray,
         dataset_path: str,
         config_options: List[Tuple[str, np.ndarray]],
-        count: int,
         storage_ref: db.Reference,
         current_idx: List[int],
         video_name: str,
         config_hash: str,
-        save_result: bool,
     ):
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
@@ -224,22 +215,18 @@ class Optimize(CliPlugin):
                     set_config_part(key, config_value)
 
                 try:
-                    if count == "-1":
-                        count = None
-
                     MotionTrackerPipeline(
                         path, runtime_config=self._runtime_config
-                    ).run(count)
+                    ).run()
                     SqliteParticleFilterPipeline(
                         path, runtime_config=self._runtime_config
-                    ).run(count)
+                    ).run()
 
                     recall, precision, f1 = self._get_metrics(
                         "./output/results.db", ground_truth_path
                     )
 
-                    if save_result:
-                        self._save_results(video_name, idx, config_hash)
+                    self._save_results(video_name, idx, config_hash)
                 except ValueError:
                     recall, precision, f1 = 0, 0, 0
 
@@ -313,7 +300,6 @@ class Optimize(CliPlugin):
     def _get_design_space(
         self,
         video_name: str,
-        frame_count: int,
         enable_tracking: bool,
         enable_persist: bool,
     ):
@@ -359,15 +345,13 @@ class Optimize(CliPlugin):
         else:
             persist_ref = tracking_ref.child("persist_disabled")
 
-        frame_count_ref = persist_ref.child(str(frame_count))
-        known_idx_ref = frame_count_ref.child("current_idx")
+        known_idx_ref = persist_ref.child("current_idx")
 
         updated_cache = False
         known_idx = known_idx_ref.get() or []
         for idx in known_idx:
             cache_key = (
                 config_hash,
-                frame_count,
                 video_name,
                 enable_tracking,
                 enable_persist,
@@ -377,7 +361,7 @@ class Optimize(CliPlugin):
             if cache_key in cache:
                 recall, precision, f1 = cache[cache_key]
             else:
-                idx_ref = frame_count_ref.child(str(idx))
+                idx_ref = persist_ref.child(str(idx))
                 recall, precision, f1 = idx_ref.get()
                 cache[cache_key] = (recall, precision, f1)
                 updated_cache = True
@@ -424,11 +408,10 @@ class Optimize(CliPlugin):
         else:
             persist_ref = tracking_ref.child("persist_disabled")
 
-        frame_count_ref = persist_ref.child(args.count)
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         X, y, current_idx = self._get_design_space(
-            video_name, args.count, args.enable_tracking, args.enable_persist
+            video_name, args.enable_tracking, args.enable_persist
         )
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
@@ -465,12 +448,10 @@ class Optimize(CliPlugin):
                 idx,
                 dataset_path,
                 config_options,
-                int(args.count),
-                frame_count_ref,
+                persist_ref,
                 current_idx,
                 video_name,
                 config_hash,
-                args.count == -1,
             ),
             action_only=None,
             n_hint_init=0,
