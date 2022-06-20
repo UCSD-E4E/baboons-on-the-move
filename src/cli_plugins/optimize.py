@@ -59,7 +59,7 @@ class Optimize(CliPlugin):
         parser.add_argument(
             "-c",
             "--count",
-            default=-1,
+            default="-1",
             help="The number of frames to use for the video processing. -1 reprsents all frames.",
         )
 
@@ -224,7 +224,7 @@ class Optimize(CliPlugin):
                     set_config_part(key, config_value)
 
                 try:
-                    if count == -1:
+                    if count == "-1":
                         count = None
 
                     MotionTrackerPipeline(
