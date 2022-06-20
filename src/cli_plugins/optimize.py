@@ -185,7 +185,7 @@ class Optimize(CliPlugin):
         requested_idx = requested_idx_ref.get() or []
         requested_idx.extend(known_idx)
         requested_idx = np.array(requested_idx)
-        self._print(str(int(requested_idx)))
+        self._print(str(requested_idx))
 
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
@@ -195,7 +195,7 @@ class Optimize(CliPlugin):
         ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
         for idx in requested_idx:
-            cache_result_ref = storage_ref.child(str(idx))
+            cache_result_ref = storage_ref.child(str(int(idx)))
             cache_result = cache_result_ref.get()
 
             if not cache_result:
