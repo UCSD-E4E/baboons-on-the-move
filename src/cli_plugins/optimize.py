@@ -185,7 +185,7 @@ class Optimize(CliPlugin):
         requested_idx = requested_idx_ref.get() or []
         requested_idx.extend(known_idx)
         requested_idx = np.array(requested_idx)
-        self._print(str(requested_idx))
+        self._print(str(int(requested_idx)))
 
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
