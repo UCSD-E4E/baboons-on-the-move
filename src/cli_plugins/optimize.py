@@ -133,9 +133,12 @@ class Optimize(CliPlugin):
                     matches = np.array(
                         [bb_intersection_over_union(current, t[1:]) for t in truth]
                     )
-                    match_idx = np.argmax(matches)
-                    score = matches[match_idx]
-                    truth_identity = truth[match_idx, 0]
+                    if matches:
+                        match_idx = np.argmax(matches)
+                        score = matches[match_idx]
+                        truth_identity = truth[match_idx, 0]
+                    else:
+                        score = 0
 
                     if score > 0 and self._tracking_enabled:
                         identity_map[identity] = truth_identity
@@ -198,8 +201,6 @@ class Optimize(CliPlugin):
         requested_idx.extend(known_idx)
         requested_idx = np.array(requested_idx)
         self._print(str(requested_idx))
-
-        errors_ref = storage_ref.child("errors")
 
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
