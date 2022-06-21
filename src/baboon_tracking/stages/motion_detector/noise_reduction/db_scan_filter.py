@@ -5,6 +5,7 @@ the corrected frame and labels array
 from sklearn.cluster import DBSCAN
 import cv2
 import numpy as np
+from tqdm import tqdm
 from baboon_tracking.decorators.save_result import save_result
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
@@ -61,15 +62,18 @@ class DbScanFilter(Stage, MovingForegroundMixin):
         image[:, 0] = x
         image[:, 1] = y
 
-        # creates clusters and eliminates noise from labels and 2dframe
-        dbscan = DBSCAN(eps=self._dbscan_eps, min_samples=self._dbscan_min_samples).fit(
-            image
-        )
-        labels = dbscan.labels_
-        image, _ = self._eliminate_noise(labels, image)
-        image = image.astype(np.uint32)
         noiseless_frame = np.zeros_like(two_d_frame)
-        noiseless_frame[image[:, 0], image[:, 1]] = 255
+        try:
+            # creates clusters and eliminates noise from labels and 2dframe
+            dbscan = DBSCAN(
+                eps=self._dbscan_eps, min_samples=self._dbscan_min_samples
+            ).fit(image)
+            labels = dbscan.labels_
+            image, _ = self._eliminate_noise(labels, image)
+            image = image.astype(np.uint32)
+            noiseless_frame[image[:, 0], image[:, 1]] = 255
+        except ValueError:
+            tqdm.write("Warning dbscan did not find anything.")
 
         # applies dilate filter and saves the residual frame
         kernel = np.ones((self._kernel, self._kernel), np.uint8)
