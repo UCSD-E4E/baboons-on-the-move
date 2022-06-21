@@ -28,6 +28,8 @@ from library.firebase import initialize_app
 from library.nas import NAS
 from library.region import bb_intersection_over_union
 
+from collections import OrderedDict
+
 
 class Optimize(CliPlugin):
     """
@@ -281,6 +283,8 @@ class Optimize(CliPlugin):
             )
             self._print("=" * 10)
 
+            current_idx = list(OrderedDict.fromkeys(current_idx))
+
             max_recall_ref.set(self._max_recall)
             max_precision_ref.set(self._max_precision)
             max_f1_ref.set(self._max_f1)
@@ -293,7 +297,8 @@ class Optimize(CliPlugin):
             requested_idx_ref.set(list(set(requested_idx_new)))
 
             if self._progress and idx in known_idx:
-                self._progressbar.update(1)
+                self._progressbar.n = len(current_idx)
+                self._progressbar.refresh()
 
     def _get_design_space(
         self,
