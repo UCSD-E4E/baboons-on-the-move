@@ -216,26 +216,15 @@ class Optimize(CliPlugin):
 
                     set_config_part(key, config_value)
 
-                try:
-                    MotionTrackerPipeline(
-                        path, runtime_config=self._runtime_config
-                    ).run()
-                    SqliteParticleFilterPipeline(
-                        path, runtime_config=self._runtime_config
-                    ).run()
+                MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
+                SqliteParticleFilterPipeline(
+                    path, runtime_config=self._runtime_config
+                ).run()
 
-                    recall, precision, f1 = self._get_metrics(
-                        "./output/results.db", ground_truth_path
-                    )
-
-                    self._save_results(video_name, idx, config_hash)
-                except ValueError:
-                    errors = errors_ref.get() or []
-                    errors.append(int(idx))
-
-                    errors_ref.set(errors)
-
-                    recall, precision, f1 = 0, 0, 0
+                recall, precision, f1 = self._get_metrics(
+                    "./output/results.db", ground_truth_path
+                )
+                self._save_results(video_name, idx, config_hash)
 
                 cache_result_ref.set((recall, precision, f1))
                 cache_known_idx.append(int(idx))
