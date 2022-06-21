@@ -126,7 +126,7 @@ class Optimize(CliPlugin):
 
                 current = (x1, y1, x2, y2)
                 if identity not in identity_map or not np.any(
-                    truth[:, 0] == truth_identity
+                    truth[:, 0] == identity_map[identity]
                 ):
                     matches = np.array(
                         [bb_intersection_over_union(current, t[1:]) for t in truth]
