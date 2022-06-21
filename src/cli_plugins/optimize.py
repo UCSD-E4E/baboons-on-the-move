@@ -187,7 +187,7 @@ class Optimize(CliPlugin):
         last_update_ref = storage_ref.child("last_update")
 
         requested_idx_ref = storage_ref.child("requested_idx")
-        requested_idx = requested_idx_ref.get() or []
+        requested_idx = []
         requested_idx.extend(known_idx)
         requested_idx = np.array(requested_idx)
         self._print(str(requested_idx))
