@@ -36,16 +36,6 @@ class Optimize(CliPlugin):
     CLI Plugin for performing optimization.
     """
 
-    # VIDEO_FILES = [
-    #     "VISO/car/003",  # Video 1
-    #     # "VISO/car/004",  # Video 2
-    #     # "VISO/car/005",  # Video 3
-    #     # "VISO/car/006",  # Video 4
-    #     # "VISO/car/007",  # Video 5
-    #     # "VISO/car/008",  # Video 6
-    #     # "VISO/car/009",  # Video 7
-    # ]
-
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
@@ -383,6 +373,13 @@ class Optimize(CliPlugin):
 
         return float(recall), float(precision), float(f1)
 
+    def _get_video_ref(self, dataset: str, parent_ref: db.Reference):
+        ref = parent_ref
+        for part in dataset.split("/"):
+            ref = ref.child(part)
+
+        return ref
+
     def execute(self, args: Namespace):
         np.random.seed(1234)  # Allow our caching to be more effective
 
@@ -399,7 +396,7 @@ class Optimize(CliPlugin):
         video_name = dataset_path.split("/")[-1]
 
         sherlock_ref = db.reference("sherlock")
-        video_name_ref = sherlock_ref.child(video_name)
+        video_name_ref = self._get_video_ref(args.dataset, sherlock_ref)
         config_declaration_ref = video_name_ref.child(config_hash)
 
         if args.enable_tracking:
