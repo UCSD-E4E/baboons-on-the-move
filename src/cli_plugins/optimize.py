@@ -24,7 +24,7 @@ from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilter
 from cli_plugins.cli_plugin import CliPlugin
 from library.config import set_config_part, get_config_declaration, get_config_options
 from library.dataset import get_dataset_path
-from library.firebase import initialize_app
+from library.firebase import initialize_app, get_dataset_ref
 from library.nas import NAS
 from library.region import bb_intersection_over_union
 
@@ -159,13 +159,13 @@ class Optimize(CliPlugin):
 
         return recall, precision, f1
 
-    def _save_results(self, video_name: str, idx: int, config_hash: str):
+    def _save_results(self, video_file: str, idx: int, config_hash: str):
         with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
             archive.write("./output/results.db")
 
         nas = NAS()
         nas.upload_file(
-            f"/baboons/Results/VISO/car/{video_name}/{config_hash}/{idx}",
+            f"/baboons/Results/{video_file}/{config_hash}/{idx}",
             "./output/results.db.7z",
         )
 
@@ -178,7 +178,7 @@ class Optimize(CliPlugin):
         config_options: List[Tuple[str, np.ndarray]],
         storage_ref: db.Reference,
         current_idx: List[int],
-        video_name: str,
+        video_file: str,
         config_hash: str,
     ):
         cache_known_idx_ref = storage_ref.child("known_idx")
@@ -219,7 +219,7 @@ class Optimize(CliPlugin):
                 recall, precision, f1 = self._get_metrics(
                     "./output/results.db", ground_truth_path
                 )
-                self._save_results(video_name, idx, config_hash)
+                self._save_results(video_file, idx, config_hash)
 
                 cache_result_ref.set((recall, precision, f1))
                 cache_known_idx.append(int(idx))
@@ -293,7 +293,7 @@ class Optimize(CliPlugin):
 
     def _get_design_space(
         self,
-        video_name: str,
+        video_file: str,
         enable_tracking: bool,
         enable_persist: bool,
     ):
@@ -326,8 +326,8 @@ class Optimize(CliPlugin):
 
         sherlock_ref = db.reference("sherlock")
 
-        video_name_ref = sherlock_ref.child(video_name)
-        config_declaration_ref = video_name_ref.child(config_hash)
+        video_file_ref = get_dataset_ref(video_file, sherlock_ref)
+        config_declaration_ref = video_file_ref.child(config_hash)
 
         if enable_tracking:
             tracking_ref = config_declaration_ref.child("tracking_enabled")
@@ -346,7 +346,7 @@ class Optimize(CliPlugin):
         for idx in known_idx:
             cache_key = (
                 config_hash,
-                video_name,
+                video_file,
                 enable_tracking,
                 enable_persist,
                 idx,
@@ -373,13 +373,6 @@ class Optimize(CliPlugin):
 
         return float(recall), float(precision), float(f1)
 
-    def _get_video_ref(self, dataset: str, parent_ref: db.Reference):
-        ref = parent_ref
-        for part in dataset.split("/"):
-            ref = ref.child(part)
-
-        return ref
-
     def execute(self, args: Namespace):
         np.random.seed(1234)  # Allow our caching to be more effective
 
@@ -392,12 +385,13 @@ class Optimize(CliPlugin):
         with open("./config_declaration.yml", "rb") as f:
             config_hash = hashlib.md5(f.read()).hexdigest()
 
-        dataset_path = get_dataset_path(args.dataset)
-        video_name = dataset_path.split("/")[-1]
+        video_file = args.dataset
+
+        dataset_path = get_dataset_path(video_file)
 
         sherlock_ref = db.reference("sherlock")
-        video_name_ref = self._get_video_ref(args.dataset, sherlock_ref)
-        config_declaration_ref = video_name_ref.child(config_hash)
+        video_file_ref = get_dataset_ref(video_file, sherlock_ref)
+        config_declaration_ref = video_file_ref.child(config_hash)
 
         if args.enable_tracking:
             tracking_ref = config_declaration_ref.child("tracking_enabled")
@@ -412,7 +406,7 @@ class Optimize(CliPlugin):
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         X, y, current_idx = self._get_design_space(
-            video_name, args.enable_tracking, args.enable_persist
+            video_file, args.enable_tracking, args.enable_persist
         )
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
@@ -451,7 +445,7 @@ class Optimize(CliPlugin):
                 config_options,
                 persist_ref,
                 current_idx,
-                video_name,
+                video_file,
                 config_hash,
             ),
             action_only=None,
