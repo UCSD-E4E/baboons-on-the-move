@@ -133,7 +133,7 @@ class Optimize(CliPlugin):
                     matches = np.array(
                         [bb_intersection_over_union(current, t[1:]) for t in truth]
                     )
-                    if matches:
+                    if matches.size:
                         match_idx = np.argmax(matches)
                         score = matches[match_idx]
                         truth_identity = truth[match_idx, 0]
