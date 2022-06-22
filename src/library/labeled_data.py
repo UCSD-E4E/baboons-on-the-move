@@ -23,22 +23,21 @@ def get_regions_from_xml(xml_path: str):
     xml = _load_xml(xml_path)
     # uses a dict for simplicity, can be converted into array if needed.
     # key is frame, value is list of centroids
-    video_frames = {}
+    regions = []
     # iterate through each baboon
     for baboon in xml.iter("track"):
+        identity = int(baboon.get("id"))
+
         # iterate through each labeled frame
         for box in baboon.iter("box"):
-            frame = int(box.get("frame"))
-            # create new list if there is none for this frame
-            if video_frames.get(frame) is None:
-                video_frames[frame] = []
+            frame = int(box.get("frame")) + 1
 
             xtl = floor(float(box.get("xtl")))
             ytl = floor(float(box.get("ytl")))
             xbr = ceil(float(box.get("xbr")))
             ybr = ceil(float(box.get("ybr")))
 
-            region = (xtl, ytl, xbr, ybr)
-            video_frames[frame].append(region)
+            region = (frame, identity, xtl, ytl, xbr, ybr)
+            regions.append(region)
 
-    return video_frames
+    return regions

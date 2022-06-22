@@ -21,13 +21,13 @@
                 // "--pipeline",
                 // "ParticleFilter"
                 // --------
-                "optimize",
-                "-d",
-                "VISO/car/009",
-                "-t",
-                "yes",
-                "-p",
-                "no"
+                // "optimize",
+                // "-d",
+                // "VISO/car/009",
+                // "-t",
+                // "yes",
+                // "-p",
+                // "no"
                 // --------
                 // "compare",
                 // "-1",
@@ -35,6 +35,8 @@
                 // "-2",
                 // "./output/results_parallel.db"
                 // "calc-metrics"
+                // --------
+                "dataset"
             ]
         },
         {

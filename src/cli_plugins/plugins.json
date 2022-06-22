@@ -51,6 +51,14 @@
             "description": "Download data from team Google Drive"
         },
         {
+            "module": "dataset",
+            "class": "Dataset",
+            "subcommands": [
+                "dataset"
+            ],
+            "description": "Create dataset from xml file and video."
+        },
+        {
             "module": "download_parameters",
             "class": "DownloadParameters",
             "subcommands": [

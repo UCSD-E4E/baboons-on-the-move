@@ -7,7 +7,7 @@ import hashlib
 from argparse import ArgumentParser, Namespace
 import pickle
 from sqlite3 import connect
-from typing import Any, Dict, List, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
