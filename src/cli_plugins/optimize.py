@@ -36,6 +36,16 @@ class Optimize(CliPlugin):
     CLI Plugin for performing optimization.
     """
 
+    VIDEO_SCORES = {
+        "VISO/car/003": (0.92, 0.92, 0.84),
+        "VISO/car/004": (0.83, 0.89, 0.85),
+        "VISO/car/005": (0.94, 0.88, 0.91),
+        "VISO/car/006": (0.88, 0.93, 0.86),
+        "VISO/car/007": (0.80, 0.84, 0.80),
+        "VISO/car/008": (0.83, 0.85, 0.81),
+        "VISO/car/009": (0.93, 0.73, 0.78),
+    }
+
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
@@ -242,21 +252,37 @@ class Optimize(CliPlugin):
             _, max_precision, _ = self._max_precision
             _, _, max_f1 = self._max_f1
 
+            if video_file in Optimize.VIDEO_SCORES:
+                (
+                    required_recall,
+                    required_precision,
+                    required_f1,
+                ) = Optimize.VIDEO_SCORES[video_file]
+            else:
+                required_recall, required_precision, required_f1 = (2, 2, 2)
+
             recall_color = "\033[0m"
             if max_recall < recall:
                 self._max_recall = (recall, precision, f1)
                 recall_color = "\033[93m"
+            elif max_recall >= required_recall:
+                recall_color = "\033[94m"
 
             precision_color = "\033[0m"
             if max_precision < precision:
                 self._max_precision = (recall, precision, f1)
                 precision_color = "\033[93m"
+            elif max_precision >= required_precision:
+                precision_color = "\033[94m"
 
             f1_color = "\033[0m"
             if max_f1 < f1:
                 self._max_f1 = (recall, precision, f1)
                 f1_color = "\033[93m"
+            elif max_f1 >= required_f1:
+                f1_color = "\033[94m"
 
+            self._print("=" * 3 + video_file + "=" * 3)
             self._print(
                 f"\033[1mCompleted {idx:} at {datetime.utcnow().isoformat()} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
