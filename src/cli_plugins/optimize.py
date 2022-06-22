@@ -191,8 +191,6 @@ class Optimize(CliPlugin):
         video_file: str,
         config_hash: str,
     ):
-        self._print("=" * 3 + video_file + "=" * 3)
-
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
         current_idx_ref = storage_ref.child("current_idx")
@@ -212,6 +210,8 @@ class Optimize(CliPlugin):
         ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
         for idx in requested_idx:
+            self._print("=" * 3 + video_file + "=" * 3)
+
             cache_result_ref = storage_ref.child(str(idx))
             cache_result = cache_result_ref.get()
 
