@@ -191,6 +191,8 @@ class Optimize(CliPlugin):
         video_file: str,
         config_hash: str,
     ):
+        self._print("=" * 3 + video_file + "=" * 3)
+
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
         current_idx_ref = storage_ref.child("current_idx")
@@ -282,7 +284,6 @@ class Optimize(CliPlugin):
             elif max_f1 >= required_f1:
                 f1_color = "\033[94m"
 
-            self._print("=" * 3 + video_file + "=" * 3)
             self._print(
                 f"\033[1mCompleted {idx:} at {datetime.utcnow().isoformat()} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
@@ -298,7 +299,6 @@ class Optimize(CliPlugin):
             self._print(
                 f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
-            self._print("=" * 10)
 
             current_idx = list(OrderedDict.fromkeys(current_idx))
 
