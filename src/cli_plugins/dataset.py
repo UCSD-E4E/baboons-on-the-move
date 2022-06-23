@@ -6,7 +6,8 @@ from os.path import splitext, basename, dirname
 from library.labeled_data import get_regions_from_xml
 
 from cli_plugins.cli_plugin import CliPlugin
-from cli_plugins.optimize import str2bool
+
+# from cli_plugins.optimize import str2bool
 import numpy as np
 import pandas as pd
 
