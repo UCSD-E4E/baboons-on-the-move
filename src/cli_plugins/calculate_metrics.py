@@ -95,7 +95,7 @@ class CalculateMetrics(CliPlugin):
                 )
 
                 requests.update(
-                    (video_file, config, not config, idx)
+                    (ref_video_file, config, not config, idx)
                     for idx in known_idx
                     if not dataset_filter_results_exists(
                         ref_video_file, config, not config, idx, config_hash
