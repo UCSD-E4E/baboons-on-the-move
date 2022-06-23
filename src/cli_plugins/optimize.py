@@ -24,6 +24,7 @@ from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilter
 from cli_plugins.cli_plugin import CliPlugin
 from library.config import set_config_part, get_config_declaration, get_config_options
 from library.dataset import get_dataset_path
+from library.design_space import get_design_space
 from library.firebase import initialize_app, get_dataset_ref
 from library.nas import NAS
 from library.region import bb_intersection_over_union
@@ -289,15 +290,15 @@ class Optimize(CliPlugin):
             )
             recall, precision, f1 = self._max_recall
             self._print(
-                f"{recall_color}Max Recall: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+                f"{recall_color}Max Recall: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m => {required_recall}"
             )
             recall, precision, f1 = self._max_precision
             self._print(
-                f"{precision_color}Max Precision: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+                f"{precision_color}Max Precision: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m => {required_precision}"
             )
             recall, precision, f1 = self._max_f1
             self._print(
-                f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+                f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m => {required_f1}"
             )
 
             current_idx = list(OrderedDict.fromkeys(current_idx))
@@ -316,83 +317,6 @@ class Optimize(CliPlugin):
             if self._progress and idx in known_idx:
                 self._progressbar.n = len(current_idx)
                 self._progressbar.refresh()
-
-    def _get_design_space(
-        self,
-        video_file: str,
-        enable_tracking: bool,
-        enable_persist: bool,
-    ):
-        cache_path = "./output/plot_cache.pickle"
-        cache: Dict[
-            Tuple[str, int, str, bool, bool, int], Tuple[float, float, float]
-        ] = None
-        if exists(cache_path):
-            with open(cache_path, "rb") as f:
-                cache = pickle.load(f)
-        else:
-            cache = {}
-
-        with open("./config_declaration.yml", "r", encoding="utf8") as f:
-            config_declaration = get_config_declaration("", yaml.safe_load(f))
-            f.seek(0)
-
-        config_options = [
-            (k, get_config_options(i), i["type"])
-            for k, i in config_declaration.items()
-            if "skip_learn" not in i or not i["skip_learn"]
-        ]
-        X = np.array(np.meshgrid(*[c for _, c, _ in config_options])).T.reshape(
-            -1, len(config_options)
-        )
-        y = np.zeros((X.shape[0], 3))
-
-        with open("./config_declaration.yml", "rb") as f:
-            config_hash = hashlib.md5(f.read()).hexdigest()
-
-        sherlock_ref = db.reference("sherlock")
-
-        video_file_ref = get_dataset_ref(video_file, sherlock_ref)
-        config_declaration_ref = video_file_ref.child(config_hash)
-
-        if enable_tracking:
-            tracking_ref = config_declaration_ref.child("tracking_enabled")
-        else:
-            tracking_ref = config_declaration_ref.child("tracking_disabled")
-
-        if enable_persist:
-            persist_ref = tracking_ref.child("persist_enabled")
-        else:
-            persist_ref = tracking_ref.child("persist_disabled")
-
-        known_idx_ref = persist_ref.child("current_idx")
-
-        updated_cache = False
-        known_idx = known_idx_ref.get() or []
-        for idx in known_idx:
-            cache_key = (
-                config_hash,
-                video_file,
-                enable_tracking,
-                enable_persist,
-                idx,
-            )
-
-            if cache_key in cache:
-                recall, precision, f1 = cache[cache_key]
-            else:
-                idx_ref = persist_ref.child(str(idx))
-                recall, precision, f1 = idx_ref.get()
-                cache[cache_key] = (recall, precision, f1)
-                updated_cache = True
-
-            y[idx, :] = np.array([recall, precision, f1])
-
-        if updated_cache:
-            with open(cache_path, "wb") as f:
-                pickle.dump(cache, f)
-
-        return X, y, known_idx
 
     def _unpack(self, array: np.ndarray):
         recall, precision, f1 = array
@@ -431,7 +355,7 @@ class Optimize(CliPlugin):
 
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
-        X, y, current_idx = self._get_design_space(
+        X, y, current_idx, _ = get_design_space(
             video_file, args.enable_tracking, args.enable_persist
         )
 

@@ -19,7 +19,7 @@ from baboon_tracking import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from library.nas import NAS
 from library.region import bb_intersection_over_union
-
+from library.design_space import get_design_space
 
 flatten = lambda t: [item for sublist in t for item in sublist]
 
@@ -220,50 +220,62 @@ class CalculateMetrics(CliPlugin):
         """
         Calculate metrics for the specified video and output to Firebase.
         """
-        with open("./config_declaration.yml", "rb") as f:
-            config_hash = hashlib.md5(f.read()).hexdigest()
 
         initialize_app()
 
-        with open("./config_declaration.yml", "r", encoding="utf8") as f:
-            config_declaration = get_config_declaration("", yaml.safe_load(f))
-            f.seek(0)
+        while True:
+            did_work = False
+            for video_file in CalculateMetrics.VIDEO_FILES:
+                for config in [True, False]:
+                    X, y, current_idx, known_idx = get_design_space(
+                        video_file, config, not config
+                    )
 
-        config_options = [
-            (k, get_config_options(i), i["type"])
-            for k, i in config_declaration.items()
-            if "skip_learn" not in i or not i["skip_learn"]
-        ]
-        X = np.array(np.meshgrid(*[c for _, c, _ in config_options])).T.reshape(
-            -1, len(config_options)
-        )
+            if not did_work:
+                pass
 
-        requests = self._get_requests(config_hash)
-        while flatten(r for _, r in requests.items()):
-            video_name, idx = self._get_request(requests)
-            print(f"{video_name}: {idx}")
+        # with open("./config_declaration.yml", "rb") as f:
+        #     config_hash = hashlib.md5(f.read()).hexdigest()
 
-            # Remove the requested idx we are going to start work on.
-            self._remove_requested_idx(video_name, idx, config_hash)
+        # with open("./config_declaration.yml", "r", encoding="utf8") as f:
+        #     config_declaration = get_config_declaration("", yaml.safe_load(f))
+        #     f.seek(0)
 
-            self._set_config(idx, X, config_options)
+        # config_options = [
+        #     (k, get_config_options(i), i["type"])
+        #     for k, i in config_declaration.items()
+        #     if "skip_learn" not in i or not i["skip_learn"]
+        # ]
+        # X = np.array(np.meshgrid(*[c for _, c, _ in config_options])).T.reshape(
+        #     -1, len(config_options)
+        # )
 
-            video_file = f"VISO/car/{video_name}"
-            dataset_path = get_dataset_path(video_file)
-            path = f"{dataset_path}/img"
-            ground_truth_path = f"{dataset_path}/gt/gt.txt"
+        # requests = self._get_requests(config_hash)
+        # while flatten(r for _, r in requests.items()):
+        #     video_name, idx = self._get_request(requests)
+        #     print(f"{video_name}: {idx}")
 
-            MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
-            SqliteParticleFilterPipeline(
-                path, runtime_config=self._runtime_config
-            ).run()
+        #     # Remove the requested idx we are going to start work on.
+        #     self._remove_requested_idx(video_name, idx, config_hash)
 
-            recall, precision, f1 = self._get_metrics(
-                "./output/results.db", ground_truth_path
-            )
+        #     self._set_config(idx, X, config_options)
 
-            self._set_known_idx(video_name, idx, config_hash, recall, precision, f1)
-            self._save_results(video_name, idx, config_hash)
+        #     video_file = f"VISO/car/{video_name}"
+        #     dataset_path = get_dataset_path(video_file)
+        #     path = f"{dataset_path}/img"
+        #     ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
-            # Update the requests in case more are running
-            requests = self._get_requests(config_hash)
+        #     MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
+        #     SqliteParticleFilterPipeline(
+        #         path, runtime_config=self._runtime_config
+        #     ).run()
+
+        #     recall, precision, f1 = self._get_metrics(
+        #         "./output/results.db", ground_truth_path
+        #     )
+
+        #     self._set_known_idx(video_name, idx, config_hash, recall, precision, f1)
+        #     self._save_results(video_name, idx, config_hash)
+
+        #     # Update the requests in case more are running
+        #     requests = self._get_requests(config_hash)

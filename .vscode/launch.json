@@ -34,9 +34,10 @@
                 // "./output/results_serial.db",
                 // "-2",
                 // "./output/results_parallel.db"
-                // "calc-metrics"
                 // --------
-                "dataset"
+                "calc-metrics"
+                // --------
+                // "dataset"
             ]
         },
         {
