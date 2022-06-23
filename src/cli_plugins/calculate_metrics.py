@@ -3,7 +3,7 @@ Plugin for calculating metrics.
 """
 from argparse import ArgumentParser, Namespace
 import hashlib
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 from sqlite3 import connect
@@ -12,14 +12,14 @@ import py7zr
 import yaml
 from cli_plugins.cli_plugin import CliPlugin
 from library.config import get_config_declaration, get_config_options, set_config_part
-from library.firebase import initialize_app
+from library.firebase import initialize_app, get_dataset_ref
 from firebase_admin import db
 from library.dataset import get_dataset_path
 from baboon_tracking import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from library.nas import NAS
 from library.region import bb_intersection_over_union
-from library.design_space import get_design_space
+from library.design_space import get_pareto_front, get_design_space
 
 flatten = lambda t: [item for sublist in t for item in sublist]
 
@@ -57,10 +57,10 @@ class CalculateMetrics(CliPlugin):
             "enable_persist": self._enable_persist,
         }
 
-    def _get_storage_ref(self, video_name: str, config_hash: str):
-        results_ref = db.reference("results")
-        video_name_ref = results_ref.child(video_name)
-        config_declaration_ref = video_name_ref.child(config_hash)
+    def _get_storage_ref(self, video_file: str, config_hash: str):
+        results_ref = db.reference("sherlock")
+        video_file_ref = get_dataset_ref(video_file, results_ref)
+        config_declaration_ref = video_file_ref.child(config_hash)
 
         if self._enable_tracking:
             tracking_ref = config_declaration_ref.child("tracking_enabled")
@@ -74,32 +74,35 @@ class CalculateMetrics(CliPlugin):
 
         return persist_ref
 
-    def _get_requests(self, config_hash: str) -> Dict[str, List[int]]:
-        results = {}
+    def _get_requests(self, config_hash: str):
+        requests: Tuple[str, bool, bool, int] = []
 
-        for video_file in CalculateMetrics.VIDEO_FILES:
-            dataset_path = get_dataset_path(video_file)
-            video_name = dataset_path.split("/")[-1]
+        for ref_video_file in CalculateMetrics.VIDEO_FILES:
+            for config in [True, False]:
+                _, ypredict_idx = get_pareto_front(ref_video_file, config, not config)
+                ypredict_idx = set(ypredict_idx)
 
-            storage_ref = self._get_storage_ref(video_name, config_hash)
-            requested_idx_ref = storage_ref.child("requested_idx")
-            known_idx_ref = storage_ref.child("known_idx")
+                for video_file in CalculateMetrics.VIDEO_FILES:
+                    storage_ref = self._get_storage_ref(video_file, config_hash)
+                    working_idx_ref = storage_ref.child("working_idx")
 
-            requested_idx = set(requested_idx_ref.get() or [])
-            known_idx = set(known_idx_ref.get() or [])
+                    _, _, _, known_idx = get_design_space(
+                        video_file, config, not config
+                    )
 
-            # In case we new known_idx have shown up
-            requested_idx.difference_update(known_idx)
+                    known_idx = set(known_idx)
+                    working_idx = set(working_idx_ref.get() or [])
 
-            results[video_name] = list(requested_idx)
+                    ypredict_idx_remaining = ypredict_idx.difference(
+                        known_idx.union(working_idx)
+                    )
 
-        return results
+                    requests.extend(
+                        (video_file, config, not config, idx)
+                        for idx in ypredict_idx_remaining
+                    )
 
-    def _get_request(self, requests: Dict[str, List[int]]):
-        for video_name, requested_idx in requests.items():
-            for idx in requested_idx:
-                # idx loop doesn't run if requested_idx is empty
-                return video_name, idx
+        return requests
 
     def _remove_requested_idx(self, video_name: str, idx: int, config_hash: str):
         storage_ref = self._get_storage_ref(video_name, config_hash)
@@ -223,19 +226,25 @@ class CalculateMetrics(CliPlugin):
 
         initialize_app()
 
-        while True:
-            did_work = False
-            for video_file in CalculateMetrics.VIDEO_FILES:
-                for config in [True, False]:
-                    X, y, current_idx, known_idx = get_design_space(
-                        video_file, config, not config
-                    )
+        # while True:
+        #     did_work = False
+        #     for ref_video_file in CalculateMetrics.VIDEO_FILES:
+        #         for config in [True, False]:
+        #             _, ypredict_idx = get_pareto_front(
+        #                 ref_video_file, config, not config
+        #             )
+        #             ypredict_idx = set(ypredict_idx)
 
-            if not did_work:
-                pass
+        #             for video_file in CalculateMetrics.VIDEO_FILES:
+        #                 X, y, _, known_idx = get_design_space(
+        #                     video_file, config, not config
+        #                 )
 
-        # with open("./config_declaration.yml", "rb") as f:
-        #     config_hash = hashlib.md5(f.read()).hexdigest()
+        #                 known_idx = set(known_idx)
+        #                 ypredict_idx_clone = ypredict_idx.difference(known_idx)
+
+        #     if not did_work:
+        #         pass
 
         # with open("./config_declaration.yml", "r", encoding="utf8") as f:
         #     config_declaration = get_config_declaration("", yaml.safe_load(f))
@@ -250,32 +259,37 @@ class CalculateMetrics(CliPlugin):
         #     -1, len(config_options)
         # )
 
-        # requests = self._get_requests(config_hash)
-        # while flatten(r for _, r in requests.items()):
-        #     video_name, idx = self._get_request(requests)
-        #     print(f"{video_name}: {idx}")
+        with open("./config_declaration.yml", "rb") as f:
+            config_hash = hashlib.md5(f.read()).hexdigest()
 
-        #     # Remove the requested idx we are going to start work on.
-        #     self._remove_requested_idx(video_name, idx, config_hash)
+        requests = self._get_requests(config_hash)
+        while requests:
+            video_name, enable_tracking, enable_presist, idx = requests[0]
+            print(
+                f"{video_name} {'tracking' if enable_tracking else 'detection'}: {idx}"
+            )
 
-        #     self._set_config(idx, X, config_options)
+            #     # Remove the requested idx we are going to start work on.
+            #     self._remove_requested_idx(video_name, idx, config_hash)
 
-        #     video_file = f"VISO/car/{video_name}"
-        #     dataset_path = get_dataset_path(video_file)
-        #     path = f"{dataset_path}/img"
-        #     ground_truth_path = f"{dataset_path}/gt/gt.txt"
+            #     self._set_config(idx, X, config_options)
 
-        #     MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
-        #     SqliteParticleFilterPipeline(
-        #         path, runtime_config=self._runtime_config
-        #     ).run()
+            #     video_file = f"VISO/car/{video_name}"
+            #     dataset_path = get_dataset_path(video_file)
+            #     path = f"{dataset_path}/img"
+            #     ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
-        #     recall, precision, f1 = self._get_metrics(
-        #         "./output/results.db", ground_truth_path
-        #     )
+            #     MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
+            #     SqliteParticleFilterPipeline(
+            #         path, runtime_config=self._runtime_config
+            #     ).run()
 
-        #     self._set_known_idx(video_name, idx, config_hash, recall, precision, f1)
-        #     self._save_results(video_name, idx, config_hash)
+            #     recall, precision, f1 = self._get_metrics(
+            #         "./output/results.db", ground_truth_path
+            #     )
 
-        #     # Update the requests in case more are running
-        #     requests = self._get_requests(config_hash)
+            #     self._set_known_idx(video_name, idx, config_hash, recall, precision, f1)
+            #     self._save_results(video_name, idx, config_hash)
+
+            #     # Update the requests in case more are running
+            requests = self._get_requests(config_hash)
