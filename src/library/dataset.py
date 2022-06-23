@@ -4,6 +4,8 @@ Module for getting data from the NAS.
 
 import pickle
 from genericpath import exists, isdir
+
+import py7zr
 from library.nas import NAS
 
 
@@ -40,3 +42,38 @@ def get_dataset_list(root: str = ""):
         pickle.dump(viso_datasets, f)
 
     return viso_datasets
+
+
+def save_dataset_motion_results(
+    video_file: str,
+    idx: int,
+    config_hash: str,
+):
+    with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
+        archive.write("./output/results.db")
+
+    nas = NAS()
+    nas.upload_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{idx}",
+        "./output/results.db.7z",
+    )
+
+
+def save_dataset_filter_results(
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    idx: int,
+    config_hash: str,
+):
+    with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
+        archive.write("./output/results.db")
+
+    tracking_folder = "tracking_enabled" if enable_tracking else "tracking_disabled"
+    persist_folder = "persist_enabled" if enable_persist else "persist_disabled"
+
+    nas = NAS()
+    nas.upload_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{tracking_folder}/{persist_folder}/{idx}",
+        "./output/results.db.7z",
+    )
