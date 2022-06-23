@@ -328,7 +328,7 @@ class Optimize(CliPlugin):
 
             working_idx = set(working_idx_ref.get() or [])
             working_idx.remove(int(idx))
-            working_idx_ref.set(working_idx)
+            working_idx_ref.set(list(working_idx))
 
             if self._progress and idx in known_idx:
                 self._progressbar.n = len(current_idx)

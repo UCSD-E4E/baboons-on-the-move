@@ -45,19 +45,20 @@ class CalculateMetrics(CliPlugin):
         self._connection = None
         self._cursor = None
 
-        self._enable_tracking = True
-        self._enable_persist = False
-
         self._runtime_config = {
             "display": False,
             "save": True,
             "timings": False,
             "progress": True,
-            "enable_tracking": self._enable_tracking,
-            "enable_persist": self._enable_persist,
         }
 
-    def _get_storage_ref(self, video_file: str, config_hash: str):
+    def _get_storage_ref(
+        self,
+        video_file: str,
+        enable_tracking: bool,
+        enable_persist: bool,
+        config_hash: str,
+    ):
         results_ref = db.reference("sherlock")
         video_file_ref = get_dataset_ref(video_file, results_ref)
         config_declaration_ref = video_file_ref.child(config_hash)
@@ -104,11 +105,34 @@ class CalculateMetrics(CliPlugin):
 
         return requests
 
-    def _add_working_idx(self, video_name: str, idx: int, config_hash: str):
-        pass
+    def _add_working_idx(
+        self,
+        video_name: str,
+        enable_tracking: bool,
+        enable_persist: bool,
+        idx: int,
+        config_hash: str,
+    ):
+        storage_ref = self._get_storage_ref(
+            video_name, enable_tracking, enable_persist, config_hash
+        )
+        working_idx_ref = storage_ref.child("working_idx")
 
-    def _remove_working_idx(self, video_name: str, idx: int, config_hash: str):
-        storage_ref = self._get_storage_ref(video_name, config_hash)
+        working_idx = set(working_idx_ref.get() or [])
+        working_idx.add(idx)
+        working_idx_ref.set(list(working_idx))
+
+    def _remove_working_idx(
+        self,
+        video_name: str,
+        enable_tracking: bool,
+        enable_persist: bool,
+        idx: int,
+        config_hash: str,
+    ):
+        storage_ref = self._get_storage_ref(
+            video_name, enable_tracking, enable_persist, config_hash
+        )
         working_idx_ref = storage_ref.child("working_idx")
 
         working_idx = set(working_idx_ref.get() or [])
@@ -267,10 +291,18 @@ class CalculateMetrics(CliPlugin):
 
         requests = self._get_requests(config_hash)
         while requests:
-            video_name, enable_tracking, enable_presist, idx = requests[0]
+            video_name, enable_tracking, enable_persist, idx = requests[0]
             print(
                 f"{video_name} {'tracking' if enable_tracking else 'detection'}: {idx}"
             )
+
+            self._remove_working_idx(
+                video_name, enable_tracking, enable_persist, idx, config_hash
+            )
+
+            runtime_config = self._runtime_config
+            runtime_config["enable_tracking"] = enable_tracking
+            runtime_config["enable_persist"] = enable_persist
 
             #     self._set_config(idx, X, config_options)
 
@@ -292,7 +324,9 @@ class CalculateMetrics(CliPlugin):
             #     self._save_results(video_name, idx, config_hash)
 
             # Remove the working idx to signify that we are done.
-            self._remove_working_idx(video_name, idx, config_hash)
+            self._remove_working_idx(
+                video_name, enable_tracking, enable_persist, idx, config_hash
+            )
 
             # Update the requests in case more are running
             requests = self._get_requests(config_hash)
