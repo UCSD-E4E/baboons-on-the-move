@@ -112,6 +112,9 @@ class CalculateMetrics(CliPlugin):
             )
             cache[key] = result
 
+            with open(cache_path, "wb") as f:
+                pickle.dump(cache, f)
+
             return result
 
     def _get_requests(self, config_hash: str):
