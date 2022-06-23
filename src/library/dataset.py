@@ -59,7 +59,11 @@ def get_dataset_motion_results(
     idx: int,
     config_hash: str,
 ):
-    unlink("./output/results.db")
+    if exists("./output/results.db"):
+        unlink("./output/results.db")
+
+    if exists("./output/results.db.7z"):
+        unlink("./output/results.db.7z")
 
     nas = NAS()
     nas.download_file(

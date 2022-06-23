@@ -8,13 +8,20 @@ import numpy as np
 import pandas as pd
 from sqlite3 import connect
 import py7zr
+from tqdm import tqdm
 
 import yaml
 from cli_plugins.cli_plugin import CliPlugin
 from library.config import get_config_declaration, get_config_options, set_config_part
 from library.firebase import initialize_app, get_dataset_ref
 from firebase_admin import db
-from library.dataset import get_dataset_path
+from library.dataset import (
+    dataset_motion_results_exists,
+    get_dataset_motion_results,
+    get_dataset_path,
+    save_dataset_filter_results,
+    save_dataset_motion_results,
+)
 from baboon_tracking import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from library.nas import NAS
@@ -45,6 +52,8 @@ class CalculateMetrics(CliPlugin):
         self._connection = None
         self._cursor = None
 
+        self._enable_tracking = None
+
         self._runtime_config = {
             "display": False,
             "save": True,
@@ -63,12 +72,12 @@ class CalculateMetrics(CliPlugin):
         video_file_ref = get_dataset_ref(video_file, results_ref)
         config_declaration_ref = video_file_ref.child(config_hash)
 
-        if self._enable_tracking:
+        if enable_tracking:
             tracking_ref = config_declaration_ref.child("tracking_enabled")
         else:
             tracking_ref = config_declaration_ref.child("tracking_disabled")
 
-        if self._enable_persist:
+        if enable_persist:
             persist_ref = tracking_ref.child("persist_enabled")
         else:
             persist_ref = tracking_ref.child("persist_disabled")
@@ -84,7 +93,9 @@ class CalculateMetrics(CliPlugin):
                 ypredict_idx = set(ypredict_idx)
 
                 for video_file in CalculateMetrics.VIDEO_FILES:
-                    storage_ref = self._get_storage_ref(video_file, config_hash)
+                    storage_ref = self._get_storage_ref(
+                        video_file, config, not config, config_hash
+                    )
                     working_idx_ref = storage_ref.child("working_idx")
 
                     _, _, _, known_idx = get_design_space(
@@ -220,31 +231,25 @@ class CalculateMetrics(CliPlugin):
     def _set_known_idx(
         self,
         video_name: str,
+        enable_tracking: bool,
+        enable_persist: bool,
         idx: int,
         config_hash: str,
         recall: float,
         precision: float,
         f1: float,
     ):
-        storage_ref = self._get_storage_ref(video_name, config_hash)
+        storage_ref = self._get_storage_ref(
+            video_name, enable_tracking, enable_persist, config_hash
+        )
 
         known_idx_ref = storage_ref.child("known_idx")
         known_idx = set(known_idx_ref.get() or [])
-        known_idx.add(idx)
+        known_idx.add(int(idx))
         known_idx_ref.set(list(known_idx))
 
         idx_ref = storage_ref.child(str(idx))
         idx_ref.set((recall, precision, f1))
-
-    def _save_results(self, video_name: str, idx: int, config_hash: str):
-        with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
-            archive.write("./output/results.db")
-
-        nas = NAS()
-        nas.upload_file(
-            f"/baboons/Results/VISO/car/{video_name}/{config_hash}/{idx}",
-            "./output/results.db.7z",
-        )
 
     def execute(self, args: Namespace):
         """
@@ -253,79 +258,75 @@ class CalculateMetrics(CliPlugin):
 
         initialize_app()
 
-        # while True:
-        #     did_work = False
-        #     for ref_video_file in CalculateMetrics.VIDEO_FILES:
-        #         for config in [True, False]:
-        #             _, ypredict_idx = get_pareto_front(
-        #                 ref_video_file, config, not config
-        #             )
-        #             ypredict_idx = set(ypredict_idx)
+        with open("./config_declaration.yml", "r", encoding="utf8") as f:
+            config_declaration = get_config_declaration("", yaml.safe_load(f))
+            f.seek(0)
 
-        #             for video_file in CalculateMetrics.VIDEO_FILES:
-        #                 X, y, _, known_idx = get_design_space(
-        #                     video_file, config, not config
-        #                 )
-
-        #                 known_idx = set(known_idx)
-        #                 ypredict_idx_clone = ypredict_idx.difference(known_idx)
-
-        #     if not did_work:
-        #         pass
-
-        # with open("./config_declaration.yml", "r", encoding="utf8") as f:
-        #     config_declaration = get_config_declaration("", yaml.safe_load(f))
-        #     f.seek(0)
-
-        # config_options = [
-        #     (k, get_config_options(i), i["type"])
-        #     for k, i in config_declaration.items()
-        #     if "skip_learn" not in i or not i["skip_learn"]
-        # ]
-        # X = np.array(np.meshgrid(*[c for _, c, _ in config_options])).T.reshape(
-        #     -1, len(config_options)
-        # )
+        config_options = [
+            (k, get_config_options(i), i["type"])
+            for k, i in config_declaration.items()
+            if "skip_learn" not in i or not i["skip_learn"]
+        ]
 
         with open("./config_declaration.yml", "rb") as f:
             config_hash = hashlib.md5(f.read()).hexdigest()
 
         requests = self._get_requests(config_hash)
         while requests:
-            video_name, enable_tracking, enable_persist, idx = requests[0]
-            print(
-                f"{video_name} {'tracking' if enable_tracking else 'detection'}: {idx}"
+            video_file, enable_tracking, enable_persist, idx = requests[0]
+            tqdm.write(
+                f"{video_file} {'tracking' if enable_tracking else 'detection'}: {idx}"
             )
 
-            self._remove_working_idx(
-                video_name, enable_tracking, enable_persist, idx, config_hash
+            self._enable_tracking = enable_tracking
+
+            self._add_working_idx(
+                video_file, enable_tracking, enable_persist, idx, config_hash
             )
 
             runtime_config = self._runtime_config
             runtime_config["enable_tracking"] = enable_tracking
             runtime_config["enable_persist"] = enable_persist
 
-            #     self._set_config(idx, X, config_options)
+            X, _, _, _ = get_design_space(video_file, enable_tracking, enable_persist)
+            self._set_config(idx, X, config_options)
 
-            #     video_file = f"VISO/car/{video_name}"
-            #     dataset_path = get_dataset_path(video_file)
-            #     path = f"{dataset_path}/img"
-            #     ground_truth_path = f"{dataset_path}/gt/gt.txt"
+            dataset_path = get_dataset_path(video_file)
+            path = f"{dataset_path}/img"
+            ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
-            #     MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
-            #     SqliteParticleFilterPipeline(
-            #         path, runtime_config=self._runtime_config
-            #     ).run()
+            if not dataset_motion_results_exists(video_file, idx, config_hash):
+                MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
+                save_dataset_motion_results(video_file, idx, config_hash)
+            else:
+                tqdm.write("Using previous motion results...")
+                get_dataset_motion_results(video_file, idx, config_hash)
 
-            #     recall, precision, f1 = self._get_metrics(
-            #         "./output/results.db", ground_truth_path
-            #     )
+            SqliteParticleFilterPipeline(
+                path, runtime_config=self._runtime_config
+            ).run()
+            save_dataset_filter_results(
+                video_file, enable_tracking, enable_persist, idx, config_hash
+            )
 
-            #     self._set_known_idx(video_name, idx, config_hash, recall, precision, f1)
-            #     self._save_results(video_name, idx, config_hash)
+            recall, precision, f1 = self._get_metrics(
+                "./output/results.db", ground_truth_path
+            )
+
+            self._set_known_idx(
+                video_file,
+                enable_tracking,
+                enable_persist,
+                idx,
+                config_hash,
+                recall,
+                precision,
+                f1,
+            )
 
             # Remove the working idx to signify that we are done.
             self._remove_working_idx(
-                video_name, enable_tracking, enable_persist, idx, config_hash
+                video_file, enable_tracking, enable_persist, idx, config_hash
             )
 
             # Update the requests in case more are running
