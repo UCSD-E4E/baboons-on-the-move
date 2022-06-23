@@ -18,7 +18,7 @@ import yaml
 from firebase_admin import db
 from sherlock import Sherlock
 from tqdm import tqdm
-from cli_plugins.run import str2bool
+from library.cli import str2bool
 
 from baboon_tracking.motion_tracker_pipeline import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
