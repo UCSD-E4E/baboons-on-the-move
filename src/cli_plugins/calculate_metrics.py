@@ -2,7 +2,9 @@
 Plugin for calculating metrics.
 """
 from argparse import ArgumentParser, Namespace
+from genericpath import exists
 import hashlib
+import pickle
 from typing import Dict, List, Set, Tuple
 import numpy as np
 import pandas as pd
@@ -85,6 +87,33 @@ class CalculateMetrics(CliPlugin):
 
         return persist_ref
 
+    def _dataset_filter_results_exists(
+        self,
+        video_file: str,
+        enable_tracking: bool,
+        enable_persist: bool,
+        idx: int,
+        config_hash: str,
+    ):
+        cache_path = "./output/dataset_filter_results_exist_cache.pickle"
+
+        if exists(cache_path):
+            with open(cache_path, "rb") as f:
+                cache = pickle.load(f)
+        else:
+            cache = {}
+
+        key = (video_file, enable_tracking, enable_persist, idx, config_hash)
+        if key in cache:
+            return cache[key]
+        else:
+            result = dataset_filter_results_exists(
+                video_file, enable_tracking, enable_persist, idx, config_hash
+            )
+            cache[key] = result
+
+            return result
+
     def _get_requests(self, config_hash: str):
         requests: Set[Tuple[str, bool, bool, int]] = set()
 
@@ -97,7 +126,7 @@ class CalculateMetrics(CliPlugin):
                 requests.update(
                     (ref_video_file, config, not config, idx)
                     for idx in known_idx
-                    if not dataset_filter_results_exists(
+                    if not self._dataset_filter_results_exists(
                         ref_video_file, config, not config, idx, config_hash
                     )
                 )
