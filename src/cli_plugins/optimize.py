@@ -271,7 +271,7 @@ class Optimize(CliPlugin):
                 self._max_recall = (recall, precision, f1)
                 recall_color = "\033[93m"
 
-            max_recall_color = "\033[0m"
+            max_recall_color = recall_color
             if max_recall >= required_recall:
                 max_recall_color = "\033[94m"
             else:
@@ -282,7 +282,7 @@ class Optimize(CliPlugin):
                 self._max_precision = (recall, precision, f1)
                 precision_color = "\033[93m"
 
-            max_precision_color = "\033[0m"
+            max_precision_color = precision_color
             if max_precision >= required_precision:
                 max_precision_color = "\033[94m"
             else:
@@ -292,10 +292,8 @@ class Optimize(CliPlugin):
             if max_f1 < f1:
                 self._max_f1 = (recall, precision, f1)
                 f1_color = "\033[93m"
-            elif max_f1 >= required_f1:
-                f1_color = "\033[94m"
 
-            max_f1_color = "\033[0m"
+            max_f1_color = f1_color
             if max_f1 >= required_f1:
                 max_f1_color = "\033[94m"
             else:
