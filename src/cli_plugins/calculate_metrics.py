@@ -318,7 +318,8 @@ class CalculateMetrics(CliPlugin):
 
         requests = self._get_requests(config_hash)
         while requests:
-            video_file, enable_tracking, enable_persist, idx = requests[0]
+            iterator = iter(requests)
+            video_file, enable_tracking, enable_persist, idx = next(iterator)
             tqdm.write(
                 f"{video_file} {'tracking' if enable_tracking else 'detection'}: {idx}"
             )
