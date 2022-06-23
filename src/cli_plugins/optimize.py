@@ -326,6 +326,10 @@ class Optimize(CliPlugin):
             current_idx_ref.set(current_idx)
             last_update_ref.set(datetime.utcnow().isoformat())
 
+            working_idx = set(working_idx_ref.get() or [])
+            working_idx.remove(int(idx))
+            working_idx_ref.set(working_idx)
+
             if self._progress and idx in known_idx:
                 self._progressbar.n = len(current_idx)
                 self._progressbar.refresh()
