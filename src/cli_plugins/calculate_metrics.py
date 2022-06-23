@@ -130,7 +130,7 @@ class CalculateMetrics(CliPlugin):
         working_idx_ref = storage_ref.child("working_idx")
 
         working_idx = set(working_idx_ref.get() or [])
-        working_idx.add(idx)
+        working_idx.add(int(idx))
         working_idx_ref.set(list(working_idx))
 
     def _remove_working_idx(
@@ -148,7 +148,7 @@ class CalculateMetrics(CliPlugin):
 
         working_idx = set(working_idx_ref.get() or [])
         if idx in working_idx:
-            working_idx.remove(idx)
+            working_idx.remove(int(idx))
             working_idx_ref.set(list(working_idx))
 
     def _set_config(self, idx: int, X: np.ndarray, config_options):
