@@ -22,7 +22,7 @@ def initialize_app():
         pass
 
 
-def get_dataset_ref(dataset_name, parent_ref: db.Reference):
+def get_dataset_ref(dataset_name: str, parent_ref: db.Reference):
     ref = parent_ref
     for part in dataset_name.split("/"):
         ref = ref.child(part)

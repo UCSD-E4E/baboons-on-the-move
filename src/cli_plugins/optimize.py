@@ -195,13 +195,8 @@ class Optimize(CliPlugin):
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
         current_idx_ref = storage_ref.child("current_idx")
+        working_idx_ref = storage_ref.child("working_idx")
         last_update_ref = storage_ref.child("last_update")
-
-        requested_idx_ref = storage_ref.child("requested_idx")
-        requested_idx = []
-        requested_idx.extend(known_idx)
-        requested_idx = np.array(requested_idx)
-        self._print(str(requested_idx))
 
         max_recall_ref = storage_ref.child("max_recall")
         max_precision_ref = storage_ref.child("max_precision")
@@ -210,7 +205,14 @@ class Optimize(CliPlugin):
         path = f"{dataset_path}/img"
         ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
-        for idx in requested_idx:
+        working_idx = set(working_idx_ref.get() or [])
+
+        self._print(str(known_idx))
+        for idx in known_idx:
+            # Store the value we are working on so that we don't repeat work.
+            working_idx.add(idx)
+            working_idx_ref.set(list(working_idx))
+
             self._print("=" * 3 + video_file + "=" * 3)
 
             cache_result_ref = storage_ref.child(str(idx))
@@ -304,11 +306,11 @@ class Optimize(CliPlugin):
             )
             recall, precision, f1 = self._max_recall
             self._print(
-                f"{recall_color}Max Recall: {max_recall_color}Recall: {recall:.2f}/{required_recall}\033[0m Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+                f"{recall_color}Max Recall: {max_recall_color}Recall: {recall:.2f}/{required_recall}{recall_color} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_precision
             self._print(
-                f"{precision_color}Max Precision: Recall: {recall:.2f} {max_precision_color}Precision: {precision:.2f}/{required_precision}\033[0m F1: {f1:.2f}\033[0m"
+                f"{precision_color}Max Precision: Recall: {recall:.2f} {max_precision_color}Precision: {precision:.2f}/{required_precision}{precision_color} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_f1
             self._print(
@@ -322,11 +324,6 @@ class Optimize(CliPlugin):
             max_f1_ref.set(self._max_f1)
             current_idx_ref.set(current_idx)
             last_update_ref.set(datetime.utcnow().isoformat())
-
-            requested_idx = {int(r) for r in requested_idx}
-            requested_idx_new = requested_idx_ref.get() or []
-            requested_idx_new = [r for r in requested_idx_new if r not in requested_idx]
-            requested_idx_ref.set(list(set(requested_idx_new)))
 
             if self._progress and idx in known_idx:
                 self._progressbar.n = len(current_idx)
