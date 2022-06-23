@@ -2,6 +2,7 @@
 Module for getting data from the NAS.
 """
 
+from os import unlink
 import pickle
 from genericpath import exists, isdir
 
@@ -42,6 +43,31 @@ def get_dataset_list(root: str = ""):
         pickle.dump(viso_datasets, f)
 
     return viso_datasets
+
+
+def dataset_motion_results_exists(
+    video_file: str,
+    idx: int,
+    config_hash: str,
+):
+    nas = NAS()
+    return nas.exists(f"/baboons/Results/{video_file}/{config_hash}/{idx}")
+
+
+def get_dataset_motion_results(
+    video_file: str,
+    idx: int,
+    config_hash: str,
+):
+    unlink("./output/results.db")
+
+    nas = NAS()
+    nas.download_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{idx}/results.db.7z", "./output"
+    )
+
+    with py7zr.SevenZipFile("./output/results.db.7z", "r") as archive:
+        archive.extractall()
 
 
 def save_dataset_motion_results(

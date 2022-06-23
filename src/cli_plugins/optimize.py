@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple
 import numpy as np
 import pandas as pd
 import py7zr
+from pyrsistent import v
 import yaml
 
 from firebase_admin import db
@@ -24,9 +25,11 @@ from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilter
 from cli_plugins.cli_plugin import CliPlugin
 from library.config import set_config_part, get_config_declaration, get_config_options
 from library.dataset import (
+    dataset_motion_results_exists,
     get_dataset_path,
     save_dataset_filter_results,
     save_dataset_motion_results,
+    get_dataset_motion_results,
 )
 from library.design_space import get_design_space
 from library.firebase import initialize_app, get_dataset_ref
@@ -222,8 +225,14 @@ class Optimize(CliPlugin):
 
                     set_config_part(key, config_value)
 
-                MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
-                save_dataset_motion_results(video_file, idx, config_hash)
+                if not dataset_motion_results_exists(video_file, idx, config_hash):
+                    MotionTrackerPipeline(
+                        path, runtime_config=self._runtime_config
+                    ).run()
+                    save_dataset_motion_results(video_file, idx, config_hash)
+                else:
+                    self._print("Using previous motion results...")
+                    get_dataset_motion_results(video_file, idx, config_hash)
 
                 SqliteParticleFilterPipeline(
                     path, runtime_config=self._runtime_config

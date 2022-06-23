@@ -72,6 +72,9 @@ class NAS:
 
         return leaf_nodes
 
+    def download_file(self, synology_path: str, target_dir: str):
+        self._file_station.get_file(synology_path, "download", dest_path=target_dir)
+
     def download_folder(self, synology_path: str, target_dir: str):
         makedirs(target_dir, exist_ok=True)
 
@@ -86,11 +89,9 @@ class NAS:
         files = [fd for fd in files_and_dirs if not fd["isdir"]]
 
         for file in tqdm(files):
-            self._file_station.get_file(
-                file["path"], "download", dest_path=f"{target_dir}"
-            )
+            self.download_file(file["path"], target_dir)
 
-    def exists(self, path: str):
+    def exists(self, path: str) -> bool:
         result = self._file_station.get_file_list(path)
 
         if "success" not in result:
