@@ -210,7 +210,7 @@ class Optimize(CliPlugin):
         self._print(str(known_idx))
         for idx in known_idx:
             # Store the value we are working on so that we don't repeat work.
-            working_idx.add(idx)
+            working_idx.add(int(idx))
             working_idx_ref.set(list(working_idx))
 
             self._print("=" * 3 + video_file + "=" * 3)
