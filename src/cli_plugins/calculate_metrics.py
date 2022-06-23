@@ -104,14 +104,17 @@ class CalculateMetrics(CliPlugin):
 
         return requests
 
-    def _remove_requested_idx(self, video_name: str, idx: int, config_hash: str):
-        storage_ref = self._get_storage_ref(video_name, config_hash)
-        requested_idx_ref = storage_ref.child("requested_idx")
+    def _add_working_idx(self, video_name: str, idx: int, config_hash: str):
+        pass
 
-        requested_idx = set(requested_idx_ref.get() or [])
-        if idx in requested_idx:
-            requested_idx.remove(idx)
-            requested_idx_ref.set(list(requested_idx))
+    def _remove_working_idx(self, video_name: str, idx: int, config_hash: str):
+        storage_ref = self._get_storage_ref(video_name, config_hash)
+        working_idx_ref = storage_ref.child("working_idx")
+
+        working_idx = set(working_idx_ref.get() or [])
+        if idx in working_idx:
+            working_idx.remove(idx)
+            working_idx_ref.set(list(working_idx))
 
     def _set_config(self, idx: int, X: np.ndarray, config_options):
         for i, (key, _, value_type) in enumerate(config_options):
@@ -269,9 +272,6 @@ class CalculateMetrics(CliPlugin):
                 f"{video_name} {'tracking' if enable_tracking else 'detection'}: {idx}"
             )
 
-            #     # Remove the requested idx we are going to start work on.
-            #     self._remove_requested_idx(video_name, idx, config_hash)
-
             #     self._set_config(idx, X, config_options)
 
             #     video_file = f"VISO/car/{video_name}"
@@ -291,5 +291,8 @@ class CalculateMetrics(CliPlugin):
             #     self._set_known_idx(video_name, idx, config_hash, recall, precision, f1)
             #     self._save_results(video_name, idx, config_hash)
 
-            #     # Update the requests in case more are running
+            # Remove the working idx to signify that we are done.
+            self._remove_working_idx(video_name, idx, config_hash)
+
+            # Update the requests in case more are running
             requests = self._get_requests(config_hash)
