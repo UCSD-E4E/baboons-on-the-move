@@ -89,6 +89,22 @@ def save_dataset_motion_results(
     )
 
 
+def dataset_filter_results_exists(
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    idx: int,
+    config_hash: str,
+):
+    tracking_folder = "tracking_enabled" if enable_tracking else "tracking_disabled"
+    persist_folder = "persist_enabled" if enable_persist else "persist_disabled"
+
+    nas = NAS()
+    return nas.exists(
+        f"/baboons/Results/{video_file}/{config_hash}/{tracking_folder}/{persist_folder}/{idx}"
+    )
+
+
 def save_dataset_filter_results(
     video_file: str,
     enable_tracking: bool,
