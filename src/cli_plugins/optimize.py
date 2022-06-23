@@ -268,15 +268,23 @@ class Optimize(CliPlugin):
             if max_recall < recall:
                 self._max_recall = (recall, precision, f1)
                 recall_color = "\033[93m"
-            elif max_recall >= required_recall:
-                recall_color = "\033[94m"
+
+            max_recall_color = "\033[0m"
+            if max_recall >= required_recall:
+                max_recall_color = "\033[94m"
+            else:
+                max_recall_color = "\033[91m"
 
             precision_color = "\033[0m"
             if max_precision < precision:
                 self._max_precision = (recall, precision, f1)
                 precision_color = "\033[93m"
-            elif max_precision >= required_precision:
-                precision_color = "\033[94m"
+
+            max_precision_color = "\033[0m"
+            if max_precision >= required_precision:
+                max_precision_color = "\033[94m"
+            else:
+                max_precision_color = "\033[91m"
 
             f1_color = "\033[0m"
             if max_f1 < f1:
@@ -285,20 +293,26 @@ class Optimize(CliPlugin):
             elif max_f1 >= required_f1:
                 f1_color = "\033[94m"
 
+            max_f1_color = "\033[0m"
+            if max_f1 >= required_f1:
+                max_f1_color = "\033[94m"
+            else:
+                max_f1_color = "\033[91m"
+
             self._print(
                 f"\033[1mCompleted {idx:} at {datetime.utcnow().isoformat()} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_recall
             self._print(
-                f"{recall_color}Max Recall: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m/{required_recall}"
+                f"{recall_color}Max Recall: {max_recall_color}Recall: {recall:.2f}/{required_recall}\033[0m Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_precision
             self._print(
-                f"{precision_color}Max Precision: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m/{required_precision}"
+                f"{precision_color}Max Precision: Recall: {recall:.2f} {max_precision_color}Precision: {precision:.2f}/{required_precision}\033[0m F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_f1
             self._print(
-                f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m/{required_f1}"
+                f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} {max_f1_color}F1: {f1:.2f}/{required_f1}\033[0m"
             )
 
             current_idx = list(OrderedDict.fromkeys(current_idx))
