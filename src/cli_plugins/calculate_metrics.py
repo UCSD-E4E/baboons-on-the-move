@@ -126,13 +126,13 @@ class CalculateMetrics(CliPlugin):
                     ref_video_file, config, not config
                 )
 
-                requests.update(
-                    (ref_video_file, config, not config, idx)
-                    for idx in known_idx
-                    if not self._dataset_filter_results_exists(
-                        ref_video_file, config, not config, idx, config_hash
-                    )
-                )
+                # requests.update(
+                #     (ref_video_file, config, not config, idx)
+                #     for idx in known_idx
+                #     if not self._dataset_filter_results_exists(
+                #         ref_video_file, config, not config, idx, config_hash
+                #     )
+                # )
 
                 _, ypredict_idx = get_pareto_front(ref_video_file, config, not config)
                 ypredict_idx = set(ypredict_idx)
