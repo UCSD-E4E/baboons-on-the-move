@@ -4,10 +4,18 @@ Starts the baboon tracker algorithm.
 from argparse import ArgumentParser, Namespace
 import argparse
 from typing import Callable, List
+import numpy as np
+
+import yaml
 from baboon_tracking import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
-from library.config import set_config_path
+from library.config import (
+    get_config_declaration,
+    get_config_options,
+    set_config_part,
+    set_config_path,
+)
 from library.dataset import get_dataset_path  # pylint: disable=import-outside-toplevel
 from library.cli import str2bool, str2factory
 
@@ -89,8 +97,33 @@ class Run(CliPlugin):
             help="The configuration file used for this run.",
         )
 
+    def _set_config(self, idx: int, X: np.ndarray, config_options):
+        for i, (key, _, value_type) in enumerate(config_options):
+            config_value = X[idx, i]
+            if value_type == "int32":
+                config_value = int(config_value)
+
+            set_config_part(key, config_value)
+
     def execute(self, args: Namespace):
-        set_config_path(args.config)
+        if args.config.isnumeric():
+            idx = int(args.config)
+
+            with open("./config_declaration.yml", "r", encoding="utf8") as f:
+                config_declaration = get_config_declaration("", yaml.safe_load(f))
+
+            config_options = [
+                (k, get_config_options(i), i["type"])
+                for k, i in config_declaration.items()
+                if "skip_learn" not in i or not i["skip_learn"]
+            ]
+            X = np.array(np.meshgrid(*[c for _, c, _ in config_options])).T.reshape(
+                -1, len(config_options)
+            )
+
+            self._set_config(idx, X, config_options)
+        else:
+            set_config_path(args.config)
 
         if args.input.startswith("d:"):
             args.input = f"{get_dataset_path(args.input[2:])}/img"
