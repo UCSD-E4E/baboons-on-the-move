@@ -35,9 +35,13 @@
                 // "-2",
                 // "./output/results_parallel.db"
                 // --------
-                "calc-metrics"
+                // "calc-metrics"
                 // --------
                 // "dataset"
+                // --------
+                "render-dataset",
+                "-d",
+                "Baboons/NeilThomas/001"
             ]
         },
         {

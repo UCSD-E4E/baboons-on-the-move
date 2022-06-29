@@ -148,6 +148,14 @@
                 "test"
             ],
             "description": "Runs pytest unit and integration tests"
+        },
+        {
+            "module": "render_dataset",
+            "class": "RenderDataset",
+            "subcommands": [
+                "render-dataset"
+            ],
+            "description": "Renders the specified dataset"
         }
     ]
 }

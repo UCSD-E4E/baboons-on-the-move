@@ -105,33 +105,42 @@ class Dataset(CliPlugin):
 
         return data
 
-    def _is_motion(self, frame: int, identity: int, data: np.ndarray):
-        if frame == 1:
-            # First frame, it is motion
-            return True
+    def _is_motion(
+        self, frame: int, identity: int, data: np.ndarray, hysteresis=1, direction=-1
+    ):
+        if frame == 1 and direction == -1:
+            # First frame, we can'te tell if motion
+            return False
 
         selector = np.logical_and(data[:, 0] == frame, data[:, 1] == identity)
         idx = np.argmax(selector)
 
         previous_data = data[:idx, :]
 
-        # Can we find it in the previous frame
-        previous_selector = np.logical_and(
-            previous_data[:, 0] == frame - 1, previous_data[:, 1] == identity
-        )
-        if not np.any(previous_selector):
-            # We didn't see this item last frame
-            return True
-        previous_idx = np.argmax(previous_selector)
+        for i in range(hysteresis):
+            i += 1
 
-        centroid = data[idx, 2:4] + data[idx, 4:6]
-        previous_centroid = (
-            previous_data[previous_idx, 2:4] + previous_data[previous_idx, 4:6]
-        )
+            # Can we find it in the previous frame
+            previous_selector = np.logical_and(
+                previous_data[:, 0] == frame + direction * i,
+                previous_data[:, 1] == identity,
+            )
+            if not np.any(previous_selector):
+                # We didn't see this item last frame
+                return True
+            previous_idx = np.argmax(previous_selector)
 
-        length = np.linalg.norm(centroid - previous_centroid)
+            centroid = data[idx, 2:4] + data[idx, 4:6]
+            previous_centroid = (
+                previous_data[previous_idx, 2:4] + previous_data[previous_idx, 4:6]
+            )
 
-        return length >= 2
+            length = np.linalg.norm(centroid - previous_centroid)
+
+            if length >= 2:
+                return True
+
+        return False
 
     def _generate_gt(
         self, xml: str, start: int, end: int, motion_only: bool, dataset_path: str
@@ -148,6 +157,7 @@ class Dataset(CliPlugin):
         data = data[data[:, 0] >= start]
         data[:, 0] -= frame_shift
 
+        original = data.copy()
         if motion_only:
             unique_frames = set(data[:, 0])
             unique_identities = set(data[:, 1])
@@ -162,7 +172,7 @@ class Dataset(CliPlugin):
                         continue
 
                     idx = np.argmax(selector)
-                    if not self._is_motion(frame, identity, data):
+                    if not self._is_motion(frame, identity, original, hysteresis=4):
                         data = np.delete(data, idx, axis=0)
 
         height, _ = data.shape
@@ -185,7 +195,7 @@ class Dataset(CliPlugin):
     def execute(self, args: Namespace):
         dataset_path = f"./data/Datasets/{args.name}"
 
-        self._generate_img(args.video, args.start, args.end, dataset_path)
+        # self._generate_img(args.video, args.start, args.end, dataset_path)
         self._generate_gt(
             args.xml, args.start, args.end, args.enable_motion_only, dataset_path
         )
