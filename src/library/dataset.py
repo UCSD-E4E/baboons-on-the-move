@@ -105,6 +105,32 @@ def dataset_filter_results_exists(
     )
 
 
+def get_dataset_filter_results(
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    idx: int,
+    config_hash: str,
+):
+    if exists("./output/results.db"):
+        unlink("./output/results.db")
+
+    if exists("./output/results.db.7z"):
+        unlink("./output/results.db.7z")
+
+    tracking_folder = "tracking_enabled" if enable_tracking else "tracking_disabled"
+    persist_folder = "persist_enabled" if enable_persist else "persist_disabled"
+
+    nas = NAS()
+    nas.download_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{tracking_folder}/{persist_folder}/{idx}/results.db.7z",
+        "./output",
+    )
+
+    with py7zr.SevenZipFile("./output/results.db.7z", "r") as archive:
+        archive.extractall()
+
+
 def save_dataset_filter_results(
     video_file: str,
     enable_tracking: bool,
