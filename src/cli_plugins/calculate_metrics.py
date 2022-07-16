@@ -325,9 +325,9 @@ class CalculateMetrics(CliPlugin):
             video_file, enable_tracking, enable_persist, idx = next(iterator)
             video_file, enable_tracking, enable_persist, idx = (
                 "Baboons/NeilThomas/001",
+                True,
                 False,
-                False,
-                15824,
+                1340,
             )
             tqdm.write(
                 f"{video_file} {'tracking' if enable_tracking else 'detection'}: {idx}"

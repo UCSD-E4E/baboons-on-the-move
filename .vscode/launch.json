@@ -41,7 +41,9 @@
                 // --------
                 "render-dataset",
                 "-d",
-                "Baboons/NeilThomas/001"
+                "VISO/car/007",
+                "-f",
+                "f:yes:no:7100"
             ]
         },
         {
