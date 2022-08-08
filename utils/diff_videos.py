@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import sys
 
-from config import *
+from library.config import *
 
 
 def main():

@@ -8,7 +8,7 @@ import multiprocessing
 import sys
 
 import baboon_tracking as bt
-from config import *
+from library.config import *
 
 configs["blob_det_params"] = BLOB_DET_PARAMS
 

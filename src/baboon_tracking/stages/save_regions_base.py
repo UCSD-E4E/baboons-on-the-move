@@ -11,7 +11,7 @@ import git
 from pipeline import Stage
 from pipeline.stage_result import StageResult
 from pipeline.parent_stage import ParentStage
-from config import get_config
+from library.config import get_config
 
 
 class SaveRegionsBase(Stage, ABC):

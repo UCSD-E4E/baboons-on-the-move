@@ -4,7 +4,7 @@ CLI Plugin for downloading the best parameter from the cloud.
 
 from argparse import ArgumentParser, Namespace
 from cli_plugins.cli_plugin import CliPlugin
-from config import get_latest_config, save_config
+from library.config import get_latest_config, save_config
 
 
 class DownloadParameters(CliPlugin):
