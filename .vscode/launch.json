@@ -21,17 +21,17 @@
                 // "--pipeline",
                 // "ParticleFilter"
                 // --------
-                // "optimize",
-                // "-d",
-                // "VISO/car/003",
-                // "-c",
-                // "20"
+                "optimize",
+                "-d",
+                "VISO/car/003",
+                "-c",
+                "20"
                 // --------
-                "compare",
-                "-1",
-                "./output/results_serial.db",
-                "-2",
-                "./output/results_parallel.db"
+                // "compare",
+                // "-1",
+                // "./output/results_serial.db",
+                // "-2",
+                // "./output/results_parallel.db"
             ]
         },
         {

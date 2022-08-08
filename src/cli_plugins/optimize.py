@@ -13,6 +13,7 @@ import yaml
 from firebase_admin import db
 from sherlock import Sherlock
 from tqdm import tqdm
+from cli_plugins.run import str2bool
 
 from baboon_tracking.motion_tracker_pipeline import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
@@ -41,6 +42,8 @@ class Optimize(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
+        self._progress = True
+
         parser.add_argument(
             "-d",
             "--dataset",
@@ -55,6 +58,22 @@ class Optimize(CliPlugin):
             help="The number of frames to use for the video processing. -1 reprsents all frames.",
         )
 
+        parser.add_argument(
+            "-t",
+            "--enable-tracking",
+            default="yes",
+            type=str2bool,
+            help="Enable tracking instead of detection.",
+        )
+
+        parser.add_argument(
+            "-p",
+            "--enable-persist",
+            default="no",
+            type=str2bool,
+            help="Enable persist for particle filter.",
+        )
+
         self._runtime_config = {
             "display": False,
             "save": True,
@@ -65,7 +84,16 @@ class Optimize(CliPlugin):
         self._max_recall = (0, 0, 0)
         self._max_f1 = (0, 0, 0)
 
-        self._progressbar: tqdm = None
+        self._tracking_enabled = False
+
+        if self._progress:
+            self._progressbar: tqdm = None
+
+    def _print(self, output):
+        if self._progress:
+            tqdm.write(output)
+        else:
+            print(output)
 
     def _extend(self, target: Dict[str, Any], source: Dict[str, Any]):
         for key, value in source.items():
@@ -165,7 +193,7 @@ class Optimize(CliPlugin):
                     score = matches[match_idx]
                     truth_identity = truth[match_idx, 0]
 
-                    if score > 0:
+                    if score > 0 and self._tracking_enabled:
                         identity_map[identity] = truth_identity
                 else:
                     truth_identity = identity_map[identity]
@@ -204,7 +232,7 @@ class Optimize(CliPlugin):
         count: int,
         storage_ref: db.Reference,
     ):
-        tqdm.write(str(known_idx))
+        self._print(str(known_idx))
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
 
@@ -248,7 +276,7 @@ class Optimize(CliPlugin):
                 cache_known_idx_ref.set(cache_known_idx)
 
             else:
-                tqdm.write("Using Cache...")
+                self._print("Using Cache...")
                 recall, precision, f1 = cache_result
 
             y[idx, :] = np.array([recall, precision, f1])
@@ -276,31 +304,36 @@ class Optimize(CliPlugin):
                 self._max_f1 = (recall, precision, f1)
                 f1_color = "\033[93m"
 
-            tqdm.write(
+            self._print(
                 f"\033[1mCompleted {idx:} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_recall
-            tqdm.write(
+            self._print(
                 f"{recall_color}Max Recall: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_precision
-            tqdm.write(
+            self._print(
                 f"{precision_color}Max Precision: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_f1
-            tqdm.write(
+            self._print(
                 f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
-            tqdm.write("=" * 10)
+            self._print("=" * 10)
 
             max_recall_ref.set(self._max_recall)
             max_precision_ref.set(self._max_precision)
             max_f1_ref.set(self._max_f1)
 
-            self._progressbar.update(1)
+            if self._progress:
+                self._progressbar.update(1)
 
     def execute(self, args: Namespace):
         initialize_app()
+
+        self._runtime_config["enable_tracking"] = args.enable_tracking
+        self._runtime_config["enable_persist"] = args.enable_persist
+        self._tracking_enabled = args.enable_tracking
 
         with open("./config_declaration.yml", "rb") as f:
             config_hash = hashlib.md5(f.read()).hexdigest()
@@ -311,7 +344,18 @@ class Optimize(CliPlugin):
         sherlock_ref = db.reference("sherlock")
         video_file_ref = sherlock_ref.child(video_file)
         config_declaration_ref = video_file_ref.child(config_hash)
-        frame_count_ref = config_declaration_ref.child(args.count)
+
+        if args.enable_tracking:
+            tracking_ref = config_declaration_ref.child("tracking_enabled")
+        else:
+            tracking_ref = config_declaration_ref.child("tracking_disabled")
+
+        if args.enable_persist:
+            persist_ref = tracking_ref.child("persist_enabled")
+        else:
+            persist_ref = tracking_ref.child("persist_disabled")
+
+        frame_count_ref = persist_ref.child(args.count)
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
@@ -332,7 +376,10 @@ class Optimize(CliPlugin):
 
         percent = 0.3
         budget = int(X.shape[0] * percent)
-        self._progressbar = tqdm(total=budget)
+
+        if self._progress:
+            self._progressbar = tqdm(total=budget)
+
         sherlock = Sherlock(
             n_init=5,
             budget=budget,
@@ -360,4 +407,6 @@ class Optimize(CliPlugin):
         )
 
         sherlock.fit(X).predict(X, y)
-        self._progressbar.close()
+
+        if self._progress:
+            self._progressbar.close()

@@ -3,6 +3,9 @@ Saves the list of baboons in Sqlite database.
 """
 from os import remove
 from os.path import exists
+from sqlite3 import OperationalError
+
+import backoff
 
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
@@ -45,6 +48,7 @@ class SaveMotionRegions(SaveRegions):
         if exists(self.file_name):
             remove(self.file_name)
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def on_database_create(self) -> None:
         super().on_database_create()
 
@@ -76,6 +80,7 @@ class SaveMotionRegions(SaveRegions):
 
         SqliteBase.connection.commit()
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def execute(self) -> StageResult:
         stage_result = super().execute()
 
