@@ -9,6 +9,7 @@ import sys
 import tarfile
 import urllib.request
 import zipfile
+import platform
 
 from shutil import which
 from cli_plugins.cli_plugin import CliPlugin
@@ -56,9 +57,12 @@ class Install(CliPlugin):
         subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
 
     def _install_node_in_repo(self):
-        if sys.platform in ("linux", "linux2"):
-            # Assume we are on 64 bit Intel
-            url = "https://nodejs.org/dist/v14.15.1/node-v14.15.1-linux-x64.tar.xz"
+        platform_machine = platform.machine()
+        is_amd64 = platform_machine == "x86_64"
+        is_linux = sys.platform in ("linux", "linux2")
+
+        if is_linux:
+            url = f"https://nodejs.org/dist/v16.15.1/node-v16.15.1-linux-{'x64' if is_amd64 else 'arm64'}.tar.xz"
             ext = "tar.xz"
         else:
             url = None

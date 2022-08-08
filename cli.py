@@ -64,6 +64,9 @@ def main():
 
     # Plugins are loaded dynamically from ./src/cli_plugins/plugins.json
     for plugin in plugins_dict["plugins"]:
+        if "support_arm" in plugin and not plugin["support_arm"]:
+            continue
+
         for subcommand in plugin["subcommands"]:
             subparser = subparsers.add_parser(
                 subcommand, description=plugin["description"]
