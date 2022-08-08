@@ -13,10 +13,12 @@ import pandas as pd
 import yaml
 
 from sherlock import Sherlock
+from sherlock.utils import adrs
 
 from baboon_tracking import BaboonTracker
+from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
-from library.config import set_config_part
+from library.config import get_config, set_config_part
 from library.dataset import get_dataset_path
 from library.region import bb_intersection_over_union
 
@@ -34,7 +36,11 @@ class Optimize(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
+        self._score_count = 0
         self._runtime_config = {"display": False, "save": True, "timings": False}
+        self._max_precision = (0, 0, 0)
+        self._max_recall = (0, 0, 0)
+        self._max_f1 = (0, 0, 0)
 
     def _extend(self, target: Dict[str, Any], source: Dict[str, Any]):
         for key, value in source.items():
@@ -100,7 +106,18 @@ class Optimize(CliPlugin):
 
             ground_truth = pd.read_csv(ground_truth_path).to_numpy()
             found_regions = cursor.execute(
-                "SELECT x1, y1, x2, y2, frame FROM motion_regions"
+                "SELECT x1, y1, x2, y2, identity, frame FROM computed_regions WHERE observed = 1 ORDER BY frame"
+            )
+
+            counts = {}
+            for x1, y1, x2, y2, identity, frame in found_regions:
+                if identity not in counts:
+                    counts[identity] = 0
+
+                counts[identity] += 1
+
+            found_regions = cursor.execute(
+                "SELECT x1, y1, x2, y2, identity, frame FROM computed_regions WHERE observed = 1 ORDER BY frame"
             )
 
             curr_frame = -1
@@ -108,7 +125,7 @@ class Optimize(CliPlugin):
             false_negative = 0
             false_positive = 0
             truth = None
-            for x1, y1, x2, y2, frame in found_regions:
+            for x1, y1, x2, y2, identity, frame in found_regions:
                 if curr_frame != frame:
                     if truth is not None:
                         false_negative += truth.shape[0]
@@ -123,6 +140,10 @@ class Optimize(CliPlugin):
                     )
                     curr_frame = frame
 
+                # Skip regions that only show up for one frame
+                if counts[identity] == 1:
+                    continue
+
                 current = (x1, y1, x2, y2)
                 matches = np.array(
                     [bb_intersection_over_union(current, t) for t in truth]
@@ -134,8 +155,18 @@ class Optimize(CliPlugin):
                 else:
                     false_positive += 1
 
-            recall = true_positive / (false_negative + true_positive)
+        if true_positive == 0:
+            false_negative = ground_truth.shape[0]
+
+        recall = true_positive / (false_negative + true_positive)
+        if false_positive == 0 and true_positive == 0:
+            precision = 0
+        else:
             precision = true_positive / (true_positive + false_positive)
+
+        if recall == 0 or precision == 0:
+            f1 = 0
+        else:
             f1 = (2 * recall * precision) / (recall + precision)
 
         return recall, precision, f1
@@ -164,28 +195,78 @@ class Optimize(CliPlugin):
             hash_str = str(X[idx, :])
 
             if hash_str not in video_score_cache:
-                for i, (key, _) in enumerate(config_options):
-                    set_config_part(key, X[idx, i])
+                for i, (key, _, value_type) in enumerate(config_options):
+                    config_value = X[idx, i]
+                    if value_type == "int32":
+                        config_value = int(config_value)
 
-                baboon_tracker = BaboonTracker(
-                    path, runtime_config=self._runtime_config
-                )
-                baboon_tracker.run(20)
+                    set_config_part(key, config_value)
 
-                recall, precision, f1 = self._get_metrics(
-                    "./output/results.db", ground_truth_path
-                )
-                video_score_cache[hash_str] = (recall, precision, f1)
+                try:
+                    baboon_tracker = BaboonTracker(
+                        path, runtime_config=self._runtime_config
+                    )
+                    baboon_tracker.run(20)
+                    particle_filter = SqliteParticleFilterPipeline(
+                        path, runtime_config=self._runtime_config
+                    )
+                    particle_filter.run(20)
+
+                    recall, precision, f1 = self._get_metrics(
+                        "./output/results.db", ground_truth_path
+                    )
+                    video_score_cache[hash_str] = (recall, precision, f1)
+                except ValueError:
+                    recall, precision, f1 = 0, 0, 0
+                    video_score_cache[hash_str] = (recall, precision, f1)
 
                 with open("./score_cache.pickle", "wb") as f:
                     pickle.dump(score_cache, f)
 
             recall, precision, f1 = video_score_cache[hash_str]
-            y[idx, :] = np.array(recall, precision)
 
+            y[idx, :] = np.array([recall, precision, f1])
+            if np.sum(y[idx, :]) == 0:
+                y[idx, :] = np.array([1e-5, 1e-5, 1e-5])
+
+            y[idx, :] /= 1
+
+            max_recall, _, _ = self._max_recall
+            _, max_precision, _ = self._max_precision
+            _, _, max_f1 = self._max_f1
+
+            recall_color = "\033[0m"
+            if max_recall < recall:
+                self._max_recall = (recall, precision, f1)
+                recall_color = "\033[93m"
+
+            precision_color = "\033[0m"
+            if max_precision < precision:
+                self._max_precision = (recall, precision, f1)
+                precision_color = "\033[93m"
+
+            f1_color = "\033[0m"
+            if max_f1 < f1:
+                self._max_f1 = (recall, precision, f1)
+                f1_color = "\033[93m"
+
+            self._score_count += 1
             print(
-                f"Completed: {idx} with Recall: {recall} Precision: {precision} F1: {f1}"
+                f"\033[1mCompleted ({self._score_count / X.shape[0] * 100:.2f}%): {idx:} with Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
+            recall, precision, f1 = self._max_recall
+            print(
+                f"{recall_color}Max Recall: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+            )
+            recall, precision, f1 = self._max_precision
+            print(
+                f"{precision_color}Max Precision: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+            )
+            recall, precision, f1 = self._max_f1
+            print(
+                f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+            )
+            print("=" * 10)
 
     def execute(self, args: Namespace):
         for video_file in Optimize.VIDEO_FILES:
@@ -193,18 +274,18 @@ class Optimize(CliPlugin):
                 config_declaration = self._get_config_declaration("", yaml.safe_load(f))
 
             config_options = [
-                (k, self._get_config_options(i))
+                (k, self._get_config_options(i), i["type"])
                 for k, i in config_declaration.items()
                 if "skip_learn" not in i or not i["skip_learn"]
             ]
-            X = np.array(np.meshgrid(*[c for _, c in config_options])).T.reshape(
+            X = np.array(np.meshgrid(*[c for _, c, _ in config_options])).T.reshape(
                 -1, len(config_options)
             )
-            y = np.zeros((X.shape[0], 2))
+            y = np.zeros((X.shape[0], 3))
 
             sherlock = Sherlock(
                 n_init=5,
-                budget=int(X.shape[0] * 0.15),
+                budget=int(X.shape[0] * 0.2),
                 surrogate_type="rbfthin_plate-rbf_multiquadric-randomforest-gpy",
                 kernel="matern",
                 num_restarts=0,
