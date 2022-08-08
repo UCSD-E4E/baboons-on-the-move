@@ -7,7 +7,7 @@ from typing import Callable, List
 from baboon_tracking import BaboonTracker
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
-from config import set_config_path
+from library.config import set_config_path
 from library.dataset import get_dataset_path  # pylint: disable=import-outside-toplevel
 
 

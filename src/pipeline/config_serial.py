@@ -3,7 +3,7 @@ Implements a serial stage which allows the various sub stages to be reordered or
 """
 from typing import Dict, Callable, List
 from pipeline.serial import Serial
-from config import get_config_part
+from library.config import get_config_part
 
 
 class ConfigSerial(Serial):

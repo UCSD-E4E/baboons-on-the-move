@@ -11,13 +11,14 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                "run",
-                "--save",
-                "no",
-                "--display",
-                "yes",
-                "--input",
-                "d:VISO/car/001"
+                // "run",
+                // "--save",
+                // "no",
+                // "--display",
+                // "yes",
+                // "--input",
+                // "d:VISO/car/001"
+                "optimize"
             ]
         },
         {

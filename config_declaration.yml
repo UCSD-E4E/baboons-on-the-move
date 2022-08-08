@@ -1,17 +1,7 @@
-input:
-  type: string
-  skip_learn: true
-output:
-  type: string
-  skip_learn: true
-mask_output:
-  type: string
-  skip_learn: true
-
 preprocess:
   kernel_size:
     type: int32
-    min: 1
+    min: 3
     max: 10
     odd: true
     step: 1
@@ -19,9 +9,9 @@ preprocess:
 motion_detector:
   history_frames:
     type: int32
-    min: 1
+    min: 3
+    max: 8
     step: 1
-    max: 10
 
   registration:
     good_match_percent:
@@ -29,122 +19,46 @@ motion_detector:
       min: 0
       max: 1
       step: 0.1
+      skip_learn: true
     ransac_max_error:
       type: float
       min: 0
       max: 20
       step: 2
+      skip_learn: true
     ssc_num_ret_points:
       type: int32
       min: 0
       max: 100000
       step: 100
+      skip_learn: true
     ssc_tolerence:
-      type: flat
+      type: float
       min: 0
       max: 2
       step: 0.1
+      skip_learn: true
 
   quantize_frames:
     scale_factor:
       type: int32
-      min: 0
-      max: 100
-      step: 1
-
-  # noise_reduction:
-  #   erode_kernel_size:
-  #     type: int32
-  #     min: 0
-  #     std: 0.5
-  #   dilate_kernel_size:
-  #     type: int32
-  #     min: 0
-  #     std: 1
-  #   combine_kernel_size:
-  #     type: int32
-  #     min: 0
-  #     std: 0.5
-
-  # hysteresis:
-  #   required_motion_observations:
-  #     type: int32
-  #     min: 0
-  #     std: 0.5
-  #   required_no_motion_observations:
-  #     type: int32
-  #     min: 0
-  #     std: 0.5
-
-  # group_filter:
-  #   size:
-  #     type: int32
-  #     min: 0
-  #     max: 8
-  #     std: 0.5
-
-  # min_size_filter:
-  #   min_size:
-  #     type: int32
-  #     min: 0
-  #     std: 0.5
+      min: 5
+      max: 20
+      step: 2
 
   dbscan:
     eps:
-      type: int32
-      min: 0
-      max: 10
+      type: float
+      min: 0.5
+      max: 5
+      step: 1
     min_samples:
       type: int32
-      min: 0
-      max: 10
+      min: 5
+      step: 2
+      max: 20
     kernel:
       type: int32
       odd: true
-      min: 0
+      min: 3
       max: 10
-
-# dead_reckoning:
-#     dist_threshold:
-#       type: int32
-#       min: 0
-#       std: 0.5
-#     same_region_threshold:
-#       type: float
-#       min: 0
-#       std: 0.01
-
-# motion_detector_stages:
-#   HysteresisFilter:
-#       order:
-#         type: int32
-#         min: 0
-#         max: 100
-#         std: 0.5
-#       enabled:
-#         type: int32
-#         min: 0
-#         max: 2
-#         std: 0.5
-#   GroupFilter:
-#       order:
-#         type: int32
-#         min: 0
-#         max: 100
-#         std: 0.5
-#       enabled:
-#         type: int32
-#         min: 0
-#         max: 2
-#         std: 0.5
-#   DilateErodeFilter:
-#       order:
-#         type: int32
-#         min: 0
-#         max: 100
-#         std: 0.5
-#       enabled:
-#         type: int32
-#         min: 0
-#         max: 2
-#         std: 0.5

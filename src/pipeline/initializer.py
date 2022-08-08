@@ -3,7 +3,7 @@ Intializes classes, satisfying configuration and supplied parameters.
 """
 import inspect
 from typing import Callable, Dict, List
-from config import get_config_part
+from library.config import get_config_part
 from pipeline.stage import Stage
 
 

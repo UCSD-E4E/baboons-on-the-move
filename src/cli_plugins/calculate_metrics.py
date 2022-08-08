@@ -11,8 +11,8 @@ from firebase_admin import db
 from cli_plugins.cli_plugin import CliPlugin
 from library.firebase import initialize_app
 from library.metrics import get_metrics
-from config import get_latest_config, set_config
 from sqlite3 import connect
+from library.config import get_latest_config, set_config
 from library.region import bb_intersection_over_union
 
 

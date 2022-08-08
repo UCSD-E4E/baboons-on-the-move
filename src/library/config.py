@@ -5,7 +5,7 @@ Handles reading from /config.yml
 import os
 from datetime import datetime
 from random import gauss
-from typing import Dict, Tuple
+from typing import Any, Dict, Tuple
 
 from firebase_admin import db
 from numpy.core.numeric import Inf
@@ -71,6 +71,14 @@ def get_config_part(key: str) -> Dict:
         key_curr_config = key_curr_config[key_part]
 
     return key_curr_config
+
+
+def set_config_part(key: str, value: Any):
+    parent_key = "/".join(key.split("/")[:-1])
+    child_key = key.split("/")[-1]
+    config_part = get_config_part(parent_key)
+
+    config_part[child_key] = value
 
 
 def _update_config(config: Dict, declaration: Dict):
