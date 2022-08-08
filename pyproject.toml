@@ -28,6 +28,7 @@ PyYAML = "^6.0"
 scikit-learn = "^1.0.2"
 synology-api = "^0.4.3"
 jupyter = "^1.0.0"
+GitPython = "^3.1.27"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.11.1"
