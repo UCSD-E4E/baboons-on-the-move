@@ -32,6 +32,7 @@ GitPython = "^3.1.27"
 sherlock = { git = "https://github.com/KastnerRG/sherlock.git", branch = "feature/package", markers = "platform_machine == 'x86_64'" }
 ipykernel = "^6.13.0"
 backoff = "^2.1.2"
+py7zr = "^0.18.9"
 
 [tool.poetry.dev-dependencies]
 pylint = "^2.11.1"
