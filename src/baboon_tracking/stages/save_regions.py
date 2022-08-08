@@ -2,7 +2,10 @@
 Base class for saving regions to Sqlite database.
 """
 
+from sqlite3 import OperationalError
 from typing import List
+
+import backoff
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.region import Region
@@ -25,6 +28,7 @@ class SaveRegions(SqliteBase):
         self._baboons = baboons
         self._frame = frame
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def on_database_create(self) -> None:
         super().on_database_create()
 
@@ -52,6 +56,7 @@ class SaveRegions(SqliteBase):
 
         return StageResult(True, True)
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def _save_baboons_for_frame(self, baboons: List[Region], frame_number: int):
         baboons = [(b.rectangle, b.id_str, b.identity) for b in baboons]
         baboons = [

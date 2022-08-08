@@ -4,7 +4,7 @@ Defines a stage which uses a paticle filter to fill in missing regions.
 
 import concurrent.futures
 
-from typing import List, Set
+from typing import Any, Dict, List, Set
 
 from numpy import ndarray
 from baboon_tracking.decorators.debug import debug
@@ -17,7 +17,7 @@ from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.particle_filter import ParticleFilter
 from pipeline import Stage
 from pipeline.stage_result import StageResult
-from pipeline.decorators import stage
+from pipeline.decorators import runtime_config, stage
 
 
 flatten = lambda t: [item for sublist in t for item in sublist]
@@ -46,6 +46,7 @@ def process_pool(
 @debug(FrameMixin, (0, 0, 255))
 @stage("baboons")
 @stage("transformation_matrices")
+@runtime_config("config")
 class ParticleFilterStage(Stage, BaboonsMixin):
     """
     Defines a stage which uses a paticle filter to fill in missing regions.
@@ -55,6 +56,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self,
         baboons: BaboonsMixin,
         transformation_matrices: TransformationMatricesMixin,
+        config: Dict[str, Any],
     ) -> None:
         Stage.__init__(self)
         BaboonsMixin.__init__(self)
@@ -65,6 +67,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._particle_filters: Set[ParticleFilter] = {}
         self._particle_count = 5
         self._probability_thresh = 0
+        self._runtime_config = config
 
     def on_destroy(self) -> None:
         self._executor.shutdown()
@@ -88,13 +91,17 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         probs = flatten(probs)
         probs.sort(key=lambda p: p[0], reverse=True)
 
-        used_particle_filters = {
-            pf for p, _, pf in probs if p > self._probability_thresh
-        }
-        unused_particle_filters = [
-            p for p in self._particle_filters if p not in used_particle_filters
-        ]
-        self._particle_filters.difference_update(unused_particle_filters)
+        if (
+            "enable_persist" not in self._runtime_config
+            or not self._runtime_config["enable_persist"]
+        ):
+            used_particle_filters = {
+                pf for p, _, pf in probs if p > self._probability_thresh
+            }
+            unused_particle_filters = [
+                p for p in self._particle_filters if p not in used_particle_filters
+            ]
+            self._particle_filters.difference_update(unused_particle_filters)
 
         thresh_probs = [(p, b) for p, b, _ in probs if p > self._probability_thresh]
         used_babooons: Set[Region] = set()

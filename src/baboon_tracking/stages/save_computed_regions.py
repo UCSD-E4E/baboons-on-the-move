@@ -2,6 +2,8 @@
 Saves the computed, identity regions into a Sqlite database.
 """
 
+from sqlite3 import OperationalError
+import backoff
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.stages.sqlite_base import SqliteBase
@@ -25,6 +27,7 @@ class SaveComputedRegions(SqliteBase):
     def before_database_close(self) -> None:
         self.save_hash("SaveComputedRegions")
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def on_database_create(self) -> None:
         SqliteBase.cursor.execute("DROP TABLE IF EXISTS bayesian_filter_regions")
 
@@ -43,6 +46,7 @@ class SaveComputedRegions(SqliteBase):
 
         self.connection.commit()
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def execute(self) -> StageResult:
         frame_number = self._frame.frame.get_frame_number()
 

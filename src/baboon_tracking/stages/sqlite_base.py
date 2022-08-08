@@ -2,9 +2,10 @@ from abc import ABC
 from datetime import datetime
 import json
 import hashlib
-from sqlite3 import Connection, Cursor, connect
+from sqlite3 import Connection, Cursor, OperationalError, connect
 
 import git
+import backoff
 from library.config import get_config
 from pipeline.parent_stage import ParentStage
 from pipeline.pipeline import Pipeline
@@ -66,6 +67,7 @@ class SqliteBase(Stage, ABC):
         SqliteBase.connection.commit()
         SqliteBase.created_metadata = True
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def _insert_start_metadata(self):
         if SqliteBase.inserted_metadata:
             return
@@ -93,6 +95,7 @@ class SqliteBase(Stage, ABC):
         SqliteBase.connection.commit()
         SqliteBase.inserted_metadata = True
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def on_init(self) -> None:
         self.before_database_create()
 
@@ -111,6 +114,7 @@ class SqliteBase(Stage, ABC):
         Called just before the connection to the database is closed.
         """
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def on_destroy(self) -> None:
         if SqliteBase.connection is not None:
             SqliteBase.connection.commit()
@@ -130,6 +134,7 @@ class SqliteBase(Stage, ABC):
             SqliteBase.created_metadata = False
             SqliteBase.inserted_metadata = False
 
+    @backoff.on_exception(backoff.expo, OperationalError)
     def save_hash(self, hash_key: str):
         SqliteBase.cursor.execute(
             "INSERT INTO metadata VALUES (?, ?, ?)",
