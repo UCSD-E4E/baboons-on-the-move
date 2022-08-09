@@ -21,7 +21,7 @@ This repository contains the state-of-the-art aerial drone background tracking a
 
 # Contributing
 ## System Requirements
-This project only officially runs on Ubuntu 20.04.  Other operating systems are compatible through the use of Vagrant.
+This project has been tested on Ubuntu 18.04, 20.04, 22.04.  Other operating systems are compatible through the use of Vagrant.
 
 ### Windows
 To run the project on Windows, please ensure you run the following command in an admin PowerShell
@@ -39,6 +39,10 @@ To run the project on Linux, please ensure you run the correct command for your 
 sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git ffmpeg
 ```
 #### Ubuntu 20.04
+```
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git ffmpeg
+```
+#### Ubuntu 18.04
 ```
 sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git ffmpeg
 ```
