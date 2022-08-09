@@ -5,10 +5,15 @@ import glob
 import os
 import subprocess
 import sys
+import platform
 from typing import List
 
 
 def _get_node_executable(name: str):
+    platform_machine = platform.machine()
+    is_linux = sys.platform in ("linux", "linux2")
+    is_amd64 = platform_machine == "x86_64"
+
     if sys.platform == "win32":
         executable = name + ".cmd"
     elif sys.platform in ("darwin", "linux", "linux2"):
@@ -16,8 +21,8 @@ def _get_node_executable(name: str):
     else:
         executable = None
 
-    if sys.platform in ("linux", "linux2"):
-        directory = "node-v14.15.1-linux-x64/bin"
+    if is_linux:
+        directory = f"node-v16.15.1-linux-{'x64' if is_amd64 else 'arm64'}/bin"
     else:
         directory = None
 
