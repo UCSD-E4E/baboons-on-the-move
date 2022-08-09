@@ -32,10 +32,15 @@ Set-ExecutionPolicy Unrestricted
 ### macOS
 Please ensure you have HomeBrew installed.
 
-### Ubuntu 20.04
-To run the project on Ubuntu, please ensure you run the following command.
+### Linux
+To run the project on Linux, please ensure you run the correct command for your distro.
+#### Ubuntu 22.04
 ```
-sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python3-openssl git ffmpeg
+```
+#### Ubuntu 20.04
+```
+sudo apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl git ffmpeg
 ```
 
 ## Recommended Development Enviornment
