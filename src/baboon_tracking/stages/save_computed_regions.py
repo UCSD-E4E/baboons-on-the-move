@@ -36,6 +36,7 @@ class SaveComputedRegions(SaveRegionsBase):
                 y2 int,
                 identity int,
                 id_str text,
+                observed int,
                 frame int
             )"""
         )
@@ -45,7 +46,10 @@ class SaveComputedRegions(SaveRegionsBase):
     def execute(self) -> StageResult:
         frame_number = self._frame.frame.get_frame_number()
 
-        baboons = [(b.rectangle, b.identity, b.id_str) for b in self._baboons.baboons]
+        baboons = [
+            (b.rectangle, b.identity, b.id_str, b.observed)
+            for b in self._baboons.baboons
+        ]
         baboons = [
             (
                 x1,
@@ -54,12 +58,13 @@ class SaveComputedRegions(SaveRegionsBase):
                 y2,
                 identity,
                 id_str,
+                observed,
                 frame_number,
             )
-            for (x1, y1, x2, y2), identity, id_str in baboons
+            for (x1, y1, x2, y2), identity, id_str, observed in baboons
         ]
         self.cursor.executemany(
-            "INSERT INTO computed_regions VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO computed_regions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             baboons,
         )
 

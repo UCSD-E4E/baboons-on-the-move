@@ -1,5 +1,5 @@
 preprocess:
-    kernel_size: 7
+    kernel_size: 3
 
 motion_detector:
     history_frames: 3

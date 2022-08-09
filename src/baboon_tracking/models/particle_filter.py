@@ -39,6 +39,7 @@ class Particle:
             (top_left[0], top_left[1], bottom_right[0], bottom_right[1]),
             id_str=self.baboon.id_str,
             identity=self.baboon.identity,
+            observed=self.baboon.observed,
         )
 
     def predict(self):
@@ -74,6 +75,7 @@ class Particle:
         self.baboon = self._get_moved_baboon(
             delta_x, delta_y, delta_x1, delta_y1, delta_x2, delta_y2
         )
+        self.baboon.observed = False
 
     def update(self, baboons: List[Baboon]):
         """
@@ -96,6 +98,7 @@ class Particle:
 
         self.weight *= weight
         self.baboon = baboon
+        self.baboon.observed = True
 
     def _get_moved_baboon(
         self,
@@ -121,7 +124,10 @@ class Particle:
         y2 += delta_y2
 
         return Baboon(
-            (x1, y1, x2, y2), id_str=self.baboon.id_str, identity=self.baboon.identity
+            (x1, y1, x2, y2),
+            id_str=self.baboon.id_str,
+            identity=self.baboon.identity,
+            observed=self.baboon.observed,
         )
 
 

@@ -2,8 +2,7 @@ preprocess:
   kernel_size:
     type: int32
     min: 3
-    max: 10
-    odd: true
+    max: 7
     step: 1
 
 motion_detector:

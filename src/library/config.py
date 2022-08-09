@@ -64,7 +64,7 @@ def get_config_part(key: str) -> Dict:
     """
     config = get_config()
 
-    key_parts = key.split("/")
+    key_parts = [k for k in key.split("/") if k]
 
     key_curr_config = config
     for key_part in key_parts:
@@ -74,11 +74,18 @@ def get_config_part(key: str) -> Dict:
 
 
 def set_config_part(key: str, value: Any):
-    parent_key = "/".join(key.split("/")[:-1])
-    child_key = key.split("/")[-1]
-    config_part = get_config_part(parent_key)
+    # pylint: disable=global-statement
+    global CONFIG_STORE
+    CONFIG_STORE = get_config()
 
-    config_part[child_key] = value
+    key_parts = [k for k in key.split("/") if k]
+
+    key_curr_config = CONFIG_STORE
+    for key_part in key_parts:
+        if isinstance(key_curr_config[key_part], dict):
+            key_curr_config = key_curr_config[key_part]
+        else:
+            key_curr_config[key_part] = value
 
 
 def _update_config(config: Dict, declaration: Dict):

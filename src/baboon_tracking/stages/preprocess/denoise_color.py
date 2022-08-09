@@ -3,6 +3,7 @@ Implements denoising using OpenCV.
 """
 import cv2
 from baboon_tracking.decorators.show_result import show_result
+from baboon_tracking.mixins.frame_mixin import FrameMixin
 
 from baboon_tracking.models.frame import Frame
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
@@ -11,28 +12,29 @@ from pipeline.stage_result import StageResult
 from pipeline.decorators import stage
 
 
-@stage("preprocessed_frame")
+@stage("frame")
 @show_result
-class Denoise(Stage, PreprocessedFrameMixin):
+class DenoiseColor(Stage, FrameMixin):
     """
     Implements denoising using OpenCV.
     """
 
-    def __init__(self, preprocessed_frame: PreprocessedFrameMixin) -> None:
-        PreprocessedFrameMixin.__init__(self)
+    def __init__(self, frame: FrameMixin) -> None:
+        FrameMixin.__init__(self)
         Stage.__init__(self)
 
-        self._preprocessed_frame = preprocessed_frame
+        self._frame = frame
 
     def execute(self) -> StageResult:
-        self.processed_frame = Frame(
-            cv2.fastNlMeansDenoising(
-                self._preprocessed_frame.processed_frame.get_frame(),
+        self.frame = Frame(
+            cv2.fastNlMeansDenoisingColored(
+                self._frame.frame.get_frame(),
                 h=3,
+                hColor=20,
                 templateWindowSize=7,
                 searchWindowSize=21,
             ),
-            self._preprocessed_frame.processed_frame.get_frame_number(),
+            self._frame.frame.get_frame_number(),
         )
 
         return StageResult(True, True)

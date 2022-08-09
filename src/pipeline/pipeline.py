@@ -84,12 +84,13 @@ class Pipeline(ABC):
 
         return result
 
-    def run(self, iterations=None):
+    def run(self, iterations: int = None):
         """
         Runs the algorithm until it finishes.
         """
 
-        Pipeline.iterations = iterations
+        if iterations:
+            Pipeline.iterations = iterations
 
         caf = Caffine()
         request_id = caf.request()
@@ -101,7 +102,7 @@ class Pipeline(ABC):
 
             curr += 1
 
-            if not result.continue_pipeline or (iterations and curr >= iterations):
+            if not result.continue_pipeline or (iterations and curr >= iterations + 1):
                 self._progressbar.close()
 
                 if (
