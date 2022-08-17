@@ -32,7 +32,7 @@
                 // "./output/results_serial.db",
                 // "-2",
                 // "./output/results_parallel.db"
-                "plot"
+                "calc-metrics"
             ]
         },
         {
