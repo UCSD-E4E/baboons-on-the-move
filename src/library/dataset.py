@@ -2,72 +2,12 @@
 Module for getting data from the NAS.
 """
 
+from os import unlink
 import pickle
-import sys
-from os import getenv, makedirs
-import getpass
-import json
 from genericpath import exists, isdir
-from synology_api import filestation
-from tqdm import tqdm
 
-
-def _download_folder(
-    synology_path: str, target_dir: str, file_station: filestation.FileStation
-):
-    makedirs(target_dir, exist_ok=True)
-
-    files_and_dirs = file_station.get_file_list(synology_path)["data"]["files"]
-    dirs = [fd for fd in files_and_dirs if fd["isdir"]]
-
-    for directory in dirs:
-        _download_folder(
-            directory["path"], f"{target_dir}/{directory['name']}", file_station
-        )
-
-    files = [fd for fd in files_and_dirs if not fd["isdir"]]
-
-    for file in tqdm(files):
-        file_station.get_file(file["path"], "download", dest_path=f"{target_dir}")
-
-
-def _get_credentials():
-    username = getenv("NAS_USER_NAME")
-    password = getenv("NAS_PASSWORD")
-
-    username_token = None
-    password_token = None
-    if exists("./nas_token.pickle"):
-        with open("./nas_token.pickle", "rb") as f:
-            username_token, password_token = pickle.load(f)
-
-    if not username:
-        if username_token:
-            username = username_token
-        else:
-            print("NAS Username: ", end="")
-            username = sys.stdin.readline().strip()
-
-    if not password:
-        if password_token:
-            password = password_token
-        else:
-            password = getpass.getpass(prompt="NAS Password: ")
-
-    with open("./nas_token.pickle", "wb") as f:
-        pickle.dump((username, password), f)
-
-    return username, password
-
-
-def _get_nas_parameters():
-    username, password = _get_credentials()
-    with open("./decrypted/nas.json", "r", encoding="utf8") as f:
-        nas_config = json.load(f)
-        hostname = nas_config["hostname"]
-        port = nas_config["port"]
-
-    return username, password, hostname, port
+import py7zr
+from library.nas import NAS
 
 
 def get_dataset_path(name: str):
@@ -78,35 +18,10 @@ def get_dataset_path(name: str):
     dataset_root = f"./data/Datasets/{name}"
 
     if not isdir(dataset_root):
-        username, password, hostname, port = _get_nas_parameters()
+        nas = NAS()
+        nas.download_folder(f"/baboons/Datasets/{name}", dataset_root)
 
-        file_station = filestation.FileStation(
-            hostname,
-            port,
-            username,
-            password,
-            secure=True,
-            cert_verify=False,
-            dsm_version=2,
-            debug=False,
-            otp_code=None,
-        )
-
-        _download_folder(f"/baboons/Datasets/{name}", dataset_root, file_station)
-
-    return f"{dataset_root}/img"
-
-
-def _find_leaf_nodes(path: str, file_station: filestation.FileStation):
-    files_and_dirs = file_station.get_file_list(path)["data"]["files"]
-    dirs = [fd for fd in files_and_dirs if fd["isdir"]]
-    files = [fd for fd in files_and_dirs if not fd["isdir"]]
-
-    leaf_nodes = [f["path"] for f in files]
-    for directory in dirs:
-        leaf_nodes.extend(_find_leaf_nodes(directory["path"], file_station))
-
-    return leaf_nodes
+    return dataset_root
 
 
 def get_dataset_list(root: str = ""):
@@ -116,21 +31,8 @@ def get_dataset_list(root: str = ""):
         with open(cache_path, "rb") as f:
             return pickle.load(f)
 
-    username, password, hostname, port = _get_nas_parameters()
-
-    file_station = filestation.FileStation(
-        hostname,
-        port,
-        username,
-        password,
-        secure=True,
-        cert_verify=False,
-        dsm_version=2,
-        debug=False,
-        otp_code=None,
-    )
-
-    leaf_nodes = _find_leaf_nodes(f"/baboons/Datasets/{root}", file_station)
+    nas = NAS()
+    leaf_nodes = nas.find_leaf_nodes(f"/baboons/Datasets/{root}")
 
     viso_datasets = set("/".join(l.split("/")[:-1]) for l in leaf_nodes)
     viso_datasets = [
@@ -141,3 +43,109 @@ def get_dataset_list(root: str = ""):
         pickle.dump(viso_datasets, f)
 
     return viso_datasets
+
+
+def dataset_motion_results_exists(
+    video_file: str,
+    idx: int,
+    config_hash: str,
+):
+    nas = NAS()
+    return nas.exists(f"/baboons/Results/{video_file}/{config_hash}/{idx}")
+
+
+def get_dataset_motion_results(
+    video_file: str,
+    idx: int,
+    config_hash: str,
+):
+    if exists("./output/results.db"):
+        unlink("./output/results.db")
+
+    if exists("./output/results.db.7z"):
+        unlink("./output/results.db.7z")
+
+    nas = NAS()
+    nas.download_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{idx}/results.db.7z", "./output"
+    )
+
+    with py7zr.SevenZipFile("./output/results.db.7z", "r") as archive:
+        archive.extractall()
+
+
+def save_dataset_motion_results(
+    video_file: str,
+    idx: int,
+    config_hash: str,
+):
+    with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
+        archive.write("./output/results.db")
+
+    nas = NAS()
+    nas.upload_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{idx}",
+        "./output/results.db.7z",
+    )
+
+
+def dataset_filter_results_exists(
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    idx: int,
+    config_hash: str,
+):
+    tracking_folder = "tracking_enabled" if enable_tracking else "tracking_disabled"
+    persist_folder = "persist_enabled" if enable_persist else "persist_disabled"
+
+    nas = NAS()
+    return nas.exists(
+        f"/baboons/Results/{video_file}/{config_hash}/{tracking_folder}/{persist_folder}/{idx}"
+    )
+
+
+def get_dataset_filter_results(
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    idx: int,
+    config_hash: str,
+):
+    if exists("./output/results.db"):
+        unlink("./output/results.db")
+
+    if exists("./output/results.db.7z"):
+        unlink("./output/results.db.7z")
+
+    tracking_folder = "tracking_enabled" if enable_tracking else "tracking_disabled"
+    persist_folder = "persist_enabled" if enable_persist else "persist_disabled"
+
+    nas = NAS()
+    nas.download_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{tracking_folder}/{persist_folder}/{idx}/results.db.7z",
+        "./output",
+    )
+
+    with py7zr.SevenZipFile("./output/results.db.7z", "r") as archive:
+        archive.extractall()
+
+
+def save_dataset_filter_results(
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    idx: int,
+    config_hash: str,
+):
+    with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
+        archive.write("./output/results.db")
+
+    tracking_folder = "tracking_enabled" if enable_tracking else "tracking_disabled"
+    persist_folder = "persist_enabled" if enable_persist else "persist_disabled"
+
+    nas = NAS()
+    nas.upload_file(
+        f"/baboons/Results/{video_file}/{config_hash}/{tracking_folder}/{persist_folder}/{idx}",
+        "./output/results.db.7z",
+    )
