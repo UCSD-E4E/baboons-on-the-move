@@ -3,7 +3,7 @@ Plugin for calculating metrics.
 """
 from argparse import ArgumentParser, Namespace
 import hashlib
-from typing import Dict, List, Tuple
+from typing import Dict, List, Set, Tuple
 import numpy as np
 import pandas as pd
 from sqlite3 import connect
@@ -16,6 +16,7 @@ from library.config import get_config_declaration, get_config_options, set_confi
 from library.firebase import initialize_app, get_dataset_ref
 from firebase_admin import db
 from library.dataset import (
+    dataset_filter_results_exists,
     dataset_motion_results_exists,
     get_dataset_motion_results,
     get_dataset_path,
@@ -85,10 +86,22 @@ class CalculateMetrics(CliPlugin):
         return persist_ref
 
     def _get_requests(self, config_hash: str):
-        requests: Tuple[str, bool, bool, int] = []
+        requests: Set[Tuple[str, bool, bool, int]] = set()
 
         for ref_video_file in CalculateMetrics.VIDEO_FILES:
             for config in [True, False]:
+                _, _, _, known_idx = get_design_space(
+                    ref_video_file, config, not config
+                )
+
+                requests.update(
+                    (video_file, config, not config, idx)
+                    for idx in known_idx
+                    if not dataset_filter_results_exists(
+                        ref_video_file, config, not config, idx, config_hash
+                    )
+                )
+
                 _, ypredict_idx = get_pareto_front(ref_video_file, config, not config)
                 ypredict_idx = set(ypredict_idx)
 
@@ -109,7 +122,7 @@ class CalculateMetrics(CliPlugin):
                         known_idx.union(working_idx)
                     )
 
-                    requests.extend(
+                    requests.update(
                         (video_file, config, not config, idx)
                         for idx in ypredict_idx_remaining
                     )
