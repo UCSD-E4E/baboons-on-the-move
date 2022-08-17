@@ -28,6 +28,9 @@ class Pipeline(ABC):
         self, name: str, *stage_types: List[Stage], parallel=False, runtime_config=None
     ):
         ParentStage.static_stages = []
+        Pipeline.instance = self
+
+        self.name = name
         self._runtime_config = runtime_config
         self._progressbar: tqdm = None
 

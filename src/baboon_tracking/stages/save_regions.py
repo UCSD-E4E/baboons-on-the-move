@@ -1,19 +1,22 @@
 """
-Saves the computed, identity regions into a Sqlite database.
+Base class for saving regions to Sqlite database.
 """
 
+from typing import List
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
+from baboon_tracking.models.region import Region
 from baboon_tracking.stages.sqlite_base import SqliteBase
+
 from pipeline.decorators import stage
 from pipeline.stage_result import StageResult
 
 
 @stage("baboons")
 @stage("frame")
-class SaveComputedRegions(SqliteBase):
+class SaveRegions(SqliteBase):
     """
-    Saves the computed, identity regions into a Sqlite database.
+    Base class for saving regions to Sqlite database.
     """
 
     def __init__(self, baboons: BaboonsMixin, frame: FrameMixin) -> None:
@@ -23,48 +26,45 @@ class SaveComputedRegions(SqliteBase):
         self._frame = frame
 
     def on_database_create(self) -> None:
-        SqliteBase.cursor.execute("DROP TABLE IF EXISTS bayesian_filter_regions")
+        SqliteBase.cursor.execute("DROP TABLE IF EXISTS regions")
 
         SqliteBase.cursor.execute(
-            """CREATE TABLE bayesian_filter_regions (
+            """CREATE TABLE regions (
                 x1 int,
                 y1 int,
                 x2 int,
                 y2 int,
                 identity int,
                 id_str text,
-                observed int,
                 frame int
             )"""
         )
 
         self.connection.commit()
 
+        return super().on_database_create()
+
     def execute(self) -> StageResult:
         frame_number = self._frame.frame.get_frame_number()
-
-        baboons = [
-            (b.rectangle, b.identity, b.id_str, b.observed)
-            for b in self._baboons.baboons
-        ]
-        baboons = [
-            (
-                int(x1),
-                int(y1),
-                int(x2),
-                int(y2),
-                identity,
-                id_str,
-                observed,
-                frame_number,
-            )
-            for (x1, y1, x2, y2), identity, id_str, observed in baboons
-        ]
-        SqliteBase.cursor.executemany(
-            "INSERT INTO bayesian_filter_regions VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            baboons,
-        )
-
-        SqliteBase.connection.commit()
+        self._save_baboons_for_frame(self._baboons.baboons, frame_number)
 
         return StageResult(True, True)
+
+    def _save_baboons_for_frame(self, baboons: List[Region], frame_number: int):
+        baboons = [(b.rectangle, b.id_str, b.identity) for b in baboons]
+        baboons = [
+            (
+                x1,
+                y1,
+                x2,
+                y2,
+                id_str,
+                identity,
+                frame_number,
+            )
+            for (x1, y1, x2, y2), id_str, identity in baboons
+        ]
+        SqliteBase.cursor.executemany(
+            "INSERT INTO regions VALUES (?, ?, ?, ?, ?, ?, ?)",
+            baboons,
+        )

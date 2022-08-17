@@ -1,6 +1,7 @@
 """
-Provides an algorithm for extracting baboons from drone footage.
+Provides an algorithm for extracting motion regions from drone footage.
 """
+from baboon_tracking.stages.sqlite_base import SqliteBase
 from pipeline.pipeline import Pipeline
 from pipeline.factory import factory
 
@@ -13,15 +14,15 @@ from baboon_tracking.stages.save_motion_regions import SaveMotionRegions
 from baboon_tracking.stages.test_exit import TestExit
 
 
-class BaboonTracker(Pipeline):
+class MotionTrackerPipeline(Pipeline):
     """
-    An algorithm that attempts to extract baboons from drone footage.
+    An algorithm that attempts to extract motion regions from drone footage.
     """
 
     def __init__(self, video_path: str, runtime_config=None):
         Pipeline.__init__(
             self,
-            "BaboonTracker",
+            "MotionTrackerPipeline",
             factory(GetVideoFrame, video_path),
             PreprocessFrame,
             MotionDetector,

@@ -11,7 +11,7 @@ import pickle
 
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Baboon
 from library.region import bb_intersection_over_union
 from pipeline import Stage
 from pipeline.stage_result import StageResult

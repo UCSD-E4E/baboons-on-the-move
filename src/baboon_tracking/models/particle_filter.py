@@ -7,7 +7,8 @@ from random import random
 from typing import Dict, List
 import numpy as np
 
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Region
+from baboon_tracking.models.bayesian_region import BayesianRegion
 from library.region import bb_intersection_over_union
 
 
@@ -16,7 +17,7 @@ class Particle:
     Implements a particle for a particle filter.
     """
 
-    def __init__(self, baboon: Baboon, weight: float):
+    def __init__(self, baboon: BayesianRegion, weight: float):
         self.baboon = baboon
         self.weight = weight
 
@@ -35,7 +36,7 @@ class Particle:
             np.int32
         )
 
-        self.baboon = Baboon(
+        self.baboon = BayesianRegion(
             (top_left[0], top_left[1], bottom_right[0], bottom_right[1]),
             id_str=self.baboon.id_str,
             identity=self.baboon.identity,
@@ -77,7 +78,7 @@ class Particle:
         )
         self.baboon.observed = False
 
-    def update(self, baboons: List[Baboon]):
+    def update(self, baboons: List[Region]):
         """
         Moves the region based on our observations.
         """
@@ -97,8 +98,7 @@ class Particle:
         baboon.identity = self.baboon.identity
 
         self.weight *= weight
-        self.baboon = baboon
-        self.baboon.observed = True
+        self.baboon = BayesianRegion.from_region(baboon, observed=True)
 
     def _get_moved_baboon(
         self,
@@ -123,7 +123,7 @@ class Particle:
         x2 += delta_x2
         y2 += delta_y2
 
-        return Baboon(
+        return BayesianRegion(
             (x1, y1, x2, y2),
             id_str=self.baboon.id_str,
             identity=self.baboon.identity,
@@ -138,19 +138,20 @@ class ParticleFilter:
 
     instance_id = 0
 
-    def __init__(self, baboon: Baboon, particle_count: int):
+    def __init__(self, baboon: Region, particle_count: int):
         self._particle_count = particle_count
         self._weight = 1.0 / float(particle_count)
 
+        bayesian_baboon = BayesianRegion.from_region(baboon, observed=True)
         self.particles: List[Particle] = [
-            Particle(baboon, self._weight) for _ in range(particle_count)
+            Particle(bayesian_baboon, self._weight) for _ in range(particle_count)
         ]
 
         self._instance_id = ParticleFilter.instance_id
         ParticleFilter.instance_id += 1
 
-        baboon.identity = self._instance_id
-        baboon.id_str = str(self._instance_id)
+        bayesian_baboon.identity = self._instance_id
+        bayesian_baboon.id_str = str(self._instance_id)
 
     def transform(self, transformation: np.ndarray):
         """
@@ -166,7 +167,7 @@ class ParticleFilter:
         for particle in self.particles:
             particle.predict()
 
-    def update(self, baboons: List[Baboon]):
+    def update(self, baboons: List[Region]):
         """
         Performs the update step on each of the particles.
         """
@@ -177,7 +178,7 @@ class ParticleFilter:
         """
         Resamples the particles to have the required weights.
         """
-        baboon_weights: Dict[Baboon, float] = {}
+        baboon_weights: Dict[BayesianRegion, float] = {}
 
         for particle in self.particles:
             if not particle.baboon in baboon_weights:
@@ -208,12 +209,12 @@ class ParticleFilter:
 
             count = len(self.particles)
 
-    def get_baboon(self):
+    def get_baboon(self) -> Region:
         """
         Gets the most likely baboon from the particle filter.
         """
 
-        baboon_weights: Dict[Baboon, float] = {}
+        baboon_weights: Dict[BayesianRegion, float] = {}
 
         for particle in self.particles:
             if not particle.baboon in baboon_weights:
@@ -226,7 +227,7 @@ class ParticleFilter:
 
         return baboon
 
-    def get_probability(self, baboon: Baboon):
+    def get_probability(self, baboon: Region):
         """
         Gets the probability that this baboon is represented by the particle filter.
         """

@@ -6,6 +6,7 @@ from typing import Callable, List, Dict
 
 from pipeline.initializer import initializer
 from pipeline.models.time import Time
+from pipeline.decorators import STAGE_MAP
 
 from .stage import Stage
 
@@ -34,8 +35,8 @@ class ParentStage(Stage):
                 for parameter in stage_type.last_stage:
                     parameters_dict[parameter] = self.stages[-1]
 
-            if hasattr(stage_type, "stages"):
-                for stage, is_property in stage_type.stages:
+            if stage_type in STAGE_MAP:
+                for stage, is_property in STAGE_MAP[stage_type]:
                     if is_property:
                         continue
 
@@ -57,7 +58,7 @@ class ParentStage(Stage):
 
                     parameters_dict[parameter] = runtime_config
 
-            stage = initializer(
+            stage: Stage = initializer(
                 stage_type,
                 parameters_dict,
                 runtime_config,

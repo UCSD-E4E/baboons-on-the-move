@@ -4,7 +4,7 @@ Starts the baboon tracker algorithm.
 from argparse import ArgumentParser, Namespace
 import argparse
 from typing import Callable, List
-from baboon_tracking import BaboonTracker
+from baboon_tracking import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
 from library.config import set_config_path
@@ -69,18 +69,18 @@ def particle_filter_factory(args: Namespace):
     return SqliteParticleFilterPipeline(args.input, runtime_config=runtime_config)
 
 
-def baboon_tracker_factory(args: Namespace):
+def motion_tracker_factory(args: Namespace):
     """
-    Handles creating a baboon tracker.
+    Handles creating a motion tracker.
     """
 
     runtime_config = get_runtime_config(args)
-    return BaboonTracker(args.input, runtime_config=runtime_config)
+    return MotionTrackerPipeline(args.input, runtime_config=runtime_config)
 
 
 class Run(CliPlugin):
     """
-    Starts the baboon tracker algorithm.
+    Starts the motion tracker algorithm.
     """
 
     def __init__(self, parser: ArgumentParser):
@@ -112,8 +112,8 @@ class Run(CliPlugin):
         parser.add_argument(
             "-p",
             "--pipeline",
-            type=str2factory(baboon_tracker_factory, particle_filter_factory),
-            default="BaboonTracker",
+            type=str2factory(motion_tracker_factory, particle_filter_factory),
+            default="MotionTracker",
             help="Indicates which pipeline should be run.",
         )
 
@@ -128,6 +128,6 @@ class Run(CliPlugin):
         set_config_path(args.config)
 
         if args.input.startswith("d:"):
-            args.input = get_dataset_path(args.input[2:])
+            args.input = f"{get_dataset_path(args.input[2:])}/img"
 
         args.pipeline(args).run()

@@ -4,7 +4,7 @@ Mixin for returning baboon objects.
 
 from typing import List
 
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Region
 
 
 class BaboonsMixin:
@@ -13,4 +13,4 @@ class BaboonsMixin:
     """
 
     def __init__(self):
-        self.baboons: List[Baboon] = None
+        self.baboons: List[Region] = None

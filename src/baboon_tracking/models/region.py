@@ -1,12 +1,12 @@
 """
-Defines a baboon object.
+Defines a region object.
 """
 from typing import Tuple
 
 
-class Baboon:
+class Region:
     """
-    Defines a baboon object.
+    Defines a region object.
     """
 
     def __init__(
@@ -14,9 +14,7 @@ class Baboon:
         rectange: Tuple[int, int, int, int],
         id_str: str = None,
         identity: int = None,
-        observed: bool = False,
     ):
         self.rectangle = rectange
         self.id_str = id_str
         self.identity = identity
-        self.observed = observed

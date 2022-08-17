@@ -11,7 +11,7 @@ motion_detector:
         ssc_tolerence: 0.1
 
     quantize_frames:
-        scale_factor: 18
+        scale_factor: 10
 
     dbscan:
         eps: 2

@@ -5,7 +5,7 @@ Baseline generator for the baboon tracker.
 from os import listdir
 from os.path import basename, isfile, join, splitext
 
-from baboon_tracking.baboon_tracker import BaboonTracker
+from baboon_tracking.motion_tracker_pipeline import MotionTrackerPipeline
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 
 
@@ -25,7 +25,7 @@ class BaselineBaboonTracker:
 
         for file in files:
             output_file = join(baseline_folder, splitext(basename(file))[0] + ".csv")
-            baboon_tracker = BaboonTracker(file, runtime_config=runtime_config)
+            baboon_tracker = MotionTrackerPipeline(file, runtime_config=runtime_config)
             baboons_mixin: BaboonsMixin = baboon_tracker.get(BaboonsMixin)
 
             with open(output_file, "w", encoding="utf8") as f:

@@ -2,7 +2,7 @@
 A filter that ensures blobs are of a minimum size.
 """
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
-from baboon_tracking.models.baboon import Baboon
+from baboon_tracking.models.region import Region
 
 from pipeline import Stage
 from pipeline.stage_result import StageResult
@@ -24,7 +24,7 @@ class MinSizeFilter(Stage, BaboonsMixin):
 
         self._baboons = baboons
 
-    def _calc_area(self, baboon: Baboon):
+    def _calc_area(self, baboon: Region):
         x1, y1, x2, y2 = baboon.rectangle
 
         width = float(x2 - x1)
