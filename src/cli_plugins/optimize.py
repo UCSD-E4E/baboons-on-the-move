@@ -23,7 +23,11 @@ from baboon_tracking.motion_tracker_pipeline import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
 from library.config import set_config_part, get_config_declaration, get_config_options
-from library.dataset import get_dataset_path
+from library.dataset import (
+    get_dataset_path,
+    save_dataset_filter_results,
+    save_dataset_motion_results,
+)
 from library.design_space import get_design_space
 from library.firebase import initialize_app, get_dataset_ref
 from library.nas import NAS
@@ -170,16 +174,6 @@ class Optimize(CliPlugin):
 
         return recall, precision, f1
 
-    def _save_results(self, video_file: str, idx: int, config_hash: str):
-        with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
-            archive.write("./output/results.db")
-
-        nas = NAS()
-        nas.upload_file(
-            f"/baboons/Results/{video_file}/{config_hash}/{idx}",
-            "./output/results.db.7z",
-        )
-
     def _get_score(
         self,
         X: np.ndarray,
@@ -190,6 +184,8 @@ class Optimize(CliPlugin):
         storage_ref: db.Reference,
         current_idx: List[int],
         video_file: str,
+        enable_tracking: bool,
+        enable_persist: bool,
         config_hash: str,
     ):
         cache_known_idx_ref = storage_ref.child("known_idx")
@@ -227,14 +223,18 @@ class Optimize(CliPlugin):
                     set_config_part(key, config_value)
 
                 MotionTrackerPipeline(path, runtime_config=self._runtime_config).run()
+                save_dataset_motion_results(video_file, idx, config_hash)
+
                 SqliteParticleFilterPipeline(
                     path, runtime_config=self._runtime_config
                 ).run()
+                save_dataset_filter_results(
+                    video_file, enable_tracking, enable_persist, idx, config_hash
+                )
 
                 recall, precision, f1 = self._get_metrics(
                     "./output/results.db", ground_truth_path
                 )
-                self._save_results(video_file, idx, config_hash)
 
                 cache_result_ref.set((recall, precision, f1))
                 cache_known_idx.append(int(idx))
@@ -412,6 +412,8 @@ class Optimize(CliPlugin):
                 persist_ref,
                 current_idx,
                 video_file,
+                args.enable_tracking,
+                args.enable_persist,
                 config_hash,
             ),
             action_only=None,
