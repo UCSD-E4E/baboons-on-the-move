@@ -31,8 +31,15 @@ class Metrics:
 
                 false_negative += 1 if not regions else 0
 
-        precision = true_positive / (true_positive + false_positive)
-        recall = true_positive / (true_positive + false_negative)
-        f1 = (2 * precision * recall) / (precision + recall)
+        precision = 0
+        recall = 0
+        f1 = 0
+
+        if true_positive + false_positive != 0:
+            precision = true_positive / (true_positive + false_positive)
+        if true_positive + false_negative != 0:
+            recall = true_positive / (true_positive + false_negative)
+        if precision + recall != 0:
+            f1 = (2 * precision * recall) / (precision + recall)
 
         return recall, precision, f1
