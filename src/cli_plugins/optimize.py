@@ -33,6 +33,8 @@ from library.dataset import (
 )
 from library.design_space import get_design_space
 from library.firebase import initialize_app, get_dataset_ref
+from ..library.region_file import region_factory
+from ..library.metrics import Metrics
 from library.nas import NAS
 from library.region import bb_intersection_over_union
 
@@ -103,80 +105,6 @@ class Optimize(CliPlugin):
         else:
             print(output)
 
-    def _get_metrics(self, results_db_path: str, ground_truth_path: str):
-        with connect(results_db_path) as connection:
-            cursor = connection.cursor()
-
-            ground_truth = pd.read_csv(ground_truth_path).to_numpy()
-
-            found_regions = cursor.execute(
-                "SELECT x1, y1, x2, y2, identity, frame FROM regions ORDER BY frame"
-            )
-
-            curr_frame = -1
-            true_positive = 0
-            false_negative = 0
-            false_positive = 0
-            truth = None
-            identity_map = {}
-            for x1, y1, x2, y2, identity, frame in found_regions:
-                if curr_frame != frame:
-                    if truth is not None:
-                        false_negative += truth.shape[0]
-
-                    truth = np.array(
-                        [
-                            (truth_identity, x1, y1, x1 + width, y1 + height)
-                            for truth_identity, x1, y1, width, height in ground_truth[
-                                ground_truth[:, 0] == frame, 1:6
-                            ]
-                        ]
-                    )
-                    curr_frame = frame
-
-                current = (x1, y1, x2, y2)
-                if identity not in identity_map or not np.any(
-                    truth[:, 0] == identity_map[identity]
-                ):
-                    matches = np.array(
-                        [bb_intersection_over_union(current, t[1:]) for t in truth]
-                    )
-                    if matches.size:
-                        match_idx = np.argmax(matches)
-                        score = matches[match_idx]
-                        truth_identity = truth[match_idx, 0]
-                    else:
-                        score = 0
-
-                    if score > 0 and self._tracking_enabled:
-                        identity_map[identity] = truth_identity
-                else:
-                    truth_identity = identity_map[identity]
-                    match_idx = np.argmax(truth[:, 0] == truth_identity)
-                    score = bb_intersection_over_union(current, truth[match_idx, 1:])
-
-                if score > 0:
-                    true_positive += 1
-                    truth = np.delete(truth, match_idx, 0)
-                else:
-                    false_positive += 1
-
-        if true_positive == 0:
-            false_negative = ground_truth.shape[0]
-
-        recall = true_positive / (false_negative + true_positive)
-        if false_positive == 0 and true_positive == 0:
-            precision = 0
-        else:
-            precision = true_positive / (true_positive + false_positive)
-
-        if recall == 0 or precision == 0:
-            f1 = 0
-        else:
-            f1 = (2 * recall * precision) / (recall + precision)
-
-        return recall, precision, f1
-
     def _get_score(
         self,
         X: np.ndarray,
@@ -241,9 +169,10 @@ class Optimize(CliPlugin):
                     video_file, enable_tracking, enable_persist, idx, config_hash
                 )
 
-                recall, precision, f1 = self._get_metrics(
-                    "./output/results.db", ground_truth_path
-                )
+                recall, precision, f1 = Metrics(
+                    region_factory("./output/results.db"),
+                    region_factory(ground_truth_path),
+                ).calculate_metrics()
 
                 cache_result_ref.set((recall, precision, f1))
                 cache_known_idx.append(int(idx))

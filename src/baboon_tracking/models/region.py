@@ -2,6 +2,8 @@
 Defines a region object.
 """
 from typing import Tuple
+from typing_extensions import Self
+from library.region import bb_intersection_over_union
 
 
 class Region:
@@ -18,3 +20,6 @@ class Region:
         self.rectangle = rectange
         self.id_str = id_str
         self.identity = identity
+
+    def iou(self, other: Self):
+        return bb_intersection_over_union(self.rectangle, other.rectangle)

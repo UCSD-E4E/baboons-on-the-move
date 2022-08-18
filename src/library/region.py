@@ -4,9 +4,11 @@ Module for interacting with regions.
 
 from typing import Tuple
 
+from numba import jit
 import numpy as np
 
 
+@jit
 def bb_intersection_over_union(
     box_a: Tuple[int, int, int, int], box_b: Tuple[int, int, int, int]
 ):

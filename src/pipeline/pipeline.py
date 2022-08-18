@@ -99,27 +99,39 @@ class Pipeline(ABC):
         request_id = caf.request()
 
         curr = 1
-        while True:
-            result = self.step()
-            self.progress()
+        try:
+            while True:
+                result = self.step()
+                self.progress()
 
-            curr += 1
+                curr += 1
 
-            if not result.continue_pipeline or (iterations and curr >= iterations + 1):
-                if self._progressbar:
-                    self._progressbar.close()
-
-                if (
-                    "timings" in self._runtime_config
-                    and self._runtime_config["timings"]
+                if not result.continue_pipeline or (
+                    iterations and curr >= iterations + 1
                 ):
-                    print("Average Runtime per stage:")
-                    self.stage.get_time().print_to_console()
+                    if self._progressbar:
+                        self._progressbar.close()
 
-                self.stage.on_destroy()
-                caf.release(request_id)
+                    if (
+                        "timings" in self._runtime_config
+                        and self._runtime_config["timings"]
+                    ):
+                        print("Average Runtime per stage:")
+                        self.stage.get_time().print_to_console()
 
-                return
+                    self.stage.on_destroy()
+                    caf.release(request_id)
+
+                    return
+        except KeyboardInterrupt:
+            if "timings" in self._runtime_config and self._runtime_config["timings"]:
+                print("Average Runtime per stage:")
+                self.stage.get_time().print_to_console()
+
+            self.stage.on_destroy()
+            caf.release(request_id)
+
+            raise KeyboardInterrupt()
 
     def get(self, stage_type: Callable):
         """
