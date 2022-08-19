@@ -271,7 +271,9 @@ class Optimize(CliPlugin):
             working_idx_ref.set(list(working_idx))
 
             current_outputs = np.array(y[current_idx, :])
-            ypredict, ypredict_idx, _ = approximate_pareto(current_outputs)
+            current_outputs_order = np.argsort(current_outputs[:, 0])
+            current_outputs = current_outputs[current_outputs_order, :]
+            ypredict, _, _ = approximate_pareto(current_outputs)
             area = np.trapz(ypredict[:, 1], x=ypredict[:, 0])
             self._print(f"Area: {area}")
 
