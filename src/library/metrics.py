@@ -1,5 +1,3 @@
-from typing import Dict, Iterator, List, Tuple
-from ..baboon_tracking.models.region import Region
 from library.region_file import RegionFile
 from tqdm import tqdm
 

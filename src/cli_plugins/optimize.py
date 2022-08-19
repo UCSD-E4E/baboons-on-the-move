@@ -14,6 +14,7 @@ import pandas as pd
 import py7zr
 from pyrsistent import v
 import yaml
+from sherlock.utils import approximate_pareto
 
 from firebase_admin import db
 from sherlock import Sherlock
@@ -268,6 +269,11 @@ class Optimize(CliPlugin):
             if int(idx) in working_idx:
                 working_idx.remove(int(idx))
             working_idx_ref.set(list(working_idx))
+
+            current_outputs = np.array(y[current_idx, :])
+            ypredict, ypredict_idx, _ = approximate_pareto(current_outputs)
+            area = np.trapz(ypredict[:, 1], x=ypredict[:, 0])
+            self._print(f"Area: {area}")
 
             if self._progress and idx in known_idx:
                 self._progressbar.n = len(current_idx)
