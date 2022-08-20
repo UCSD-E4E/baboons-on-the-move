@@ -349,7 +349,7 @@ class Optimize(CliPlugin):
             pareto_margin=0,
             y_hint=None,
             plot_design_space=False,
-            use_ted_in_loop=False,
+            use_ted_in_loop=True,
             request_output=lambda y, idx: self._get_score(
                 X,
                 y,
