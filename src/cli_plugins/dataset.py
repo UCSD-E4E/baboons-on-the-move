@@ -9,6 +9,7 @@ from cli_plugins.cli_plugin import CliPlugin
 from library.cli import str2bool
 import numpy as np
 import pandas as pd
+from tqdm import tqdm
 
 
 class Dataset(CliPlugin):
@@ -39,12 +40,12 @@ class Dataset(CliPlugin):
         parser.add_argument(
             "-s",
             "--start",
-            default=90,
+            default=None,
             help="Provides the start frame for the dataset.",
         )
 
         parser.add_argument(
-            "-e", "--end", default=419, help="Provides the end frame for the dataset."
+            "-e", "--end", default=None, help="Provides the end frame for the dataset."
         )
 
         parser.add_argument(
@@ -106,45 +107,48 @@ class Dataset(CliPlugin):
         return data
 
     def _is_motion(
-        self, frame: int, identity: int, data: np.ndarray, hysteresis=1, direction=-1
+        self,
+        frame: int,
+        identity: int,
+        data: np.ndarray,
+        hysteresis=[5, 5],
     ):
-        if frame == 1 and direction == -1:
-            # First frame, we can'te tell if motion
-            return False
+        data = data.astype(float)
 
         selector = np.logical_and(data[:, 0] == frame, data[:, 1] == identity)
         idx = np.argmax(selector)
 
-        previous_data = data[:idx, :]
+        for j, h in enumerate(hysteresis):
+            direction = j - 1
 
-        for i in range(hysteresis):
-            i += 1
+            for i in range(h):
+                k = i + 1
 
-            # Can we find it in the previous frame
-            previous_selector = np.logical_and(
-                previous_data[:, 0] == frame + direction * i,
-                previous_data[:, 1] == identity,
-            )
-            if not np.any(previous_selector):
-                # We didn't see this item last frame
-                return True
-            previous_idx = np.argmax(previous_selector)
+                # Can we find it in the previous frame
+                previous_selector = np.logical_and(
+                    data[:, 0] == frame + direction * k,
+                    data[:, 1] == identity,
+                )
+                if not np.any(previous_selector):
+                    # We didn't see this item last frame
+                    return False
+                previous_idx = np.argmax(previous_selector)
 
-            centroid = data[idx, 2:4] + data[idx, 4:6]
-            previous_centroid = (
-                previous_data[previous_idx, 2:4] + previous_data[previous_idx, 4:6]
-            )
+                centroid = data[idx, 2:4] + data[idx, 4:6]
+                previous_centroid = data[previous_idx, 2:4] + data[previous_idx, 4:6]
 
-            length = np.linalg.norm(centroid - previous_centroid)
+                length = np.linalg.norm(centroid - previous_centroid)
 
-            if length >= 2:
-                return True
+                if length >= 3:
+                    return True
 
         return False
 
     def _generate_gt(
         self, xml: str, start: int, end: int, motion_only: bool, dataset_path: str
     ):
+        start = start or 0
+
         gt_path = f"{dataset_path}/gt"
         makedirs(gt_path, exist_ok=True)
 
@@ -162,7 +166,7 @@ class Dataset(CliPlugin):
             unique_frames = set(data[:, 0])
             unique_identities = set(data[:, 1])
 
-            for frame in unique_frames:
+            for frame in tqdm(unique_frames):
                 for identity in unique_identities:
                     selector = np.logical_and(
                         data[:, 0] == frame, data[:, 1] == identity
@@ -172,8 +176,53 @@ class Dataset(CliPlugin):
                         continue
 
                     idx = np.argmax(selector)
-                    if not self._is_motion(frame, identity, original, hysteresis=4):
+                    if not self._is_motion(
+                        frame, identity, original, hysteresis=[9, 11]
+                    ):
                         data = np.delete(data, idx, axis=0)
+
+            # for identity in tqdm(unique_identities):
+            #     frames = data[data[:, 1] == identity, 0]
+
+            #     prev_frame = None
+            #     contig = 0
+            #     for frame in frames:
+            #         if not prev_frame:
+            #             prev_frame = frame
+            #             continue
+
+            #         gap = frame - prev_frame
+            #         if gap <= 5:
+            #             for g in range(2, gap + 1):
+            #                 missing_frame = prev_frame + g - 1
+            #                 original_selector = np.logical_and(
+            #                     original[:, 0] == missing_frame,
+            #                     original[:, 1] == identity,
+            #                 )
+            #                 data_selector = np.logical_and(
+            #                     data[:, 0] == frame, data[:, 1] == identity
+            #                 )
+
+            #                 original_idx = np.argmax(original_selector)
+            #                 data_idx = np.argmax(data_selector)
+
+            #                 data = np.insert(
+            #                     data, data_idx, original[original_idx, :], axis=0
+            #                 )
+
+            #         if gap == 1:
+            #             contig += 1
+            #         else:
+            #             if contig <= 6:
+            #                 selector = np.logical_and(
+            #                     data[:, 0] == prev_frame, data[:, 1] == identity
+            #                 )
+            #                 idx = np.argmax(selector)
+            #                 data = np.delete(data, idx, axis=0)
+
+            #             contig = 0
+
+            #         prev_frame = frame
 
         height, _ = data.shape
 

@@ -37,7 +37,7 @@
                 // --------
                 // "calc-metrics"
                 // --------
-                // "dataset"
+                "dataset"
                 // --------
                 // "render-dataset",
                 // "-d",
@@ -45,11 +45,11 @@
                 // "-f",
                 // "f:yes:no:6812"
                 // ---------
-                "calc-metrics",
-                "-d",
-                "VISO/car/007",
-                "-f",
-                "f:yes:no:6812"
+                // "calc-metrics",
+                // "-d",
+                // "VISO/car/007",
+                // "-f",
+                // "f:yes:no:6812"
             ]
         },
         {

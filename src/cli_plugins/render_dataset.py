@@ -7,6 +7,7 @@ from os.path import dirname, basename
 from os import makedirs
 from glob import glob
 from library.args import ArgsParser, ArgumentParserBuilder
+from tqdm import tqdm
 
 
 class RenderDataset(CliPlugin):
@@ -37,7 +38,7 @@ class RenderDataset(CliPlugin):
             (width, height),
         )
 
-        for img_path in imgs:
+        for img_path in tqdm(imgs):
             frame = int(splitext(basename(img_path))[0])
             img = cv2.imread(img_path)
 
