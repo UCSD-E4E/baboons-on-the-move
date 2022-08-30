@@ -223,30 +223,30 @@ class Dataset(CliPlugin):
             #                     data, data_idx, original[original_idx, :], axis=0
             #                 )
 
-            for identity in tqdm(unique_identities):
-                frames = data[data[:, 1] == identity, 0]
+            # for identity in tqdm(unique_identities):
+            #     frames = data[data[:, 1] == identity, 0]
 
-                contig = 0
-                prev_frame = None
-                for frame in frames:
-                    if not prev_frame:
-                        prev_frame = frame
-                        continue
+            #     contig = 0
+            #     prev_frame = None
+            #     for frame in frames:
+            #         if not prev_frame:
+            #             prev_frame = frame
+            #             continue
 
-                    gap = frame - prev_frame
-                    if gap == 1:
-                        contig += 1
-                    else:
-                        if contig <= 3000000:
-                            selector = np.logical_and(
-                                data[:, 0] == prev_frame, data[:, 1] == identity
-                            )
-                            idx = np.argmax(selector)
-                            data = np.delete(data, idx, axis=0)
+            #         gap = frame - prev_frame
+            #         if gap == 1:
+            #             contig += 1
+            #         else:
+            #             if contig <= 3000000:
+            #                 selector = np.logical_and(
+            #                     data[:, 0] == prev_frame, data[:, 1] == identity
+            #                 )
+            #                 idx = np.argmax(selector)
+            #                 data = np.delete(data, idx, axis=0)
 
-                        contig = 0
+            #             contig = 0
 
-                    prev_frame = frame
+            #         prev_frame = frame
 
         height, _ = data.shape
 
