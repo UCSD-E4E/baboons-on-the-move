@@ -135,7 +135,7 @@ class Optimize(CliPlugin):
 
         working_idx = set(working_idx_ref.get() or [])
 
-        known_idx = np.array(set(known_idx).difference(current_idx))
+        known_idx = set(known_idx).difference(current_idx)
         self._print(str(known_idx))
         for idx in known_idx:
             # Store the value we are working on so that we don't repeat work.
