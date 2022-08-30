@@ -180,6 +180,11 @@ class Dataset(CliPlugin):
             unique_frames = set(data[:, 0])
             unique_identities = set(data[:, 1])
 
+            # data = pd.read_csv(
+            #     "./data/Datasets/Baboons/NeilThomas/001/gt/gt.txt"
+            # ).to_numpy()
+
+            idx2rm = []
             for frame in tqdm(unique_frames):
                 for identity in unique_identities:
                     selector = np.logical_and(
@@ -193,7 +198,11 @@ class Dataset(CliPlugin):
                     if not self._is_motion(
                         frame, identity, original, hysteresis=[9, 11]
                     ):
-                        data = np.delete(data, idx, axis=0)
+                        idx2rm.append(idx)
+
+            idx2rm.sort(reverse=True)
+            for idx in idx2rm:
+                data = np.delete(data, idx, axis=0)
 
             # for identity in tqdm(unique_identities):
             #     frames = data[data[:, 1] == identity, 0]
