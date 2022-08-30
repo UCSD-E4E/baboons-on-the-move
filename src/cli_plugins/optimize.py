@@ -387,8 +387,11 @@ class Optimize(CliPlugin):
         self._max_recall = self._unpack(y[max_precision_idx, :])
         self._max_f1 = self._unpack(y[max_f1_idx, :])
 
-        y[np.sum(y, axis=1) == 0, :] += np.array([1e-5, 1e-5, 1e-5])
-        y /= 1
+        input_known_idx = np.array(current_idx).astype(int)
+        y_known_idx = y[input_known_idx, :]
+        y_known_idx[np.sum(y_known_idx, axis=1) == 0, :] += np.array([1e-5, 1e-5, 1e-5])
+        y_known_idx /= 1
+        y[input_known_idx, :] = y_known_idx
 
         sherlock.fit(X).predict(X, y, input_known_idx=np.array(current_idx).astype(int))
 
