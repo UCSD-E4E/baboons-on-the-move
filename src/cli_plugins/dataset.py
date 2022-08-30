@@ -10,6 +10,7 @@ from library.cli import str2bool
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+from baboon_tracking.models.region import Region
 
 
 class Dataset(CliPlugin):
@@ -134,12 +135,25 @@ class Dataset(CliPlugin):
                     return False
                 previous_idx = np.argmax(previous_selector)
 
-                centroid = data[idx, 2:4] + data[idx, 4:6]
-                previous_centroid = data[previous_idx, 2:4] + data[previous_idx, 4:6]
+                region = Region(
+                    (
+                        data[idx, 2],
+                        data[idx, 3],
+                        data[idx, 2] + data[idx, 4],
+                        data[idx, 3] + data[idx, 5],
+                    )
+                )
 
-                length = np.linalg.norm(centroid - previous_centroid)
+                previous_region = Region(
+                    (
+                        data[previous_idx, 2],
+                        data[previous_idx, 3],
+                        data[previous_idx, 2] + data[previous_idx, 4],
+                        data[previous_idx, 3] + data[previous_idx, 5],
+                    )
+                )
 
-                if length >= 3:
+                if region.iou(previous_region) <= 0.9:
                     return True
 
         return False
@@ -185,14 +199,13 @@ class Dataset(CliPlugin):
             #     frames = data[data[:, 1] == identity, 0]
 
             #     prev_frame = None
-            #     contig = 0
             #     for frame in frames:
             #         if not prev_frame:
             #             prev_frame = frame
             #             continue
 
             #         gap = frame - prev_frame
-            #         if gap <= 5:
+            #         if gap <= 6:
             #             for g in range(2, gap + 1):
             #                 missing_frame = prev_frame + g - 1
             #                 original_selector = np.logical_and(
@@ -210,19 +223,30 @@ class Dataset(CliPlugin):
             #                     data, data_idx, original[original_idx, :], axis=0
             #                 )
 
-            #         if gap == 1:
-            #             contig += 1
-            #         else:
-            #             if contig <= 6:
-            #                 selector = np.logical_and(
-            #                     data[:, 0] == prev_frame, data[:, 1] == identity
-            #                 )
-            #                 idx = np.argmax(selector)
-            #                 data = np.delete(data, idx, axis=0)
+            for identity in tqdm(unique_identities):
+                frames = data[data[:, 1] == identity, 0]
 
-            #             contig = 0
+                contig = 0
+                prev_frame = None
+                for frame in frames:
+                    if not prev_frame:
+                        prev_frame = frame
+                        continue
 
-            #         prev_frame = frame
+                    gap = frame - prev_frame
+                    if gap == 1:
+                        contig += 1
+                    else:
+                        if contig <= 300:
+                            selector = np.logical_and(
+                                data[:, 0] == prev_frame, data[:, 1] == identity
+                            )
+                            idx = np.argmax(selector)
+                            data = np.delete(data, idx, axis=0)
+
+                        contig = 0
+
+                    prev_frame = frame
 
         height, _ = data.shape
 

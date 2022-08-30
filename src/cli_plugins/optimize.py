@@ -273,9 +273,14 @@ class Optimize(CliPlugin):
             current_outputs = np.array(y[current_idx, :])
             current_outputs_order = np.argsort(current_outputs[:, 0])
             current_outputs = current_outputs[current_outputs_order, :]
-            ypredict, _, _ = approximate_pareto(current_outputs)
+            ypredict, ypredict_idx, _ = approximate_pareto(current_outputs)
             area = np.trapz(ypredict[:, 1], x=ypredict[:, 0])
             self._print(f"Area: {area}")
+
+            if idx in ypredict_idx:
+                self._print("\033[93mNew Pareto Optimal point found.\033[0m")
+            else:
+                self._print("No new Pareto Optimal point found.")
 
             if self._progress and idx in known_idx:
                 self._progressbar.n = len(current_idx)
