@@ -237,7 +237,7 @@ class Dataset(CliPlugin):
                     if gap == 1:
                         contig += 1
                     else:
-                        if contig <= 300:
+                        if contig <= 3000000:
                             selector = np.logical_and(
                                 data[:, 0] == prev_frame, data[:, 1] == identity
                             )
