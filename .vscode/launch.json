@@ -21,13 +21,13 @@
                 // "--pipeline",
                 // "ParticleFilter"
                 // --------
-                "optimize",
-                "-d",
-                "VISO/car/004",
-                "-t",
-                "yes",
-                "-p",
-                "no"
+                // "optimize",
+                // "-d",
+                // "VISO/car/004",
+                // "-t",
+                // "yes",
+                // "-p",
+                // "no"
                 // --------
                 // "compare",
                 // "-1",
@@ -37,7 +37,7 @@
                 // --------
                 // "calc-metrics"
                 // --------
-                // "dataset"
+                "dataset"
                 // --------
                 // "render-dataset",
                 // "-d",

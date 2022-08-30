@@ -175,7 +175,6 @@ class Dataset(CliPlugin):
         data = data[data[:, 0] >= start]
         data[:, 0] -= frame_shift
 
-        original = data.copy()
         if motion_only:
             unique_frames = set(data[:, 0])
             unique_identities = set(data[:, 1])
@@ -195,9 +194,7 @@ class Dataset(CliPlugin):
                         continue
 
                     idx = np.argmax(selector)
-                    if not self._is_motion(
-                        frame, identity, original, hysteresis=[9, 11]
-                    ):
+                    if not self._is_motion(frame, identity, data, hysteresis=[9, 11]):
                         idx2rm.append(idx)
 
             idx2rm.sort(reverse=True)
@@ -232,6 +229,9 @@ class Dataset(CliPlugin):
             #                     data, data_idx, original[original_idx, :], axis=0
             #                 )
 
+            #         prev_frame = frame
+
+            # idx2rm = []
             # for identity in tqdm(unique_identities):
             #     frames = data[data[:, 1] == identity, 0]
 
@@ -251,11 +251,15 @@ class Dataset(CliPlugin):
             #                     data[:, 0] == prev_frame, data[:, 1] == identity
             #                 )
             #                 idx = np.argmax(selector)
-            #                 data = np.delete(data, idx, axis=0)
+            #                 idx2rm.append(idx)
 
             #             contig = 0
 
             #         prev_frame = frame
+
+            # idx2rm.sort(reverse=True)
+            # for idx in idx2rm:
+            #     data = np.delete(data, idx, axis=0)
 
         height, _ = data.shape
 
