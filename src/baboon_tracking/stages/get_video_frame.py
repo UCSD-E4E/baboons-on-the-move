@@ -9,12 +9,14 @@ import cv2
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.frame import Frame
+from baboon_tracking.decorators.show_result import show_result
 
 from pipeline.pipeline import Pipeline
 from pipeline import Stage
 from pipeline.stage_result import StageResult
 
 
+@show_result
 class GetVideoFrame(Stage, FrameMixin, CaptureMixin):
     """
     Get a video frame from a video file.

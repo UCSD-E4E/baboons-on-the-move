@@ -3,7 +3,6 @@ from os import makedirs, unlink, rename
 import subprocess
 from glob import glob
 from os.path import splitext, basename, dirname
-from library.labeled_data import get_regions_from_xml
 
 from cli_plugins.cli_plugin import CliPlugin
 from library.cli import str2bool
@@ -11,6 +10,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from baboon_tracking.models.region import Region
+from library.region_file import region_factory
 
 
 class Dataset(CliPlugin):
@@ -82,28 +82,9 @@ class Dataset(CliPlugin):
             rename(file, f"{parent_dir}/{frame_number:0>6}.jpg")
 
     def _get_ground_truth(self, xml: str):
-        regions = get_regions_from_xml(xml)
-        regions.sort(key=lambda x: x[0])
-
-        frames, identities, xtls, ytls, xbrs, ybrs = zip(*regions)
-
-        frames = np.array(frames)
-        identities = np.array(identities)
-        xtls = np.array(xtls)
-        ytls = np.array(ytls)
-        xbrs = np.array(xbrs)
-        ybrs = np.array(ybrs)
-
-        widths = xbrs - xtls
-        heights = ybrs - ytls
-
-        data = np.zeros((len(frames), 6), dtype=int)
-        data[:, 0] = frames
-        data[:, 1] = identities
-        data[:, 2] = xtls
-        data[:, 3] = ytls
-        data[:, 4] = widths
-        data[:, 5] = heights
+        region_file = region_factory(xml)
+        data = region_file.to_numpy()
+        data[:, 4:6] -= data[:, 2:4]
 
         return data
 
@@ -120,7 +101,7 @@ class Dataset(CliPlugin):
         idx = np.argmax(selector)
 
         for j, h in enumerate(hysteresis):
-            direction = j - 1
+            direction = j * 2 - 1
 
             for i in range(h):
                 k = i + 1
@@ -132,7 +113,7 @@ class Dataset(CliPlugin):
                 )
                 if not np.any(previous_selector):
                     # We didn't see this item last frame
-                    return False
+                    continue
                 previous_idx = np.argmax(previous_selector)
 
                 region = Region(
@@ -153,7 +134,7 @@ class Dataset(CliPlugin):
                     )
                 )
 
-                if region.iou(previous_region) <= 0.9:
+                if region.iou(previous_region) <= 0.87:
                     return True
 
         return False
@@ -194,7 +175,7 @@ class Dataset(CliPlugin):
                         continue
 
                     idx = np.argmax(selector)
-                    if not self._is_motion(frame, identity, data, hysteresis=[9, 11]):
+                    if not self._is_motion(frame, identity, data, hysteresis=[15, 20]):
                         idx2rm.append(idx)
 
             idx2rm.sort(reverse=True)
@@ -276,7 +257,7 @@ class Dataset(CliPlugin):
         df["3"] = -1 * np.ones(height, dtype=int)
         df["4"] = -1 * np.ones(height, dtype=int)
 
-        df.to_csv(f"{gt_path}/gt.txt", index=False, header=False)
+        # df.to_csv(f"{gt_path}/gt.txt", index=False, header=False)
 
     def execute(self, args: Namespace):
         dataset_path = f"./data/Datasets/{args.name}"

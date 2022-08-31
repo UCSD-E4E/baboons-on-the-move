@@ -1,5 +1,6 @@
 from argparse import ArgumentParser, Namespace
 from posixpath import splitext
+from baboon_tracking.dataset_viewer_pipeline import DatasetViewerPipeline
 
 from cli_plugins.cli_plugin import CliPlugin
 import cv2
@@ -17,6 +18,21 @@ class RenderDataset(CliPlugin):
 
     def execute(self, args: Namespace):
         parsed = ArgsParser(args)
+
+        # runtime_config = {
+        #     "display": True,
+        #     "save": False,
+        #     "timings": True,
+        #     "progress": True,
+        # }
+
+        # DatasetViewerPipeline(
+        #     f"{parsed.dataset_path}/img",
+        #     parsed.region_file,
+        #     runtime_config=runtime_config,
+        # ).run()
+
+        # return
 
         img_path = f"{parsed.dataset_path}/img"
 
