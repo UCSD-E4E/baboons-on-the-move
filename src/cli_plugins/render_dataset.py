@@ -19,20 +19,20 @@ class RenderDataset(CliPlugin):
     def execute(self, args: Namespace):
         parsed = ArgsParser(args)
 
-        # runtime_config = {
-        #     "display": True,
-        #     "save": False,
-        #     "timings": True,
-        #     "progress": True,
-        # }
+        runtime_config = {
+            "display": True,
+            "save": True,
+            "timings": False,
+            "progress": True,
+            "region_file": parsed.region_file,
+        }
 
-        # DatasetViewerPipeline(
-        #     f"{parsed.dataset_path}/img",
-        #     parsed.region_file,
-        #     runtime_config=runtime_config,
-        # ).run()
+        DatasetViewerPipeline(
+            f"{parsed.dataset_path}/img",
+            runtime_config=runtime_config,
+        ).run()
 
-        # return
+        return
 
         img_path = f"{parsed.dataset_path}/img"
 

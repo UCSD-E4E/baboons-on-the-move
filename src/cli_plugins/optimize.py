@@ -278,8 +278,8 @@ class Optimize(CliPlugin):
             area = np.trapz(ypredict[:, 1], x=ypredict[:, 0])
             self._print(f"Area: {area}")
 
-            current_idx = np.array(current_idx)
-            if idx in current_idx[ypredict_idx]:
+            current_idx_np = np.array(current_idx)
+            if idx in current_idx_np[ypredict_idx]:
                 self._print("\033[93mNew Pareto Optimal point found.\033[0m")
             else:
                 self._print("No new Pareto Optimal point found.")

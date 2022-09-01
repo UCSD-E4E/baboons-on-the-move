@@ -41,12 +41,12 @@ class Dataset(CliPlugin):
         parser.add_argument(
             "-s",
             "--start",
-            default=None,
+            default=90,
             help="Provides the start frame for the dataset.",
         )
 
         parser.add_argument(
-            "-e", "--end", default=None, help="Provides the end frame for the dataset."
+            "-e", "--end", default=419, help="Provides the end frame for the dataset."
         )
 
         parser.add_argument(
@@ -134,7 +134,8 @@ class Dataset(CliPlugin):
                     )
                 )
 
-                if region.iou(previous_region) <= 0.87:
+                iou = region.iou(previous_region)
+                if iou <= 0.425:
                     return True
 
         return False
@@ -164,7 +165,6 @@ class Dataset(CliPlugin):
             #     "./data/Datasets/Baboons/NeilThomas/001/gt/gt.txt"
             # ).to_numpy()
 
-            idx2rm = []
             for frame in tqdm(unique_frames):
                 for identity in unique_identities:
                     selector = np.logical_and(
@@ -175,12 +175,8 @@ class Dataset(CliPlugin):
                         continue
 
                     idx = np.argmax(selector)
-                    if not self._is_motion(frame, identity, data, hysteresis=[15, 20]):
-                        idx2rm.append(idx)
-
-            idx2rm.sort(reverse=True)
-            for idx in idx2rm:
-                data = np.delete(data, idx, axis=0)
+                    if not self._is_motion(frame, identity, data, hysteresis=[20, 30]):
+                        data = np.delete(data, idx, axis=0)
 
             # for identity in tqdm(unique_identities):
             #     frames = data[data[:, 1] == identity, 0]
@@ -212,7 +208,6 @@ class Dataset(CliPlugin):
 
             #         prev_frame = frame
 
-            # idx2rm = []
             # for identity in tqdm(unique_identities):
             #     frames = data[data[:, 1] == identity, 0]
 
@@ -227,20 +222,16 @@ class Dataset(CliPlugin):
             #         if gap == 1:
             #             contig += 1
             #         else:
-            #             if contig <= 3000000:
+            #             if contig <= 15:
             #                 selector = np.logical_and(
             #                     data[:, 0] == prev_frame, data[:, 1] == identity
             #                 )
             #                 idx = np.argmax(selector)
-            #                 idx2rm.append(idx)
+            #                 data = np.delete(data, idx, axis=0)
 
             #             contig = 0
 
             #         prev_frame = frame
-
-            # idx2rm.sort(reverse=True)
-            # for idx in idx2rm:
-            #     data = np.delete(data, idx, axis=0)
 
         height, _ = data.shape
 
@@ -257,7 +248,7 @@ class Dataset(CliPlugin):
         df["3"] = -1 * np.ones(height, dtype=int)
         df["4"] = -1 * np.ones(height, dtype=int)
 
-        # df.to_csv(f"{gt_path}/gt.txt", index=False, header=False)
+        df.to_csv(f"{gt_path}/gt.txt", index=False, header=False)
 
     def execute(self, args: Namespace):
         dataset_path = f"./data/Datasets/{args.name}"
