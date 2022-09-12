@@ -1,0 +1,6 @@
+#!/bin/bash
+
+while true
+do
+    git pull && ./cli optimize -d $DATA -t yes -p no
+done
