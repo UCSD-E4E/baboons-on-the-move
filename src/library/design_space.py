@@ -9,7 +9,7 @@ from firebase_admin import db
 import third_party.pareto as pareto
 
 from library.config import get_config_declaration, get_config_options
-from library.firebase import get_dataset_ref
+from library.firebase import get_dataset_ref, initialize_app
 
 
 def get_design_space(
@@ -17,6 +17,8 @@ def get_design_space(
     enable_tracking: bool,
     enable_persist: bool,
 ):
+    initialize_app()
+
     cache_path = "./output/plot_cache.pickle"
     cache: Dict[
         Tuple[str, int, str, bool, bool, int], Tuple[float, float, float]

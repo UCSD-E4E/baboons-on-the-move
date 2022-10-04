@@ -1,0 +1,34 @@
+# @article{yin_detecting_2022,
+# 	title = {Detecting and {Tracking} {Small} and {Dense} {Moving} {Objects} in {Satellite} {Videos}: {A} {Benchmark}},
+# 	volume = {60},
+# 	issn = {0196-2892, 1558-0644},
+# 	shorttitle = {Detecting and {Tracking} {Small} and {Dense} {Moving} {Objects} in {Satellite} {Videos}},
+# 	url = {http://arxiv.org/abs/2111.12960},
+# 	doi = {10.1109/TGRS.2021.3130436},
+# 	abstract = {Satellite video cameras can provide continuous observation for a large-scale area, which is important for many remote sensing applications. However, achieving moving object detection and tracking in satellite videos remains challenging due to the insufﬁcient appearance information of objects and lack of high-quality datasets. In this paper, we ﬁrst build a largescale satellite video dataset with rich annotations for the task of moving object detection and tracking. This dataset is collected by the Jilin-1 satellite constellation and composed of 47 high-quality videos with 1,646,038 instances of interest for object detection and 3,711 trajectories for object tracking. We then introduce a motion modeling baseline to improve the detection rate and reduce false alarms based on accumulative multi-frame differencing and robust matrix completion. Finally, we establish the ﬁrst public benchmark for moving object detection and tracking in satellite videos, and extensively evaluate the performance of several representative approaches on our dataset. Comprehensive experimental analyses and insightful conclusions are also provided. The dataset is available at https://github.com/QingyongHu/VISO.},
+# 	language = {en},
+# 	urldate = {2022-05-01},
+# 	journal = {IEEE Transactions on Geoscience and Remote Sensing},
+# 	author = {Yin, Qian and Hu, Qingyong and Liu, Hao and Zhang, Feng and Wang, Yingqian and Lin, Zaiping and An, Wei and Guo, Yulan},
+# 	year = {2022},
+# 	note = {arXiv: 2111.12960},
+# 	keywords = {Computer Science - Computer Vision and Pattern Recognition},
+# 	pages = {1--18},
+# 	file = {Yin et al. - 2022 - Detecting and Tracking Small and Dense Moving Obje.pdf:/home/chris/Zotero/storage/2LT9LP4E/Yin et al. - 2022 - Detecting and Tracking Small and Dense Moving Obje.pdf:application/pdf},
+# }
+
+Method,Video 1, Video 2, Video 3, Video 4, Video 5, Video 6, Video 7
+FD,0.26,0.55,0.51,0.47,0.44,0.55,0.28
+ABM,0.59,0.70,0.76,0.67,0.65,0.63,0.01
+MGBS,0.73,0.62,0.58,0.41,0.49,0.30,0.10
+GMM,0.41,0.41,0.56,0.39,0.35,0.36,0.16
+AGMM,0.64,0.71,0.75,0.71,0.61,0.60,0.47
+VIBE,0.55,0.73,0.56,0.54,0.67,0.50,0.30
+FPCP,0.54,0.45,0.42,0.28,0.27,0.35,0.20
+GoDec,0.56,0.75,0.72,0.64,0.74,0.68,0.30
+DECOLOR,0.42,0.73,0.81,0.56,0.75,0.72,0.52
+FRMC,0.51,0.22,0.23,0.20,0.11,0.14,0.13
+ClusterNet,0.77,0.73,0.74,0.61,0.77,0.75,0.57
+DTTP,0.75,0.72,0.76,0.63,0.65,0.69,0.42
+D&T,0.79,0.76,0.80,0.81,0.73,0.70,0.54
+MMB,0.88,0.84,0.95,0.89,0.81,0.77,0.73
