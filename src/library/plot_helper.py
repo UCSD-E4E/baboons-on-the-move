@@ -1,10 +1,15 @@
+import pickle
 from typing import Dict, List
 import numpy as np
 import pandas as pd
-from library.design_space import get_design_space, get_pareto_front
+from library.design_space import DesignSpaceCache, get_design_space, get_pareto_front
 import matplotlib.pyplot as plt
 import math
 from matplotlib.axes import Axes
+from genericpath import exists
+
+from library.firebase import initialize_app
+from library.debug import trace
 
 
 def get_video_files_dict(dataset_name: str) -> Dict[str, str]:
@@ -18,6 +23,8 @@ def get_video_files_dict(dataset_name: str) -> Dict[str, str]:
             "Video 6": "VISO/car/008",
             "Video 7": "VISO/car/009",
         }
+    elif dataset_name.lower() == "baboons":
+        return {"Video 1": "Baboons/NeilThomas/001"}
 
     raise Exception(f"{dataset_name} does not exist.")
 
@@ -33,6 +40,8 @@ def get_video_files(dataset_name: str) -> List[str]:
             "VISO/car/008",
             "VISO/car/009",
         ]
+    elif dataset_name.lower() == "baboons":
+        return ["Baboons/NeilThomas/001"]
 
     raise Exception(f"{dataset_name} does not exist.")
 
@@ -58,18 +67,72 @@ def get_viso_table_vi():
     return pd.read_csv("./plots/viso_table_vi.csv", comment="#")
 
 
+def _get_video_results(
+    dataset: str,
+    enable_tracking=True,
+    enable_persist=False,
+    disable_network=False,
+):
+    _, y, _, _ = get_design_space(
+        dataset, enable_tracking, enable_persist, disable_network=disable_network
+    )
+
+    idx = np.argmax(y[:, 2])
+    row = y[idx, :]
+
+    return row
+
+
+def get_dataset_results(
+    dataset_name: str,
+    enable_tracking=True,
+    enable_persist=False,
+    disable_network=False,
+):
+    df = pd.DataFrame(columns=["Video Name", "Recall", "Precision", "F1", "AP"])
+
+    for name, dataset in get_video_files_dict(dataset_name).items():
+        row = _get_video_results(
+            dataset,
+            enable_tracking=enable_tracking,
+            enable_persist=enable_persist,
+            disable_network=disable_network,
+        )
+
+        ypredict, _ = get_pareto_front(
+            dataset, enable_tracking, enable_persist, disable_network=disable_network
+        )
+        ypredict_order = np.argsort(ypredict[:, 0])
+        ypredict = ypredict[ypredict_order, :]
+
+        area = np.trapz(ypredict[:, 1], x=ypredict[:, 0])
+        area += ypredict[0, 0] * ypredict[0, 1]
+
+        df.loc[len(df.index)] = (
+            [name]
+            + list((np.round(row * 100) / 100).flatten())
+            + [round(area * 100) / 100]
+        )
+
+    return df
+
+
 def add_spot_row_viso_table_v(
-    table_v: pd.DataFrame, enable_tracking=True, enable_persist=False
+    table_v: pd.DataFrame,
+    enable_tracking=True,
+    enable_persist=False,
+    disable_network=False,
 ):
     spot = np.zeros((7, 3))
 
     for name, dataset in get_video_files_dict("VISO").items():
         video_idx = int(name[len("Video ") :]) - 1
-
-        _, y, _, _ = get_design_space(dataset, enable_tracking, enable_persist)
-
-        idx = np.argmax(y[:, 2])
-        row = y[idx, :]
+        row = _get_video_results(
+            dataset,
+            enable_tracking=enable_tracking,
+            enable_persist=enable_persist,
+            disable_network=disable_network,
+        )
 
         spot[video_idx, :] = row
 
@@ -81,15 +144,19 @@ def add_spot_row_viso_table_v(
 
 
 def add_spot_row_viso_table_vi(
-    table_vi: pd.DataFrame, enable_tracking=True, enable_persist=False
+    table_vi: pd.DataFrame,
+    enable_tracking=True,
+    enable_persist=False,
+    disable_network=False,
 ):
     spot = np.zeros(7)
 
     for name, dataset in get_video_files_dict("VISO").items():
         video_idx = int(name[len("Video ") :]) - 1
 
-        _, y, _, _ = get_design_space(dataset, enable_tracking, enable_persist)
-        ypredict, _ = get_pareto_front(dataset, enable_tracking, enable_persist)
+        ypredict, _ = get_pareto_front(
+            dataset, enable_tracking, enable_persist, disable_network=disable_network
+        )
         ypredict_order = np.argsort(ypredict[:, 0])
         ypredict = ypredict[ypredict_order, :]
 
@@ -289,19 +356,22 @@ def get_row_col(i: int):
 
 
 def _plot_pareto_graph(
+    dataset_name: str,
     video_name: str,
     video_file: str,
     ax: Axes,
     enable_tracking=True,
     enable_persist=False,
+    ref_video_file=None,
+    hide_title=False,
+    disable_network=False,
 ):
     X, y, current_idx, known_idx = get_design_space(
-        video_file, enable_tracking, enable_persist
+        video_file, enable_tracking, enable_persist, disable_network=disable_network
     )
-    (
-        ypredict,
-        ypredict_idx,
-    ) = get_pareto_front(video_file, enable_tracking, enable_persist)
+    (ypredict, _,) = get_pareto_front(
+        video_file, enable_tracking, enable_persist, disable_network=disable_network
+    )
 
     current_outputs = y[current_idx, :]
 
@@ -319,13 +389,43 @@ def _plot_pareto_graph(
         label="Predicted Pareto designs",
     )
 
-    ax.set_title(video_name)
+    if ref_video_file is not None and video_file != ref_video_file:
+        (_, ref_ypredict_idx,) = get_pareto_front(
+            ref_video_file,
+            enable_tracking,
+            enable_persist,
+            disable_network=disable_network,
+        )
+
+        ref_ypredict_idx_set = set(int(idx) for idx in ref_ypredict_idx)
+        known_idx_set = set(int(idx) for idx in known_idx)
+
+        missing_idx = ref_ypredict_idx_set.difference(known_idx_set)
+        # if missing_idx:
+        #     print(missing_idx)
+
+        selected_idx = list(ref_ypredict_idx_set.intersection(known_idx_set))
+
+        dataset_dict = get_video_files_dict(dataset_name)
+        ref_video_name = [k for k, v in dataset_dict.items() if v == ref_video_file][0]
+        ax.scatter(
+            y[selected_idx, 0],
+            y[selected_idx, 1],
+            c="orange",
+            marker="+",
+            label=f"Predicted Pareto designs for {ref_video_name}",
+        )
+
+    if not hide_title:
+        ax.set_title(video_name)
     ax.set(xlabel="Recall", ylabel="Precision")
     ax.set_xlim(current_outputs[:, 0].min(), current_outputs[:, 0].max())
     ax.set_ylim(current_outputs[:, 1].min(), current_outputs[:, 1].max())
 
 
-def plot_pareto_front(dataset_name: str, max_cols=3):
+def plot_pareto_front(
+    dataset_name: str, max_cols=3, ref_video_file=None, disable_network=False
+):
     video_files = get_video_files(dataset_name)
     cols = min(max_cols, len(video_files))
     rows_total = float(len(video_files)) / float(cols)
@@ -346,8 +446,69 @@ def plot_pareto_front(dataset_name: str, max_cols=3):
         video_name = [k for k, v in dataset_dict.items() if v == video_file][0]
         r, c = get_row_col(idx)
 
-        _plot_pareto_graph(video_name, video_file, axs[r, c])
+        if len(video_files) > 1:
+            ax = axs[r, c]
+        else:
+            ax = axs
 
-    fig.suptitle(f"{dataset_name} Pareto Front")
+        _plot_pareto_graph(
+            dataset_name,
+            video_name,
+            video_file,
+            ax,
+            ref_video_file=ref_video_file,
+            hide_title=len(video_files) <= 1,
+            disable_network=disable_network,
+        )
+
+    title = f"{dataset_name} Pareto Front"
+    idx = 0
+    if ref_video_file is not None:
+        ref_video_name = [k for k, v in dataset_dict.items() if v == ref_video_file][0]
+        title = f"{title} with Pareto Front from {ref_video_name}"
+
+        ref_idx = video_files.index(ref_video_file)
+        if ref_idx == 0:
+            idx = 1
+
+    if len(video_files) > 1:
+        ax = axs[idx, 0]
+    else:
+        ax = axs
+
+    handles, labels = ax.get_legend_handles_labels()
+
+    if len(video_files) > 1:
+        fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
+    else:
+        fig.legend(handles, labels, loc="upper right", bbox_to_anchor=(1, 0.8))
+
+    fig.suptitle(title)
 
     return fig
+
+
+def plot_pareto_front_ref(
+    dataset_name: str, max_cols=3, ref_video_files=None, disable_network=False
+):
+    video_files = get_video_files(dataset_name)
+
+    if ref_video_files is None:
+        ref_video_files = video_files
+
+    figs = []
+
+    for ref_video_file in ref_video_files:
+        figs.append(
+            (
+                ref_video_file,
+                plot_pareto_front(
+                    dataset_name,
+                    max_cols=max_cols,
+                    ref_video_file=ref_video_file,
+                    disable_network=disable_network,
+                ),
+            )
+        )
+
+    return figs

@@ -1,10 +1,11 @@
-from typing import Dict, Tuple
+from typing import Dict, List, Set, Tuple
 from genericpath import exists
 import pickle
 import yaml
 import numpy as np
 import hashlib
 from firebase_admin import db
+from library.debug import trace
 
 import third_party.pareto as pareto
 
@@ -12,22 +13,80 @@ from library.config import get_config_declaration, get_config_options
 from library.firebase import get_dataset_ref, initialize_app
 
 
+class DesignSpaceCache:
+    def __init__(
+        self,
+        value_cache: Dict[
+            Tuple[str, str, str, bool, bool, int], Tuple[float, float, float]
+        ] = {},
+        known_idx_cache: Dict[str, List[int]] = {},
+        current_idx_cache: Dict[str, List[int]] = {},
+        requested_idx_cache: Dict[str, Set[int]] = {},
+    ):
+        self._value_cache = value_cache
+        self._known_idx_cache = known_idx_cache
+        self._current_idx_cache = current_idx_cache
+        self._updated_cache = False
+
+    def check_value(self, cache_key: Tuple[str, str, bool, bool, int]):
+        return cache_key in self._value_cache
+
+    def get_value(self, cache_key: Tuple[str, str, bool, bool, int]):
+        if cache_key in self._value_cache:
+            return self._value_cache[cache_key]
+        else:
+            raise f"{cache_key} not found in cache."
+
+    def set_value(
+        self,
+        cache_key: Tuple[str, str, bool, bool, int],
+        recall: float,
+        precision: float,
+        f1: float,
+    ):
+        self._value_cache[cache_key] = (recall, precision, f1)
+        self._updated_cache = True
+
+    def _compare_list(self, list1: List[int], list2: List[int]):
+        return set(list1) == set(list2)
+
+    def set_known_idx(self, video_file: str, known_idx: List[int]):
+        if video_file not in self._known_idx_cache or not self._compare_list(
+            self._known_idx_cache[video_file], known_idx
+        ):
+            self._known_idx_cache[video_file] = known_idx
+            self._updated_cache = True
+
+    def get_known_idx(self, video_file: str):
+        return self._known_idx_cache[video_file]
+
+    def set_current_idx(self, video_file: str, current_idx: List[int]):
+        if video_file not in self._current_idx_cache or not self._compare_list(
+            self._current_idx_cache[video_file], current_idx
+        ):
+            self._current_idx_cache[video_file] = current_idx
+            self._updated_cache = True
+
+    def get_current_idx(self, video_file: str):
+        return self._current_idx_cache[video_file]
+
+    def get_cache_changed(self):
+        return self._updated_cache
+
+
 def get_design_space(
-    video_file: str,
-    enable_tracking: bool,
-    enable_persist: bool,
+    video_file: str, enable_tracking: bool, enable_persist: bool, disable_network=False
 ):
-    initialize_app()
+    if not disable_network:
+        initialize_app()
 
     cache_path = "./output/plot_cache.pickle"
-    cache: Dict[
-        Tuple[str, int, str, bool, bool, int], Tuple[float, float, float]
-    ] = None
+    cache: DesignSpaceCache = None
     if exists(cache_path):
         with open(cache_path, "rb") as f:
             cache = pickle.load(f)
     else:
-        cache = {}
+        cache = DesignSpaceCache()
 
     with open("./config_declaration.yml", "r", encoding="utf8") as f:
         config_declaration = get_config_declaration("", yaml.safe_load(f))
@@ -46,26 +105,29 @@ def get_design_space(
     with open("./config_declaration.yml", "rb") as f:
         config_hash = hashlib.md5(f.read()).hexdigest()
 
-    sherlock_ref = db.reference("sherlock")
+    if not disable_network:
+        sherlock_ref = db.reference("sherlock")
 
-    video_file_ref = get_dataset_ref(video_file, sherlock_ref)
-    config_declaration_ref = video_file_ref.child(config_hash)
+        video_file_ref = get_dataset_ref(video_file, sherlock_ref)
+        config_declaration_ref = video_file_ref.child(config_hash)
 
-    if enable_tracking:
-        tracking_ref = config_declaration_ref.child("tracking_enabled")
+        if enable_tracking:
+            tracking_ref = config_declaration_ref.child("tracking_enabled")
+        else:
+            tracking_ref = config_declaration_ref.child("tracking_disabled")
+
+        if enable_persist:
+            persist_ref = tracking_ref.child("persist_enabled")
+        else:
+            persist_ref = tracking_ref.child("persist_disabled")
+
+        known_idx_ref = persist_ref.child("known_idx")
+
+        known_idx = [idx for idx in (known_idx_ref.get() or []) if idx is not None]
+        cache.set_known_idx(video_file, known_idx)
     else:
-        tracking_ref = config_declaration_ref.child("tracking_disabled")
+        known_idx = cache.get_known_idx(video_file)
 
-    if enable_persist:
-        persist_ref = tracking_ref.child("persist_enabled")
-    else:
-        persist_ref = tracking_ref.child("persist_disabled")
-
-    current_idx_ref = persist_ref.child("current_idx")
-    known_idx_ref = persist_ref.child("known_idx")
-
-    updated_cache = False
-    known_idx = [idx for idx in (known_idx_ref.get() or []) if idx is not None]
     for idx in known_idx:
         cache_key = (
             config_hash,
@@ -75,27 +137,36 @@ def get_design_space(
             idx,
         )
 
-        if cache_key in cache:
-            recall, precision, f1 = cache[cache_key]
-        else:
+        if cache.check_value(cache_key):
+            recall, precision, f1 = cache.get_value(cache_key)
+        elif not disable_network:
             idx_ref = persist_ref.child(str(idx))
             recall, precision, f1 = idx_ref.get()
-            cache[cache_key] = (recall, precision, f1)
-            updated_cache = True
+            cache.set_value(cache_key, recall, precision, f1)
+        else:
+            raise f"{cache_key} is not found in cache.  This likely means an incomplete cache.  Please run with network and try again."
 
         y[idx, :] = np.array([recall, precision, f1])
 
-    if updated_cache:
+    if not disable_network:
+        current_idx_ref = persist_ref.child("current_idx")
+        current_idx = [idx for idx in (current_idx_ref.get() or []) if idx is not None]
+        cache.set_current_idx(video_file, current_idx)
+    else:
+        current_idx = cache.get_current_idx(video_file)
+
+    if cache.get_cache_changed():
         with open(cache_path, "wb") as f:
             pickle.dump(cache, f)
 
-    current_idx = [idx for idx in (current_idx_ref.get() or []) if idx is not None]
     return X, y, current_idx, known_idx
 
 
-def get_pareto_front(video_file: str, enable_tracking: bool, enable_persist: bool):
+def get_pareto_front(
+    video_file: str, enable_tracking: bool, enable_persist: bool, disable_network=False
+):
     _, y, current_idx, known_idx = get_design_space(
-        video_file, enable_tracking, enable_persist
+        video_file, enable_tracking, enable_persist, disable_network=disable_network
     )
 
     current_idx = np.array(current_idx)
