@@ -25,6 +25,8 @@ class CalculateMetrics(CliPlugin):
         parsed = ArgsParser(args)
 
         metrics = Metrics(parsed.regions, parsed.ground_truth_regions)
-        recall, precision, f1 = metrics.calculate_metrics()
+        recall, precision, f1, df = metrics.calculate_metrics()
+
+        df.to_csv("./output/metrics.csv")
 
         print((recall, precision, f1))

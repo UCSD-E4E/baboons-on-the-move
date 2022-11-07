@@ -37,6 +37,10 @@ class RegionFile(ABC):
     def frame_count(self) -> int:
         raise Exception("abstract method")
 
+    @property
+    def current_frame(self) -> int:
+        return self._frame
+
     def frame_regions(self, frame: int) -> Iterator[Region]:
         raise Exception("abstract method")
 

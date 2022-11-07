@@ -6,7 +6,8 @@ from sklearn.cluster import DBSCAN
 import cv2
 import numpy as np
 from tqdm import tqdm
-from baboon_tracking.decorators.save_result import save_result
+from baboon_tracking.decorators.save_img_result import save_img_result
+from baboon_tracking.decorators.save_video_result import save_video_result
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.models.frame import Frame
@@ -16,7 +17,8 @@ from pipeline.stage_result import StageResult
 
 
 @show_result
-@save_result
+@save_video_result
+@save_img_result
 @config(parameter_name="dbscan_eps", key="motion_detector/dbscan/eps")
 @config(parameter_name="dbscan_min_samples", key="motion_detector/dbscan/min_samples")
 @config(parameter_name="kernel", key="motion_detector/dbscan/kernel")

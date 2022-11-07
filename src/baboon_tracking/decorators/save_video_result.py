@@ -13,7 +13,7 @@ from pipeline.decorators import runtime_config, stage
 from pipeline.stage_result import StageResult
 
 
-def save_result(function: Callable):
+def save_video_result(function: Callable):
     """
     Provides a decorator for automatically saving the results of current stage to a video file.
     """
@@ -22,7 +22,7 @@ def save_result(function: Callable):
     prev_on_destroy = function.on_destroy
     save = True
     frame_video_writers = {}
-    capture = None
+    capture: CaptureMixin = None
     frame_attributes = []
 
     pathlib.Path("./output").mkdir(exist_ok=True)

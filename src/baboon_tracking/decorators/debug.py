@@ -7,7 +7,7 @@ from typing import Callable, Dict, List, Tuple
 import cv2
 from numpy import ndarray
 
-from baboon_tracking.decorators.save_result import save_result
+from baboon_tracking.decorators.save_video_result import save_video_result
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.models.region import Region
 from baboon_tracking.models.frame import Frame
@@ -18,7 +18,7 @@ from pipeline.stage_result import StageResult
 
 
 @show_result
-@save_result
+@save_video_result
 class DisplayDebugRegions(Stage):
     """
     Implements a debug tool which allows for rendering regions on top of a specified datasource.

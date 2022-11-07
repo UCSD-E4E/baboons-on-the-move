@@ -1,5 +1,7 @@
 from library.region_file import RegionFile
 from tqdm import tqdm
+import pandas as pd
+import numpy as np
 
 
 class Metrics:
@@ -11,11 +13,21 @@ class Metrics:
         self._threshold = threshold
 
     def calculate_metrics(self):
-        true_positive = 0
-        false_negative = 0
-        false_positive = 0
+        df = pd.DataFrame(
+            columns=["frame", "true_positive", "false_negative", "false_positive"]
+        )
 
         for calc, gd in tqdm(zip(self._calculated, self._ground_truth)):
+            if self._calculated.current_frame != self._ground_truth.current_frame:
+                raise "The frame numbers don't match"
+
+            true_positive = 0
+            false_negative = 0
+            false_positive = 0
+
+            calc = list(calc)
+            gd = list(gd)
+
             for c in calc:
                 regions = [(r, c.iou(r)) for r in gd]
                 regions = [(g, i) for g, i in regions if i > 0 and i >= self._threshold]
@@ -29,6 +41,17 @@ class Metrics:
 
                 false_negative += 1 if not regions else 0
 
+            df.loc[len(df.index)] = [
+                self._calculated.current_frame,
+                true_positive,
+                false_negative,
+                false_positive,
+            ]
+
+        true_positive = df["true_positive"].sum()
+        false_negative = df["false_negative"].sum()
+        false_positive = df["false_positive"].sum()
+
         precision = 0
         recall = 0
         f1 = 0
@@ -40,4 +63,4 @@ class Metrics:
         if precision + recall != 0:
             f1 = (2 * precision * recall) / (precision + recall)
 
-        return recall, precision, f1
+        return recall, precision, f1, df

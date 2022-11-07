@@ -3,7 +3,7 @@ Creates a video overlaying the blobs over the original video.
 """
 import numpy as np
 
-from baboon_tracking.decorators.save_result import save_result
+from baboon_tracking.decorators.save_video_result import save_video_result
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
@@ -14,7 +14,7 @@ from pipeline.stage_result import StageResult
 
 
 @show_result
-@save_result
+@save_video_result
 @stage("frame")
 @stage("moving_foreground")
 class Overlay(Stage):

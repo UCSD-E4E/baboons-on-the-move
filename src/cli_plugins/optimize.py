@@ -171,7 +171,7 @@ class Optimize(CliPlugin):
                     video_file, enable_tracking, enable_persist, idx, config_hash
                 )
 
-                recall, precision, f1 = Metrics(
+                recall, precision, f1, _ = Metrics(
                     region_factory("./output/results.db"),
                     region_factory(ground_truth_path),
                 ).calculate_metrics()

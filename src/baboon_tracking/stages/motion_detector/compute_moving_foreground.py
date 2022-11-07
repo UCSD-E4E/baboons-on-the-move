@@ -3,6 +3,7 @@ Computes the moving foreground using the subcomponents previously computed
 """
 import math
 import numpy as np
+from baboon_tracking.decorators.save_img_result import save_img_result
 
 from baboon_tracking.mixins.foreground_mixin import ForegroundMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
@@ -22,6 +23,7 @@ from pipeline.decorators import config, stage
 @stage("weights")
 @stage("frame_mixin")
 @config(parameter_name="history_frames", key="motion_detector/history_frames")
+@save_img_result
 class ComputeMovingForeground(Stage, MovingForegroundMixin):
     """
     Computes the moving foreground using the subcomponents previously computed
@@ -46,7 +48,7 @@ class ComputeMovingForeground(Stage, MovingForegroundMixin):
 
     def execute(self) -> StageResult:
         weights = self._weights.weights
-        foreground = self._foreground.foreground
+        foreground = self._foreground.foreground.get_frame()
         history_of_dissimilarity = (
             self._history_of_dissimilarity.history_of_dissimilarity
         )

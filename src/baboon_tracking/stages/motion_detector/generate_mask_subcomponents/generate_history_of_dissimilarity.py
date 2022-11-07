@@ -4,6 +4,8 @@ Generate the history of dissimilarity
 
 import cv2
 import numpy as np
+from baboon_tracking.decorators.save_img_result import save_img_result
+from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.mixins.history_of_dissimilarity_mixin import (
     HistoryOfDissimilarityMixin,
 )
@@ -11,6 +13,7 @@ from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
 from baboon_tracking.mixins.shifted_history_frames_mixin import (
     ShiftedHistoryFramesMixin,
 )
+from library.utils import scale_ndarray
 
 from pipeline import Stage
 from pipeline.decorators import stage
@@ -19,6 +22,8 @@ from pipeline.stage_result import StageResult
 
 @stage("shifted_history_frames")
 @stage("quantized_frames")
+@stage("frame")
+@save_img_result
 class GenerateHistoryOfDissimilarity(Stage, HistoryOfDissimilarityMixin):
     """
     Generate the history of dissimilarity
@@ -28,12 +33,14 @@ class GenerateHistoryOfDissimilarity(Stage, HistoryOfDissimilarityMixin):
         self,
         shifted_history_frames: ShiftedHistoryFramesMixin,
         quantized_frames: QuantizedFramesMixin,
+        frame: FrameMixin,
     ) -> None:
         Stage.__init__(self)
         HistoryOfDissimilarityMixin.__init__(self)
 
         self._shifted_history_frames = shifted_history_frames
         self._quantized_frames = quantized_frames
+        self._frame = frame
 
     def execute(self) -> StageResult:
         shifted_history_frames = self._shifted_history_frames.shifted_history_frames
@@ -41,6 +48,9 @@ class GenerateHistoryOfDissimilarity(Stage, HistoryOfDissimilarityMixin):
 
         self.history_of_dissimilarity = self._get_history_of_dissimilarity(
             shifted_history_frames, quantized_frames
+        )
+        self.history_of_dissimilarity_frame = scale_ndarray(
+            self.history_of_dissimilarity, self._frame.frame.get_frame_number()
         )
 
         return StageResult(True, True)
