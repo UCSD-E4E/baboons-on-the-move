@@ -481,7 +481,7 @@ def plot_pareto_front(
     if len(video_files) > 1:
         fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
     else:
-        fig.legend(handles, labels, loc="upper right", bbox_to_anchor=(1, 0.8))
+        fig.legend(handles, labels, loc="upper right", bbox_to_anchor=(0.725, 0.4))
 
     fig.suptitle(title)
 

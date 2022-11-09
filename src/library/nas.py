@@ -1,14 +1,22 @@
+"""
+A wrapper around the synology API for to help with NAS access.
+"""
+
+import sys
 import json
 import pickle
-from genericpath import exists
-from os import getenv, makedirs
-import sys
 import getpass
+from os import getenv, makedirs
+from genericpath import exists
 from synology_api import filestation
 from tqdm import tqdm
 
 
 class NAS:
+    """
+    A wrapper around the synology API for to help with NAS access.
+    """
+
     def __init__(self):
         username, password, hostname, port = self._get_nas_parameters()
 
@@ -62,6 +70,10 @@ class NAS:
         return username, password, hostname, port
 
     def find_leaf_nodes(self, path: str):
+        """
+        Gets the leaf file system nodes from the NAS.
+        """
+
         files_and_dirs = self._file_station.get_file_list(path)["data"]["files"]
         dirs = [fd for fd in files_and_dirs if fd["isdir"]]
         files = [fd for fd in files_and_dirs if not fd["isdir"]]
@@ -73,9 +85,17 @@ class NAS:
         return leaf_nodes
 
     def download_file(self, synology_path: str, target_dir: str):
+        """
+        Downloads the specified file from the NAS.
+        """
+
         self._file_station.get_file(synology_path, "download", dest_path=target_dir)
 
     def download_folder(self, synology_path: str, target_dir: str):
+        """
+        Downloads the given folder recursively.
+        """
+
         makedirs(target_dir, exist_ok=True)
 
         files_and_dirs = self._file_station.get_file_list(synology_path)["data"][
@@ -92,6 +112,10 @@ class NAS:
             self.download_file(file["path"], target_dir)
 
     def exists(self, path: str) -> bool:
+        """
+        Checks to see if the given path exists.
+        """
+
         result = self._file_station.get_file_list(path)
 
         if "success" not in result:
@@ -100,6 +124,10 @@ class NAS:
         return result["success"]
 
     def create_folder(self, path: str):
+        """
+        Creates a new folder on the NAS.  Returns True for success and False for failure.
+        """
+
         if self.exists(path):
             return True
 
@@ -113,4 +141,8 @@ class NAS:
         return "success" in result and result["success"]
 
     def upload_file(self, synology_folder: str, local_file: str):
+        """
+        Uploads the given folder to the NAS.
+        """
+
         self._file_station.upload_file(synology_folder, local_file)

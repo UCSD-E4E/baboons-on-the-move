@@ -25,6 +25,10 @@ def get_dataset_path(name: str):
 
 
 def get_dataset_list(root: str = ""):
+    """
+    Gets a list of datasets available on the NAS.
+    """
+
     cache_path = "./dataset_cache.pickle"
 
     if exists(cache_path):
@@ -50,6 +54,10 @@ def dataset_motion_results_exists(
     idx: int,
     config_hash: str,
 ):
+    """
+    Checks to see if the motion results exist for a particular video file.
+    """
+
     nas = NAS()
     return nas.exists(f"/baboons/Results/{video_file}/{config_hash}/{idx}")
 
@@ -59,6 +67,10 @@ def get_dataset_motion_results(
     idx: int,
     config_hash: str,
 ):
+    """
+    Gets the motion results for a particular video file from the NAS.
+    """
+
     if exists("./output/results.db"):
         unlink("./output/results.db")
 
@@ -79,6 +91,10 @@ def save_dataset_motion_results(
     idx: int,
     config_hash: str,
 ):
+    """
+    Saves the motion results from a particular video file to the NAS.
+    """
+
     with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
         archive.write("./output/results.db")
 
@@ -96,6 +112,8 @@ def dataset_filter_results_exists(
     idx: int,
     config_hash: str,
 ):
+    "Checks to see if the filter results exist for a particular video file."
+
     tracking_folder = "tracking_enabled" if enable_tracking else "tracking_disabled"
     persist_folder = "persist_enabled" if enable_persist else "persist_disabled"
 
@@ -112,6 +130,10 @@ def get_dataset_filter_results(
     idx: int,
     config_hash: str,
 ):
+    """
+    Gets the filter results for a particular video file.
+    """
+
     if exists("./output/results.db"):
         unlink("./output/results.db")
 
@@ -138,6 +160,10 @@ def save_dataset_filter_results(
     idx: int,
     config_hash: str,
 ):
+    """
+    Saves the filter results for a particular video file.
+    """
+
     with py7zr.SevenZipFile("./output/results.db.7z", "w") as archive:
         archive.write("./output/results.db")
 

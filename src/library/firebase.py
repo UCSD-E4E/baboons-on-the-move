@@ -23,6 +23,10 @@ def initialize_app():
 
 
 def get_dataset_ref(dataset_name: str, parent_ref: db.Reference):
+    """
+    Navigates down the tree in firebase based off of the dataset name to return the node.
+    """
+
     ref = parent_ref
     for part in dataset_name.split("/"):
         ref = ref.child(part)

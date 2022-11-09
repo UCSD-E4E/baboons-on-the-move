@@ -8,6 +8,7 @@ import cv2
 from numpy import ndarray
 
 from baboon_tracking.decorators.save_video_result import save_video_result
+from baboon_tracking.decorators.save_img_result import save_img_result
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.models.region import Region
 from baboon_tracking.models.frame import Frame
@@ -18,6 +19,7 @@ from pipeline.stage_result import StageResult
 
 
 @show_result
+@save_img_result
 @save_video_result
 class DisplayDebugRegions(Stage):
     """
