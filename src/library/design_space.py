@@ -5,9 +5,10 @@ import yaml
 import numpy as np
 import hashlib
 from firebase_admin import db
-from library.debug import trace
+from library.dataset import get_dataset_path
 
 import third_party.pareto as pareto
+import cv2
 
 from library.config import get_config_declaration, get_config_options
 from library.firebase import get_dataset_ref, initialize_app
@@ -75,8 +76,22 @@ class DesignSpaceCache:
 
 
 def get_design_space(
-    video_file: str, enable_tracking: bool, enable_persist: bool, disable_network=False
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    max_width: int = None,
+    max_height: int = None,
+    disable_network=False,
 ):
+    if max_width is None or max_height is None:
+        dataset_path = get_dataset_path(video_file)
+
+        img = cv2.imread(f"{dataset_path}/img/000001.jpg")
+        frame_height, frame_width, _ = img.shape
+
+        max_width = max_width or frame_width
+        max_height = max_height or frame_height
+
     if not disable_network:
         initialize_app()
 
@@ -121,7 +136,10 @@ def get_design_space(
         else:
             persist_ref = tracking_ref.child("persist_disabled")
 
-        known_idx_ref = persist_ref.child("known_idx")
+        max_width_ref = persist_ref.child(f"max_width_{max_width}")
+        max_height_ref = max_width_ref.child(f"max_height_{max_height}")
+
+        known_idx_ref = max_height_ref.child("known_idx")
 
         known_idx = [idx for idx in (known_idx_ref.get() or []) if idx is not None]
         cache.set_known_idx(video_file, known_idx)
@@ -134,13 +152,15 @@ def get_design_space(
             video_file,
             enable_tracking,
             enable_persist,
+            max_width,
+            max_height,
             idx,
         )
 
         if cache.check_value(cache_key):
             recall, precision, f1 = cache.get_value(cache_key)
         elif not disable_network:
-            idx_ref = persist_ref.child(str(idx))
+            idx_ref = max_height_ref.child(str(idx))
             recall, precision, f1 = idx_ref.get()
             cache.set_value(cache_key, recall, precision, f1)
         else:
@@ -149,7 +169,7 @@ def get_design_space(
         y[idx, :] = np.array([recall, precision, f1])
 
     if not disable_network:
-        current_idx_ref = persist_ref.child("current_idx")
+        current_idx_ref = max_height_ref.child("current_idx")
         current_idx = [idx for idx in (current_idx_ref.get() or []) if idx is not None]
         cache.set_current_idx(video_file, current_idx)
     else:
@@ -163,10 +183,20 @@ def get_design_space(
 
 
 def get_pareto_front(
-    video_file: str, enable_tracking: bool, enable_persist: bool, disable_network=False
+    video_file: str,
+    enable_tracking: bool,
+    enable_persist: bool,
+    max_width: int = None,
+    max_height: int = None,
+    disable_network=False,
 ):
     _, y, current_idx, known_idx = get_design_space(
-        video_file, enable_tracking, enable_persist, disable_network=disable_network
+        video_file,
+        enable_tracking,
+        enable_persist,
+        max_width=max_width,
+        max_height=max_height,
+        disable_network=disable_network,
     )
 
     current_idx = np.array(current_idx)
