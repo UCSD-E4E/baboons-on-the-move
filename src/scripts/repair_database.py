@@ -41,6 +41,8 @@ def process_directory(dataset: str, dir: str, nas: NAS):
         if nas.exists(f"{file}.bak"):
             continue
 
+        print(f'Starting "{file}"')
+
         nas.download_file(file, "./output")
         copy("./output/results.db.7z", "./output/results.db.7z.bak")
 
@@ -83,6 +85,8 @@ def process_directory(dataset: str, dir: str, nas: NAS):
             "./output/results.db.7z.bak",
         )
 
+        print(f'Completed "{file}"')
+
 
 def bool2str(input: bool):
     if input:
@@ -99,8 +103,6 @@ for dataset in datasets:
     tracking_presets = [(False, False), (True, False), (False, True), (True, True)]
 
     process_directory(dataset, root, nas)
-
-    exit()
 
     for track, persist in tracking_presets:
         path = f"{root}/tracking_{bool2str(track)}/persist_{bool2str(persist)}"

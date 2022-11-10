@@ -76,8 +76,8 @@ class SaveMotionRegions(SaveRegions):
         SqliteBase.insert_metadata(
             {
                 "file_name": self._capture.name,
-                "frame_height": self._capture.frame_height,
-                "frame_width": self._capture.frame_width,
+                "frame_height": str(self._capture.frame_height),
+                "frame_width": str(self._capture.frame_width),
             }
         )
 
