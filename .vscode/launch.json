@@ -11,13 +11,13 @@
             "program": "cli.py",
             "console": "integratedTerminal",
             "args": [
-                // "run",
-                // "--save",
-                // "no",
-                // "--display",
-                // "yes",
-                // "--input",
-                // "d:VISO/car/001",
+                "run",
+                "--save",
+                "no",
+                "--display",
+                "yes",
+                "--input",
+                "d:VISO/car/001",
                 // "--pipeline",
                 // "ParticleFilter"
                 // --------
@@ -45,11 +45,11 @@
                 // "-f",
                 // "f:yes:no:6812"
                 // ---------
-                "calc-metrics",
-                "-d",
-                "VISO/car/009",
-                "-f",
-                "f:yes:no:18311"
+                // "calc-metrics",
+                // "-d",
+                // "VISO/car/009",
+                // "-f",
+                // "f:yes:no:18311"
             ]
         },
         {

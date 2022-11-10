@@ -73,9 +73,12 @@ class SaveMotionRegions(SaveRegions):
 
         SqliteBase.connection.commit()
 
-        SqliteBase.cursor.execute(
-            "INSERT INTO metadata VALUES (?, ?, ?)",
-            (Pipeline.instance.name, "file_name", self._capture.name),
+        SqliteBase.insert_metadata(
+            {
+                "file_name": self._capture.name,
+                "frame_height": self._capture.frame_height,
+                "frame_width": self._capture.frame_width,
+            }
         )
 
         SqliteBase.connection.commit()

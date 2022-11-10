@@ -69,6 +69,25 @@ class NAS:
 
         return username, password, hostname, port
 
+    def list_structure(self, path: str, recursive=False):
+        """
+        Lists the structure of the current directory.
+        """
+
+        if not self.exists(path):
+            return []
+
+        files_and_dirs = self._file_station.get_file_list(path)["data"]["files"]
+        dirs = [fd["path"] for fd in files_and_dirs if fd["isdir"]]
+
+        structure = [f["path"] for f in files_and_dirs]
+
+        if recursive:
+            for directory in dirs:
+                structure.extend(self.list_structure(directory, recursive=recursive))
+
+        return structure
+
     def find_leaf_nodes(self, path: str):
         """
         Gets the leaf file system nodes from the NAS.
@@ -113,15 +132,16 @@ class NAS:
 
     def exists(self, path: str) -> bool:
         """
-        Checks to see if the given path exists.
+        Checks to see if the given directory exists.
         """
 
-        result = self._file_station.get_file_list(path)
+        parent = "/".join(path.split("/")[:-1])
+        result = self._file_station.get_file_list(parent)
 
-        if "success" not in result:
+        if "success" not in result or not result["success"]:
             return False
 
-        return result["success"]
+        return any(f for f in result["data"]["files"] if f["path"] == path)
 
     def create_folder(self, path: str):
         """

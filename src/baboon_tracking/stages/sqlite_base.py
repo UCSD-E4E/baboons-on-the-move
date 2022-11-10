@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import hashlib
 from sqlite3 import Connection, Cursor, OperationalError, connect
+from typing import Dict
 
 import git
 import backoff
@@ -78,13 +79,12 @@ class SqliteBase(Stage, ABC):
         repo = git.Repo(".")
         sha = repo.head.object.hexsha
 
-        SqliteBase.cursor.executemany(
-            "INSERT INTO metadata VALUES (?, ?, ?)",
-            [
-                (self._pipeline_name, "start_time", datetime.utcnow()),
-                (self._pipeline_name, "git_commit", sha),
-                (self._pipeline_name, "config", json.dumps(get_config())),
-            ],
+        self.insert_metadata(
+            {
+                "start_time": datetime.utcnow(),
+                "git_commit": sha,
+                "config": json.dumps(get_config()),
+            }
         )
 
         SqliteBase.cursor.executemany(
@@ -124,10 +124,7 @@ class SqliteBase(Stage, ABC):
 
             self.before_database_close()
 
-            SqliteBase.cursor.execute(
-                "INSERT INTO metadata VALUES (?, ?, ?)",
-                (self._pipeline_name, "end_time", datetime.utcnow()),
-            )
+            self.insert_metadata({"end_time": datetime.utcnow()})
 
             SqliteBase.connection.commit()
             SqliteBase.connection.close()
@@ -139,7 +136,11 @@ class SqliteBase(Stage, ABC):
 
     @backoff.on_exception(backoff.expo, OperationalError)
     def save_hash(self, hash_key: str):
-        SqliteBase.cursor.execute(
+        self.insert_metadata({hash_key: self.md5.hexdigest()})
+
+    @backoff.on_exception(backoff.expo, OperationalError)
+    def insert_metadata(self, metadata: Dict[str, str]):
+        SqliteBase.cursor.executemany(
             "INSERT INTO metadata VALUES (?, ?, ?)",
-            (self._pipeline_name, hash_key, self.md5.hexdigest()),
+            [(self._pipeline_name, k, v) for k, v in metadata.items()],
         )

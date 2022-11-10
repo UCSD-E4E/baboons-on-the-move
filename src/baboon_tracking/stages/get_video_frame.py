@@ -30,12 +30,15 @@ class GetVideoFrame(Stage, FrameMixin, CaptureMixin):
 
         self._is_video_file = self._get_is_video(video_path)
 
+        self.name = None
         if self._is_video_file:
             self._init_video_file(video_path)
         else:
             self._init_image_directory(video_path)
 
-        self.name = basename(video_path)
+        if self.name is None:
+            self.name = basename(video_path)
+
         self._frame_number = 1
 
         Pipeline.iterations = self.frame_count
@@ -58,6 +61,12 @@ class GetVideoFrame(Stage, FrameMixin, CaptureMixin):
         self.frame_height, self.frame_width, _ = img.shape
         self.fps = 30
         self.frame_count = len(self._files)
+
+        if "data/Datasets/" in video_path:
+            parts = video_path.split("/")
+            idx = parts.index("Datasets")
+
+            self.name = "/".join(parts[(idx+1):-1])
 
     def execute(self) -> StageResult:
         """
