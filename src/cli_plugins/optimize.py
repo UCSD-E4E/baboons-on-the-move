@@ -8,6 +8,7 @@ from argparse import ArgumentParser, Namespace
 import pickle
 from sqlite3 import connect
 from typing import Dict, List, Tuple
+import cv2
 
 import numpy as np
 import pandas as pd
@@ -85,6 +86,22 @@ class Optimize(CliPlugin):
             help="Enable persist for particle filter.",
         )
 
+        parser.add_argument(
+            "-w",
+            "--max-width",
+            default=None,
+            type=int,
+            help="Sets the max width of regions that can be used.",
+        )
+
+        parser.add_argument(
+            "-h",
+            "--max-height",
+            default=None,
+            type=int,
+            help="Sets the max height of regions that can be used.",
+        )
+
         self._runtime_config = {
             "display": False,
             "save": False,
@@ -118,6 +135,8 @@ class Optimize(CliPlugin):
         video_file: str,
         enable_tracking: bool,
         enable_persist: bool,
+        max_width: int,
+        max_height: int,
         config_hash: str,
     ):
         cache_known_idx_ref = storage_ref.child("known_idx")
@@ -174,6 +193,8 @@ class Optimize(CliPlugin):
                 recall, precision, f1, _ = Metrics(
                     region_factory("./output/results.db"),
                     region_factory(ground_truth_path),
+                    max_width=max_width,
+                    max_height=max_height,
                 ).calculate_metrics()
 
                 cache_result_ref.set((recall, precision, f1))
@@ -309,6 +330,16 @@ class Optimize(CliPlugin):
 
         dataset_path = get_dataset_path(video_file)
 
+        max_width: int = args.max_width
+        max_height: int = args.max_height
+
+        if max_width is None or max_height is None:
+            img = cv2.imread(f"{dataset_path}/img/000001.jpg")
+            frame_height, frame_width, _ = img.shape
+
+            max_width = max_width or frame_width
+            max_height = max_height or frame_height
+
         sherlock_ref = db.reference("sherlock")
         video_file_ref = get_dataset_ref(video_file, sherlock_ref)
         config_declaration_ref = video_file_ref.child(config_hash)
@@ -322,6 +353,9 @@ class Optimize(CliPlugin):
             persist_ref = tracking_ref.child("persist_enabled")
         else:
             persist_ref = tracking_ref.child("persist_disabled")
+
+        max_width_ref = persist_ref.child(f"max_width_{max_width}")
+        max_height_ref = max_width_ref.child(f"max_height_{max_height}")
 
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
@@ -363,11 +397,13 @@ class Optimize(CliPlugin):
                 idx,
                 dataset_path,
                 config_options,
-                persist_ref,
+                max_height_ref,
                 current_idx,
                 video_file,
                 args.enable_tracking,
                 args.enable_persist,
+                max_width,
+                max_height,
                 config_hash,
             ),
             action_only=None,
