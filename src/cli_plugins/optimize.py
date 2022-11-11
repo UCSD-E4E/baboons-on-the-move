@@ -95,7 +95,7 @@ class Optimize(CliPlugin):
         )
 
         parser.add_argument(
-            "-h",
+            "-l",
             "--max-height",
             default=None,
             type=int,
