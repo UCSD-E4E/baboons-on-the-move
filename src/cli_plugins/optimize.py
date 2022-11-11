@@ -337,6 +337,8 @@ class Optimize(CliPlugin):
         max_width: int = args.max_width
         max_height: int = args.max_height
 
+        self._print(max_width)
+
         if max_width is None or max_height is None:
             img = cv2.imread(f"{dataset_path}/img/000001.jpg")
             frame_height, frame_width, _ = img.shape
