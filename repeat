@@ -2,5 +2,5 @@
 
 while true
 do
-    git pull && ./cli optimize -d $DATASET -t yes -p no
+    git pull && ./cli optimize -d $DATASET -t yes -p no -w $MAX_WIDTH -l $MAX_HEIGHT
 done
