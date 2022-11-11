@@ -161,7 +161,11 @@ class Optimize(CliPlugin):
             working_idx.add(int(idx))
             working_idx_ref.set(list(working_idx))
 
-            self._print("=" * 3 + video_file + "=" * 3)
+            self._print(
+                "=" * 3
+                + f"{video_file}:{enable_tracking}:{enable_persist}:{max_width}:{max_height}"
+                + "=" * 3
+            )
 
             cache_result_ref = storage_ref.child(str(idx))
             cache_result = cache_result_ref.get()
