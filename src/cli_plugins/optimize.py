@@ -364,7 +364,11 @@ class Optimize(CliPlugin):
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         X, y, current_idx, _ = get_design_space(
-            video_file, args.enable_tracking, args.enable_persist
+            video_file,
+            args.enable_tracking,
+            args.enable_persist,
+            max_width=max_width,
+            max_height=max_height,
         )
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
