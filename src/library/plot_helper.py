@@ -71,10 +71,17 @@ def _get_video_results(
     dataset: str,
     enable_tracking=True,
     enable_persist=False,
+    max_width=None,
+    max_height=None,
     disable_network=False,
 ):
     _, y, _, _ = get_design_space(
-        dataset, enable_tracking, enable_persist, disable_network=disable_network
+        dataset,
+        enable_tracking,
+        enable_persist,
+        max_width=max_width,
+        max_height=max_height,
+        disable_network=disable_network,
     )
 
     idx = np.argmax(y[:, 2])
@@ -87,6 +94,8 @@ def get_dataset_results(
     dataset_name: str,
     enable_tracking=True,
     enable_persist=False,
+    max_width=None,
+    max_height=None,
     disable_network=False,
 ):
     df = pd.DataFrame(columns=["Video Name", "Recall", "Precision", "F1", "AP"])
@@ -96,11 +105,18 @@ def get_dataset_results(
             dataset,
             enable_tracking=enable_tracking,
             enable_persist=enable_persist,
+            max_width=max_width,
+            max_height=max_height,
             disable_network=disable_network,
         )
 
         ypredict, _ = get_pareto_front(
-            dataset, enable_tracking, enable_persist, disable_network=disable_network
+            dataset,
+            enable_tracking,
+            enable_persist,
+            max_width=max_width,
+            max_height=max_height,
+            disable_network=disable_network,
         )
         ypredict_order = np.argsort(ypredict[:, 0])
         ypredict = ypredict[ypredict_order, :]
@@ -121,6 +137,8 @@ def add_spot_row_viso_table_v(
     table_v: pd.DataFrame,
     enable_tracking=True,
     enable_persist=False,
+    max_width=None,
+    max_height=None,
     disable_network=False,
 ):
     spot = np.zeros((7, 3))
@@ -131,6 +149,8 @@ def add_spot_row_viso_table_v(
             dataset,
             enable_tracking=enable_tracking,
             enable_persist=enable_persist,
+            max_width=max_width,
+            max_height=max_height,
             disable_network=disable_network,
         )
 
@@ -147,6 +167,8 @@ def add_spot_row_viso_table_vi(
     table_vi: pd.DataFrame,
     enable_tracking=True,
     enable_persist=False,
+    max_width=None,
+    max_height=None,
     disable_network=False,
 ):
     spot = np.zeros(7)
@@ -155,7 +177,12 @@ def add_spot_row_viso_table_vi(
         video_idx = int(name[len("Video ") :]) - 1
 
         ypredict, _ = get_pareto_front(
-            dataset, enable_tracking, enable_persist, disable_network=disable_network
+            dataset,
+            enable_tracking,
+            enable_persist,
+            max_width=max_width,
+            max_height=max_height,
+            disable_network=disable_network,
         )
         ypredict_order = np.argsort(ypredict[:, 0])
         ypredict = ypredict[ypredict_order, :]
@@ -362,15 +389,27 @@ def _plot_pareto_graph(
     ax: Axes,
     enable_tracking=True,
     enable_persist=False,
+    max_width=None,
+    max_height=None,
     ref_video_file=None,
     hide_title=False,
     disable_network=False,
 ):
     X, y, current_idx, known_idx = get_design_space(
-        video_file, enable_tracking, enable_persist, disable_network=disable_network
+        video_file,
+        enable_tracking,
+        enable_persist,
+        max_width=max_width,
+        max_height=max_height,
+        disable_network=disable_network,
     )
     (ypredict, _,) = get_pareto_front(
-        video_file, enable_tracking, enable_persist, disable_network=disable_network
+        video_file,
+        enable_tracking,
+        enable_persist,
+        max_width=max_width,
+        max_height=max_height,
+        disable_network=disable_network,
     )
 
     current_outputs = y[current_idx, :]
@@ -394,6 +433,8 @@ def _plot_pareto_graph(
             ref_video_file,
             enable_tracking,
             enable_persist,
+            max_width=max_width,
+            max_height=max_height,
             disable_network=disable_network,
         )
 
@@ -424,7 +465,12 @@ def _plot_pareto_graph(
 
 
 def plot_pareto_front(
-    dataset_name: str, max_cols=3, ref_video_file=None, disable_network=False
+    dataset_name: str,
+    max_cols=3,
+    max_width=None,
+    max_height=None,
+    ref_video_file=None,
+    disable_network=False,
 ):
     video_files = get_video_files(dataset_name)
     cols = min(max_cols, len(video_files))
@@ -456,6 +502,8 @@ def plot_pareto_front(
             video_name,
             video_file,
             ax,
+            max_width=max_width,
+            max_height=max_height,
             ref_video_file=ref_video_file,
             hide_title=len(video_files) <= 1,
             disable_network=disable_network,
@@ -489,7 +537,12 @@ def plot_pareto_front(
 
 
 def plot_pareto_front_ref(
-    dataset_name: str, max_cols=3, ref_video_files=None, disable_network=False
+    dataset_name: str,
+    max_cols=3,
+    max_width=None,
+    max_height=None,
+    ref_video_files=None,
+    disable_network=False,
 ):
     video_files = get_video_files(dataset_name)
 
@@ -505,6 +558,8 @@ def plot_pareto_front_ref(
                 plot_pareto_front(
                     dataset_name,
                     max_cols=max_cols,
+                    max_width=max_width,
+                    max_height=max_height,
                     ref_video_file=ref_video_file,
                     disable_network=disable_network,
                 ),

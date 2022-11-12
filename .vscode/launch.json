@@ -21,17 +21,17 @@
                 // "--pipeline",
                 // "ParticleFilter"
                 // --------
-                "optimize",
-                "-d",
-                "VISO/car/003",
-                "-t",
-                "yes",
-                "-p",
-                "no",
-                "-l",
-                "35",
-                "-w",
-                "35"
+                // "optimize",
+                // "-d",
+                // "VISO/car/003",
+                // "-t",
+                // "yes",
+                // "-p",
+                // "no",
+                // "-l",
+                // "35",
+                // "-w",
+                // "35"
                 // --------
                 // "compare",
                 // "-1",
@@ -45,15 +45,15 @@
                 // --------
                 // "render-dataset",
                 // "-d",
-                // "VISO/car/007",
+                // "VISO/car/003",
                 // "-f",
-                // "f:yes:no:6812"
+                // "f:yes:no:15164"
                 // ---------
-                // "calc-metrics",
-                // "-d",
-                // "VISO/car/009",
-                // "-f",
-                // "f:yes:no:18311"
+                "calc-metrics",
+                "-d",
+                "VISO/car/003",
+                "-f",
+                "f:yes:no:15164"
             ]
         },
         {

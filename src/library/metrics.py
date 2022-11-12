@@ -35,8 +35,13 @@ class Metrics:
             calc = list(calc)
             gd = list(gd)
 
+            selected_ground_regions = set()
             for c in calc:
-                regions = [(r, c.iou(r)) for r in gd]
+                regions = [
+                    (r, c.iou(r))
+                    for r in gd
+                    if r.identity not in selected_ground_regions
+                ]
                 regions = [(g, i) for g, i in regions if i > 0 and i >= self._threshold]
 
                 if self._max_width is not None:
@@ -47,11 +52,22 @@ class Metrics:
                         (g, i) for g, i in regions if g.height <= self._max_height
                     ]
 
-                true_positive += 1 if regions else 0
-                false_positive += 1 if not regions else 0
+                regions.sort(key=lambda x: x[1], reverse=True)
+                ground_region = regions[0][0] if regions else None
 
+                if ground_region:
+                    selected_ground_regions.add(ground_region.identity)
+
+                true_positive += 1 if ground_region else 0
+                false_positive += 1 if not ground_region else 0
+
+            selected_computed_region = set()
             for g in gd:
-                regions = [(r, g.iou(r)) for r in calc]
+                regions = [
+                    (r, g.iou(r))
+                    for r in calc
+                    if r.identity not in selected_computed_region
+                ]
                 regions = [(c, i) for c, i in regions if i > 0 and i >= self._threshold]
 
                 if self._max_width is not None:
@@ -62,7 +78,13 @@ class Metrics:
                         (g, i) for g, i in regions if g.height <= self._max_height
                     ]
 
-                false_negative += 1 if not regions else 0
+                regions.sort(key=lambda x: x[1], reverse=True)
+                computed_region = regions[0][0] if regions else None
+
+                if computed_region:
+                    selected_computed_region.add(computed_region.identity)
+
+                false_negative += 1 if not computed_region else 0
 
             df.loc[len(df.index)] = [
                 self._calculated.current_frame,

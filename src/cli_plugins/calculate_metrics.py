@@ -24,7 +24,12 @@ class CalculateMetrics(CliPlugin):
         """
         parsed = ArgsParser(args)
 
-        metrics = Metrics(parsed.regions, parsed.ground_truth_regions)
+        metrics = Metrics(
+            parsed.regions,
+            parsed.ground_truth_regions,
+            max_width=parsed.max_width,
+            max_height=parsed.max_height,
+        )
         recall, precision, f1, df = metrics.calculate_metrics()
 
         df.to_csv("./output/metrics.csv")

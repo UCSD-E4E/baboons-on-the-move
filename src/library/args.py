@@ -69,7 +69,21 @@ class ArgsParser:
                 self.region_file = (
                     self.region_file[4:] if enable_persist else self.region_file[3:]
                 )
-                idx = int(self.region_file)
+                end_of_idx = None
+                has_max_settings = False
+                if ":" in self.region_file:
+                    has_max_settings = True
+                    end_of_idx = self.region_file.index(":")
+                idx = int(self.region_file[:end_of_idx])
+                max_width = None
+                max_height = None
+                if has_max_settings:
+                    remaining = self.region_file.split(":")[1:]
+                    max_width = int(remaining[0])
+                    max_height = int(remaining[1])
+
+                self.max_width = max_width
+                self.max_height = max_height
 
                 if not dataset_filter_results_exists(
                     self.dataset, enable_tracking, enable_persist, idx, self.config_hash
