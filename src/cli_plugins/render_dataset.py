@@ -14,7 +14,9 @@ from tqdm import tqdm
 class RenderDataset(CliPlugin):
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
-        ArgumentParserBuilder(parser).add_dataset().add_region_file()
+        ArgumentParserBuilder(
+            parser
+        ).add_dataset().add_region_file().add_ground_truth_file()
 
     def execute(self, args: Namespace):
         parsed = ArgsParser(args)
@@ -25,6 +27,7 @@ class RenderDataset(CliPlugin):
             "timings": False,
             "progress": True,
             "region_file": parsed.region_file,
+            "ground_truth": parsed.ground_truth,
         }
 
         DatasetViewerPipeline(
