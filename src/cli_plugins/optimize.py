@@ -383,6 +383,7 @@ class Optimize(CliPlugin):
             args.enable_persist,
             max_width=max_width,
             max_height=max_height,
+            allow_overlap=args.allow_overlap,
         )
 
         with open("./config_declaration.yml", "r", encoding="utf8") as f:
