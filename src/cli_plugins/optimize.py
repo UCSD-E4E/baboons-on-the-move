@@ -206,6 +206,7 @@ class Optimize(CliPlugin):
                     region_factory(ground_truth_path),
                     max_width=max_width,
                     max_height=max_height,
+                    allow_overlap=allow_overlap,
                 ).calculate_metrics()
 
                 cache_result_ref.set((recall, precision, f1))
@@ -369,6 +370,11 @@ class Optimize(CliPlugin):
         max_width_ref = persist_ref.child(f"max_width_{max_width}")
         max_height_ref = max_width_ref.child(f"max_height_{max_height}")
 
+        if args.allow_overlap:
+            overlap_ref = max_height_ref.child("allow_overlap")
+        else:
+            overlap_ref = max_height_ref.child("deny_overlap")
+
         design_space_size_ref = config_declaration_ref.child("design_space_size")
 
         X, y, current_idx, _ = get_design_space(
@@ -413,7 +419,7 @@ class Optimize(CliPlugin):
                 idx,
                 dataset_path,
                 config_options,
-                max_height_ref,
+                overlap_ref,
                 current_idx,
                 video_file,
                 args.enable_tracking,
