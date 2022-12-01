@@ -5,7 +5,6 @@ from datetime import datetime
 from genericpath import exists
 import hashlib
 from argparse import ArgumentParser, Namespace
-import pickle
 from sqlite3 import connect
 from typing import Dict, List, Tuple
 import cv2
@@ -35,10 +34,9 @@ from library.dataset import (
 )
 from library.design_space import get_design_space
 from library.firebase import initialize_app, get_dataset_ref
-from ..library.region_file import region_factory
-from ..library.metrics import Metrics
-from library.nas import NAS
-from library.region import bb_intersection_over_union
+from library.region_file import region_factory
+from library.metrics import Metrics
+from library.cli import str2bool
 
 from collections import OrderedDict
 
@@ -100,6 +98,14 @@ class Optimize(CliPlugin):
             default=None,
             type=int,
             help="Sets the max height of regions that can be used.",
+        )
+
+        parser.add_argument(
+            "-o",
+            "--overlap",
+            default="no",
+            type=str2bool,
+            help="Yes allows overlap in the regions for metrics calculation.",
         )
 
         self._runtime_config = {
@@ -272,15 +278,15 @@ class Optimize(CliPlugin):
             )
             recall, precision, f1 = self._max_recall
             self._print(
-                f"{recall_color}Max Recall: {max_recall_color}Recall: {recall:.2f}/{required_recall}{recall_color} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
+                f"{recall_color}Max Recall:\t{max_recall_color}Recall: {recall:.2f}/{required_recall}{recall_color} Precision: {precision:.2f} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_precision
             self._print(
-                f"{precision_color}Max Precision: Recall: {recall:.2f} {max_precision_color}Precision: {precision:.2f}/{required_precision}{precision_color} F1: {f1:.2f}\033[0m"
+                f"{precision_color}Max Precision:\tRecall: {recall:.2f} {max_precision_color}Precision: {precision:.2f}/{required_precision}{precision_color} F1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_f1
             self._print(
-                f"{f1_color}Max F1: Recall: {recall:.2f} Precision: {precision:.2f} {max_f1_color}F1: {f1:.2f}/{required_f1}\033[0m"
+                f"{f1_color}Max F1:\tRecall: {recall:.2f} Precision: {precision:.2f} {max_f1_color}F1: {f1:.2f}/{required_f1}\033[0m"
             )
 
             current_idx = list(OrderedDict.fromkeys(current_idx))
@@ -301,7 +307,7 @@ class Optimize(CliPlugin):
             current_outputs = current_outputs[current_outputs_order, :]
             ypredict, ypredict_idx, _ = approximate_pareto(current_outputs)
             area = np.trapz(ypredict[:, 1], x=ypredict[:, 0])
-            self._print(f"Area: {area}")
+            self._print(f"Area: {area:.2f}")
 
             current_idx_np = np.array(current_idx)
             if idx in current_idx_np[ypredict_idx]:
