@@ -102,7 +102,7 @@ class Optimize(CliPlugin):
 
         parser.add_argument(
             "-o",
-            "--overlap",
+            "--allow-overlap",
             default="no",
             type=str2bool,
             help="Yes allows overlap in the regions for metrics calculation.",
