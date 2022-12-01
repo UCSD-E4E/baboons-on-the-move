@@ -22,7 +22,6 @@ class DesignSpaceCache:
         ] = {},
         known_idx_cache: Dict[str, List[int]] = {},
         current_idx_cache: Dict[str, List[int]] = {},
-        requested_idx_cache: Dict[str, Set[int]] = {},
     ):
         self._value_cache = value_cache
         self._known_idx_cache = known_idx_cache
@@ -81,6 +80,7 @@ def get_design_space(
     enable_persist: bool,
     max_width: int = None,
     max_height: int = None,
+    allow_overlap=False,
     disable_network=False,
 ):
     if max_width is None or max_height is None:
@@ -139,7 +139,12 @@ def get_design_space(
         max_width_ref = persist_ref.child(f"max_width_{max_width}")
         max_height_ref = max_width_ref.child(f"max_height_{max_height}")
 
-        known_idx_ref = max_height_ref.child("known_idx")
+        if allow_overlap:
+            overlap_ref = max_height_ref.child("allow_overlap")
+        else:
+            overlap_ref = max_height_ref.child("deny_overlap")
+
+        known_idx_ref = overlap_ref.child("known_idx")
 
         known_idx = [idx for idx in (known_idx_ref.get() or []) if idx is not None]
         cache.set_known_idx(video_file, known_idx)
@@ -154,13 +159,14 @@ def get_design_space(
             enable_persist,
             max_width,
             max_height,
+            allow_overlap,
             idx,
         )
 
         if cache.check_value(cache_key):
             recall, precision, f1 = cache.get_value(cache_key)
         elif not disable_network:
-            idx_ref = max_height_ref.child(str(idx))
+            idx_ref = overlap_ref.child(str(idx))
             recall, precision, f1 = idx_ref.get()
             cache.set_value(cache_key, recall, precision, f1)
         else:
@@ -169,7 +175,7 @@ def get_design_space(
         y[idx, :] = np.array([recall, precision, f1])
 
     if not disable_network:
-        current_idx_ref = max_height_ref.child("current_idx")
+        current_idx_ref = overlap_ref.child("current_idx")
         current_idx = [idx for idx in (current_idx_ref.get() or []) if idx is not None]
         cache.set_current_idx(video_file, current_idx)
     else:
@@ -188,6 +194,7 @@ def get_pareto_front(
     enable_persist: bool,
     max_width: int = None,
     max_height: int = None,
+    allow_overlap=False,
     disable_network=False,
 ):
     _, y, current_idx, known_idx = get_design_space(
@@ -196,6 +203,7 @@ def get_pareto_front(
         enable_persist,
         max_width=max_width,
         max_height=max_height,
+        allow_overlap=allow_overlap,
         disable_network=disable_network,
     )
 

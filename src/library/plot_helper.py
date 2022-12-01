@@ -73,6 +73,7 @@ def _get_video_results(
     enable_persist=False,
     max_width=None,
     max_height=None,
+    allow_overlap=False,
     disable_network=False,
 ):
     _, y, _, _ = get_design_space(
@@ -81,6 +82,7 @@ def _get_video_results(
         enable_persist,
         max_width=max_width,
         max_height=max_height,
+        allow_overlap=allow_overlap,
         disable_network=disable_network,
     )
 
@@ -96,6 +98,7 @@ def get_dataset_results(
     enable_persist=False,
     max_width=None,
     max_height=None,
+    allow_overlap=False,
     disable_network=False,
 ):
     df = pd.DataFrame(columns=["Video Name", "Recall", "Precision", "F1", "AP"])
@@ -107,6 +110,7 @@ def get_dataset_results(
             enable_persist=enable_persist,
             max_width=max_width,
             max_height=max_height,
+            allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
 
@@ -116,6 +120,7 @@ def get_dataset_results(
             enable_persist,
             max_width=max_width,
             max_height=max_height,
+            allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
         ypredict_order = np.argsort(ypredict[:, 0])
@@ -139,6 +144,7 @@ def add_spot_row_viso_table_v(
     enable_persist=False,
     max_width=None,
     max_height=None,
+    allow_overlap=False,
     disable_network=False,
 ):
     spot = np.zeros((7, 3))
@@ -151,6 +157,7 @@ def add_spot_row_viso_table_v(
             enable_persist=enable_persist,
             max_width=max_width,
             max_height=max_height,
+            allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
 
@@ -169,6 +176,7 @@ def add_spot_row_viso_table_vi(
     enable_persist=False,
     max_width=None,
     max_height=None,
+    allow_overlap=False,
     disable_network=False,
 ):
     spot = np.zeros(7)
@@ -182,6 +190,7 @@ def add_spot_row_viso_table_vi(
             enable_persist,
             max_width=max_width,
             max_height=max_height,
+            allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
         ypredict_order = np.argsort(ypredict[:, 0])
@@ -351,10 +360,14 @@ def df2latex_table_vi(df: pd.DataFrame):
 def maximum_value_in_column(column):
     max_highlight = "background-color: red;"
     second_highlight = "background-color: blue;"
+    third_highlight = "background-color: gray;"
     default = ""
 
     maximum_in_column = column.max()
     second_in_column = max([v for v in column if v != maximum_in_column])
+    thrid_in_column = max(
+        [v for v in column if v != maximum_in_column and v != second_in_column]
+    )
 
     styles = []
     for v in column:
@@ -368,6 +381,10 @@ def maximum_value_in_column(column):
 
         if v == second_in_column:
             styles.append(second_highlight)
+            continue
+
+        if v == thrid_in_column:
+            styles.append(third_highlight)
             continue
 
         styles.append(default)
@@ -391,6 +408,7 @@ def _plot_pareto_graph(
     enable_persist=False,
     max_width=None,
     max_height=None,
+    allow_overlap=False,
     ref_video_file=None,
     hide_title=False,
     disable_network=False,
@@ -401,6 +419,7 @@ def _plot_pareto_graph(
         enable_persist,
         max_width=max_width,
         max_height=max_height,
+        allow_overlap=allow_overlap,
         disable_network=disable_network,
     )
     (ypredict, _,) = get_pareto_front(
@@ -409,6 +428,7 @@ def _plot_pareto_graph(
         enable_persist,
         max_width=max_width,
         max_height=max_height,
+        allow_overlap=allow_overlap,
         disable_network=disable_network,
     )
 
@@ -435,6 +455,7 @@ def _plot_pareto_graph(
             enable_persist,
             max_width=max_width,
             max_height=max_height,
+            allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
 
@@ -469,6 +490,7 @@ def plot_pareto_front(
     max_cols=3,
     max_width=None,
     max_height=None,
+    allow_overlap=False,
     ref_video_file=None,
     disable_network=False,
 ):
@@ -504,6 +526,7 @@ def plot_pareto_front(
             ax,
             max_width=max_width,
             max_height=max_height,
+            allow_overlap=allow_overlap,
             ref_video_file=ref_video_file,
             hide_title=len(video_files) <= 1,
             disable_network=disable_network,
@@ -541,6 +564,7 @@ def plot_pareto_front_ref(
     max_cols=3,
     max_width=None,
     max_height=None,
+    allow_overlap=False,
     ref_video_files=None,
     disable_network=False,
 ):
@@ -560,6 +584,7 @@ def plot_pareto_front_ref(
                     max_cols=max_cols,
                     max_width=max_width,
                     max_height=max_height,
+                    allow_overlap=allow_overlap,
                     ref_video_file=ref_video_file,
                     disable_network=disable_network,
                 ),
