@@ -29,6 +29,7 @@ class CalculateMetrics(CliPlugin):
             parsed.ground_truth_regions,
             max_width=parsed.max_width,
             max_height=parsed.max_height,
+            allow_overlap=parsed.allow_overlap,
         )
         recall, precision, f1, df = metrics.calculate_metrics()
 

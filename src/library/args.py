@@ -77,13 +77,18 @@ class ArgsParser:
                 idx = int(self.region_file[:end_of_idx])
                 max_width = None
                 max_height = None
+                allow_overlap = False
                 if has_max_settings:
                     remaining = self.region_file.split(":")[1:]
                     max_width = int(remaining[0])
                     max_height = int(remaining[1])
 
+                    if len(remaining) > 2:
+                        allow_overlap = remaining[2] == "yes"
+
                 self.max_width = max_width
                 self.max_height = max_height
+                self.allow_overlap = allow_overlap
 
                 if not dataset_filter_results_exists(
                     self.dataset, enable_tracking, enable_persist, idx, self.config_hash
