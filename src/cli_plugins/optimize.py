@@ -307,6 +307,7 @@ class Optimize(CliPlugin):
             current_outputs = current_outputs[current_outputs_order, :]
             ypredict, ypredict_idx, _ = approximate_pareto(current_outputs)
             area = np.trapz(ypredict[:, 1], x=ypredict[:, 0])
+            area += ypredict[0, 0] * ypredict[0, 1]
             self._print(f"Area: {area:.2f}")
 
             current_idx_np = np.array(current_idx)
