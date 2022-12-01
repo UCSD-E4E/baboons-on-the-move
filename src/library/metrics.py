@@ -9,14 +9,16 @@ class Metrics:
         self,
         calculated: RegionFile,
         ground_truth: RegionFile,
-        max_width=None,
-        max_height=None,
+        max_width: int = None,
+        max_height: int = None,
+        allow_overlap=False,
         threshold: float = 0,
     ):
         self._calculated = calculated
         self._ground_truth = ground_truth
         self._max_width = max_width
         self._max_height = max_height
+        self._allow_overlap = allow_overlap
         self._threshold = threshold
 
     def calculate_metrics(self):
@@ -55,7 +57,7 @@ class Metrics:
                 regions.sort(key=lambda x: x[1], reverse=True)
                 ground_region = regions[0][0] if regions else None
 
-                if ground_region:
+                if not self._allow_overlap and ground_region:
                     selected_ground_regions.add(ground_region.identity)
 
                 true_positive += 1 if ground_region else 0
@@ -81,7 +83,7 @@ class Metrics:
                 regions.sort(key=lambda x: x[1], reverse=True)
                 computed_region = regions[0][0] if regions else None
 
-                if computed_region:
+                if not self._allow_overlap and computed_region:
                     selected_computed_region.add(computed_region.identity)
 
                 false_negative += 1 if not computed_region else 0

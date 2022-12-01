@@ -143,6 +143,7 @@ class Optimize(CliPlugin):
         enable_persist: bool,
         max_width: int,
         max_height: int,
+        allow_overlap: bool,
         config_hash: str,
     ):
         cache_known_idx_ref = storage_ref.child("known_idx")
@@ -286,7 +287,7 @@ class Optimize(CliPlugin):
             )
             recall, precision, f1 = self._max_f1
             self._print(
-                f"{f1_color}Max F1:\tRecall: {recall:.2f} Precision: {precision:.2f} {max_f1_color}F1: {f1:.2f}/{required_f1}\033[0m"
+                f"{f1_color}Max F1:\t\tRecall: {recall:.2f} Precision: {precision:.2f} {max_f1_color}F1: {f1:.2f}/{required_f1}\033[0m"
             )
 
             current_idx = list(OrderedDict.fromkeys(current_idx))
@@ -419,6 +420,7 @@ class Optimize(CliPlugin):
                 args.enable_persist,
                 max_width,
                 max_height,
+                args.allow_overlap,
                 config_hash,
             ),
             action_only=None,
