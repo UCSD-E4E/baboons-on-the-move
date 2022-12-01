@@ -284,11 +284,11 @@ class Optimize(CliPlugin):
             )
             recall, precision, f1 = self._max_precision
             self._print(
-                f"{precision_color}Max Precision:\tRecall: {recall:.2f}\t{max_precision_color}Precision: {precision:.2f}/{required_precision}{precision_color}\tF1: {f1:.2f}\033[0m"
+                f"{precision_color}Max Precision:\tRecall: {recall:.2f}\t\t{max_precision_color}Precision: {precision:.2f}/{required_precision}{precision_color}\tF1: {f1:.2f}\033[0m"
             )
             recall, precision, f1 = self._max_f1
             self._print(
-                f"{f1_color}Max F1:\t\tRecall: {recall:.2f}\tPrecision: {precision:.2f}\t{max_f1_color}F1: {f1:.2f}/{required_f1}\033[0m"
+                f"{f1_color}Max F1:\t\tRecall: {recall:.2f}\t\tPrecision: {precision:.2f}\t{max_f1_color}F1: {f1:.2f}/{required_f1}\033[0m"
             )
 
             current_idx = list(OrderedDict.fromkeys(current_idx))

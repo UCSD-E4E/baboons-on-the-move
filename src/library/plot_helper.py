@@ -96,14 +96,18 @@ def get_dataset_results(
     dataset_name: str,
     enable_tracking=True,
     enable_persist=False,
-    max_width=None,
-    max_height=None,
+    max_width: int = None,
+    max_height: int = None,
     allow_overlap=False,
     disable_network=False,
+    video_file_override: List[str] = [],
 ):
     df = pd.DataFrame(columns=["Video Name", "Recall", "Precision", "F1", "AP"])
 
     for name, dataset in get_video_files_dict(dataset_name).items():
+        if video_file_override and name not in video_file_override:
+            continue
+
         row = _get_video_results(
             dataset,
             enable_tracking=enable_tracking,
@@ -134,6 +138,58 @@ def get_dataset_results(
             + list((np.round(row * 100) / 100).flatten())
             + [round(area * 100) / 100]
         )
+
+    return df
+
+
+def get_sherlock_table(
+    enable_tracking=True, enable_persist=False, disable_network=False
+):
+    df_video1_35_no = get_dataset_results(
+        "VISO",
+        enable_tracking=enable_tracking,
+        enable_persist=enable_persist,
+        max_width=35,
+        max_height=35,
+        allow_overlap=False,
+        disable_network=disable_network,
+        video_file_override=["Video 1"],
+    )
+    df_video1_35_yes = get_dataset_results(
+        "VISO",
+        enable_tracking=enable_tracking,
+        enable_persist=enable_persist,
+        max_width=35,
+        max_height=35,
+        allow_overlap=True,
+        disable_network=disable_network,
+        video_file_override=["Video 1"],
+    )
+    df_video1_1024_yes = get_dataset_results(
+        "VISO",
+        enable_tracking=enable_tracking,
+        enable_persist=enable_persist,
+        max_width=1024,
+        max_height=1024,
+        allow_overlap=True,
+        disable_network=disable_network,
+        video_file_override=["Video 1"],
+    )
+
+    df = pd.DataFrame([], columns=df_video1_35_no.columns)
+    df.loc[len(df.index)] = df_video1_1024_yes.loc[0]
+    df.loc[len(df.index)] = df_video1_35_yes.loc[0]
+    df.loc[len(df.index)] = df_video1_35_no.loc[0]
+
+    df.insert(
+        1,
+        "Objective Function",
+        ["Objective function 1", "Objective function 2", "Objective function 3"],
+        True,
+    )
+    df.insert(2, "Max Width", [1024, 35, 35], True)
+    df.insert(3, "Max Height", [1024, 35, 35], True)
+    df.insert(4, "Allow Overlap", ["no", "no", "yes"], True)
 
     return df
 
@@ -592,3 +648,124 @@ def plot_pareto_front_ref(
         )
 
     return figs
+
+
+def plot_sherlock_pareto_front(disable_network=False):
+    settings = [(1024, 1024, True), (35, 35, True), (35, 35, False)]
+
+    cols = 3
+    rows = 1
+
+    fig, axs = plt.subplots(
+        nrows=rows,
+        ncols=cols,
+        figsize=(4 * cols, 8 / 3 * rows),
+        constrained_layout=True,
+    )
+
+    for idx, (max_width, max_height, allow_overlap) in enumerate(settings):
+        video_name = f"Objective function {idx + 1}"
+
+        ax = axs[idx]
+
+        _plot_pareto_graph(
+            None,
+            video_name,
+            "VISO/car/003",
+            ax,
+            max_width=max_width,
+            max_height=max_height,
+            allow_overlap=allow_overlap,
+            hide_title=False,
+            disable_network=disable_network,
+        )
+
+    title = "Comparison of Sherlock Objective Functions"
+    idx = 0
+    ax = axs[idx]
+
+    handles, labels = ax.get_legend_handles_labels()
+
+    fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
+    fig.suptitle(title)
+
+    return fig
+
+
+def _add_pareto_front_to_dataframe(
+    dataset: str,
+    video_name: str,
+    objective_function: str,
+    ypredict: np.ndarray,
+    df: pd.DataFrame,
+):
+    for recall, precision, f1 in ypredict:
+        df.loc[len(df.index)] = [
+            dataset,
+            video_name,
+            objective_function,
+            recall,
+            precision,
+            f1,
+        ]
+
+
+def get_pareto_front_dataframe(
+    enable_tracking=True, enable_persist=False, disable_network=False
+):
+    df = pd.DataFrame(
+        [],
+        columns=[
+            "Dataset",
+            "Video Name",
+            "Objective Function",
+            "Recall",
+            "Precision",
+            "F1",
+        ],
+    )
+
+    ypredict, _ = get_pareto_front(
+        "VISO/car/003",
+        enable_tracking=enable_tracking,
+        enable_persist=enable_persist,
+        max_width=35,
+        max_height=35,
+        allow_overlap=True,
+        disable_network=disable_network,
+    )
+
+    _add_pareto_front_to_dataframe(
+        "VISO", "VISO/car/003", "Objective function 1", ypredict, df
+    )
+
+    ypredict, _ = get_pareto_front(
+        "VISO/car/003",
+        enable_tracking=enable_tracking,
+        enable_persist=enable_persist,
+        max_width=1024,
+        max_height=1024,
+        allow_overlap=True,
+        disable_network=disable_network,
+    )
+
+    _add_pareto_front_to_dataframe(
+        "VISO", "VISO/car/003", "Objective function 2", ypredict, df
+    )
+
+    for video_file in get_video_files("VISO"):
+        ypredict, _ = get_pareto_front(
+            video_file,
+            enable_tracking=enable_tracking,
+            enable_persist=enable_persist,
+            max_width=35,
+            max_height=35,
+            allow_overlap=False,
+            disable_network=disable_network,
+        )
+
+        _add_pareto_front_to_dataframe(
+            "VISO", video_file, "Objective function 3", ypredict, df
+        )
+
+    return df
