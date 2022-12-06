@@ -4,7 +4,6 @@ import pickle
 import yaml
 import numpy as np
 import hashlib
-from firebase_admin import db
 from library.dataset import get_dataset_path
 
 import third_party.pareto as pareto
@@ -18,7 +17,7 @@ class DesignSpaceCache:
     def __init__(
         self,
         value_cache: Dict[
-            Tuple[str, str, str, bool, bool, int], Tuple[float, float, float]
+            Tuple[str, str, bool, bool, int, int, bool, int], Tuple[float, float, float]
         ] = {},
         known_idx_cache: Dict[str, List[int]] = {},
         current_idx_cache: Dict[str, List[int]] = {},
@@ -28,10 +27,10 @@ class DesignSpaceCache:
         self._current_idx_cache = current_idx_cache
         self._updated_cache = False
 
-    def check_value(self, cache_key: Tuple[str, str, bool, bool, int]):
+    def check_value(self, cache_key: Tuple[str, str, bool, bool, int, int, bool, int]):
         return cache_key in self._value_cache
 
-    def get_value(self, cache_key: Tuple[str, str, bool, bool, int]):
+    def get_value(self, cache_key: Tuple[str, str, bool, bool, int, int, bool, int]):
         if cache_key in self._value_cache:
             return self._value_cache[cache_key]
         else:
@@ -39,7 +38,7 @@ class DesignSpaceCache:
 
     def set_value(
         self,
-        cache_key: Tuple[str, str, bool, bool, int],
+        cache_key: Tuple[str, str, bool, bool, int, int, bool, int],
         recall: float,
         precision: float,
         f1: float,
@@ -92,8 +91,7 @@ def get_design_space(
         max_width = max_width or frame_width
         max_height = max_height or frame_height
 
-    if not disable_network:
-        initialize_app()
+    db = initialize_app(disable_network=disable_network)
 
     cache_path = "./output/plot_cache.pickle"
     cache: DesignSpaceCache = None
@@ -120,7 +118,7 @@ def get_design_space(
     with open("./config_declaration.yml", "rb") as f:
         config_hash = hashlib.md5(f.read()).hexdigest()
 
-    if not disable_network:
+    if True or not disable_network:
         sherlock_ref = db.reference("sherlock")
 
         video_file_ref = get_dataset_ref(video_file, sherlock_ref)
@@ -165,7 +163,7 @@ def get_design_space(
 
         if cache.check_value(cache_key):
             recall, precision, f1 = cache.get_value(cache_key)
-        elif not disable_network:
+        elif True or not disable_network:
             idx_ref = overlap_ref.child(str(idx))
             recall, precision, f1 = idx_ref.get()
             cache.set_value(cache_key, recall, precision, f1)
@@ -174,7 +172,7 @@ def get_design_space(
 
         y[idx, :] = np.array([recall, precision, f1])
 
-    if not disable_network:
+    if True or not disable_network:
         current_idx_ref = overlap_ref.child("current_idx")
         current_idx = [idx for idx in (current_idx_ref.get() or []) if idx is not None]
         cache.set_current_idx(video_file, current_idx)

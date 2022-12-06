@@ -127,11 +127,11 @@ def step_config(config: Dict) -> Dict:
     return config
 
 
-def get_latest_config() -> Tuple[Dict, float, bool]:
+def get_latest_config(disable_network=False) -> Tuple[Dict, float, bool]:
     """
     Gets the latest config from either the cloud or from the file system if the cloud doesn't have any results.
     """
-    initialize_app()
+    initialize_app(disable_network=disable_network)
 
     ref = db.reference("optimize")
     video_ref = ref.child("input")

@@ -6,10 +6,6 @@ from library.design_space import DesignSpaceCache, get_design_space, get_pareto_
 import matplotlib.pyplot as plt
 import math
 from matplotlib.axes import Axes
-from genericpath import exists
-
-from library.firebase import initialize_app
-from library.debug import trace
 
 
 def get_video_files_dict(dataset_name: str) -> Dict[str, str]:
@@ -696,50 +692,39 @@ def _add_pareto_front_to_dataframe(
     dataset: str,
     video_name: str,
     objective_function: str,
-    ypredict: np.ndarray,
+    y: np.ndarray,
+    current_idx: np.ndarray,
     df: pd.DataFrame,
 ):
-    for recall, precision, f1 in ypredict:
-        df.loc[len(df.index)] = [
-            dataset,
-            video_name,
-            objective_function,
-            recall,
-            precision,
-            f1,
-        ]
+    current_outputs = np.array(y[current_idx, :])
+
+    update = pd.DataFrame([], columns=df.columns)
+    update["Dataset"] = [dataset] * current_outputs.shape[0]
+    update["Video Name"] = [video_name] * current_outputs.shape[0]
+    update["Objective Function"] = [objective_function] * current_outputs.shape[0]
+    update["Index"] = current_idx
+    update["Recall"] = current_outputs[:, 0]
+    update["Precision"] = current_outputs[:, 1]
+    update["F1"] = current_outputs[:, 2]
+
+    return pd.concat([df, update])
 
 
-def get_pareto_front_dataframe(
-    enable_tracking=True, enable_persist=False, disable_network=False
-):
+def get_all_data(enable_tracking=True, enable_persist=False, disable_network=False):
     df = pd.DataFrame(
         [],
         columns=[
             "Dataset",
             "Video Name",
             "Objective Function",
+            "Index",
             "Recall",
             "Precision",
             "F1",
         ],
     )
 
-    ypredict, _ = get_pareto_front(
-        "VISO/car/003",
-        enable_tracking=enable_tracking,
-        enable_persist=enable_persist,
-        max_width=35,
-        max_height=35,
-        allow_overlap=True,
-        disable_network=disable_network,
-    )
-
-    _add_pareto_front_to_dataframe(
-        "VISO", "VISO/car/003", "Objective function 1", ypredict, df
-    )
-
-    ypredict, _ = get_pareto_front(
+    _, y, current_idx, _ = get_design_space(
         "VISO/car/003",
         enable_tracking=enable_tracking,
         enable_persist=enable_persist,
@@ -749,12 +734,26 @@ def get_pareto_front_dataframe(
         disable_network=disable_network,
     )
 
-    _add_pareto_front_to_dataframe(
-        "VISO", "VISO/car/003", "Objective function 2", ypredict, df
+    df = _add_pareto_front_to_dataframe(
+        "VISO", "VISO/car/003", "Objective function 1", y, current_idx, df
+    )
+
+    _, y, current_idx, _ = get_design_space(
+        "VISO/car/003",
+        enable_tracking=enable_tracking,
+        enable_persist=enable_persist,
+        max_width=35,
+        max_height=35,
+        allow_overlap=True,
+        disable_network=disable_network,
+    )
+
+    df = _add_pareto_front_to_dataframe(
+        "VISO", "VISO/car/003", "Objective function 2", y, current_idx, df
     )
 
     for video_file in get_video_files("VISO"):
-        ypredict, _ = get_pareto_front(
+        _, y, current_idx, _ = get_design_space(
             video_file,
             enable_tracking=enable_tracking,
             enable_persist=enable_persist,
@@ -764,8 +763,8 @@ def get_pareto_front_dataframe(
             disable_network=disable_network,
         )
 
-        _add_pareto_front_to_dataframe(
-            "VISO", video_file, "Objective function 3", ypredict, df
+        df = _add_pareto_front_to_dataframe(
+            "VISO", video_file, "Objective function 3", y, current_idx, df
         )
 
     return df

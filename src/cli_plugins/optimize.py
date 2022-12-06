@@ -170,7 +170,7 @@ class Optimize(CliPlugin):
 
             self._print(
                 "=" * 3
-                + f"{video_file}:{enable_tracking}:{enable_persist}:{max_width}:{max_height}"
+                + f"{video_file}:{enable_tracking}:{enable_persist}:{max_width}:{max_height}:{allow_overlap}"
                 + "=" * 3
             )
 
@@ -330,7 +330,7 @@ class Optimize(CliPlugin):
     def execute(self, args: Namespace):
         np.random.seed(1234)  # Allow our caching to be more effective
 
-        initialize_app()
+        db = initialize_app()
 
         self._runtime_config["enable_tracking"] = args.enable_tracking
         self._runtime_config["enable_persist"] = args.enable_persist
