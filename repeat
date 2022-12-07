@@ -1,8 +1,6 @@
 #!/bin/bash
 
-SCRIPT_RELATIVE_DIR=$(dirname "${BASH_SOURCE[0]}")
-cd $SCRIPT_RELATIVE_DIR
-DIR=`pwd`
+cd /home/ubuntu/Repos/school/baboon-tracking
 
 while true
 do
