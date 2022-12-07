@@ -1,9 +1,10 @@
 #!/bin/bash
 
-cd /home/ubuntu/Repos/school/baboon-tracking
+SCRIPT_RELATIVE_DIR=$(dirname "${BASH_SOURCE[0]}")
+cd $SCRIPT_RELATIVE_DIR
+DIR=`pwd`
 
 while true
 do
-    pwd
     git pull && ./cli optimize -d $DATASET -t yes -p no -w $MAX_WIDTH -l $MAX_HEIGHT -o $ALLOW_OVERLAP
 done
