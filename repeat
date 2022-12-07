@@ -4,5 +4,6 @@ cd /home/ubuntu/Repos/school/baboon-tracking
 
 while true
 do
+    pwd
     git pull && ./cli optimize -d $DATASET -t yes -p no -w $MAX_WIDTH -l $MAX_HEIGHT -o $ALLOW_OVERLAP
 done
