@@ -185,7 +185,7 @@ def get_sherlock_table(
     )
     df.insert(2, "Max Width", [1024, 35, 35], True)
     df.insert(3, "Max Height", [1024, 35, 35], True)
-    df.insert(4, "Allow Overlap", ["no", "no", "yes"], True)
+    df.insert(4, "Allow Overlap", ["yes", "yes", "no"], True)
 
     return df
 
@@ -412,7 +412,7 @@ def df2latex_table_vi(df: pd.DataFrame):
 def maximum_value_in_column(column):
     max_highlight = "background-color: red;"
     second_highlight = "background-color: blue;"
-    third_highlight = "background-color: gray;"
+    third_highlight = ""  # "background-color: gray;"
     default = ""
 
     maximum_in_column = column.max()
