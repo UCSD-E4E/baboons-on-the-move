@@ -1,8 +1,7 @@
-import pickle
 from typing import Dict, List
 import numpy as np
 import pandas as pd
-from library.design_space import DesignSpaceCache, get_design_space, get_pareto_front
+from library.design_space import get_design_space, get_pareto_front
 import matplotlib.pyplot as plt
 import math
 from matplotlib.axes import Axes
@@ -98,7 +97,15 @@ def get_dataset_results(
     disable_network=False,
     video_file_override: List[str] = [],
 ):
-    df = pd.DataFrame(columns=["Video Name", "Recall", "Precision", "F1", "AP"])
+    df = pd.DataFrame(
+        columns=[
+            "Video Name",
+            "Recall",
+            "Precision",
+            "F1",
+            "AP",
+        ]
+    )
 
     for name, dataset in get_video_files_dict(dataset_name).items():
         if video_file_override and name not in video_file_override:
@@ -491,13 +498,13 @@ def _plot_pareto_graph(
         current_outputs[:, 1],
         c="blue",
         marker="^",
-        label="Sampled designs",
+        label="Samples",
     )
     ax.scatter(
         ypredict[:, 0],
         ypredict[:, 1],
         c="red",
-        label="Predicted Pareto designs",
+        label="Pareto Optimal Samples",
     )
 
     if ref_video_file is not None and video_file != ref_video_file:
@@ -611,6 +618,114 @@ def plot_pareto_front(
     return fig
 
 
+def plot_precision_recall_curve(
+    dataset_name: str,
+    max_width=None,
+    max_height=None,
+    allow_overlap=False,
+    display_pareto_front=False,
+    fill=False,
+    disable_network=False,
+):
+    video_files = get_video_files(dataset_name)
+    video_file = video_files[0]
+    enable_tracking = True
+    enable_persist = False
+    cols = 1
+    rows = 1
+
+    fig, ax = plt.subplots(
+        nrows=rows,
+        ncols=cols,
+        figsize=(4 * cols, 8 / 3 * rows),
+        constrained_layout=True,
+    )
+
+    dataset_dict = get_video_files_dict(dataset_name)
+    video_name = [k for k, v in dataset_dict.items() if v == video_file][0]
+
+    X, y, current_idx, known_idx = get_design_space(
+        video_file,
+        enable_tracking,
+        enable_persist,
+        max_width=max_width,
+        max_height=max_height,
+        allow_overlap=allow_overlap,
+        disable_network=disable_network,
+    )
+    (ypredict, _,) = get_pareto_front(
+        video_file,
+        enable_tracking,
+        enable_persist,
+        max_width=max_width,
+        max_height=max_height,
+        allow_overlap=allow_overlap,
+        disable_network=disable_network,
+    )
+
+    current_outputs = y[current_idx, :]
+    ypredict_order = np.argsort(ypredict[:, 0])
+
+    if display_pareto_front:
+        ax.scatter(
+            current_outputs[:, 0],
+            current_outputs[:, 1],
+            color=(0, 0, 1, 0.05),
+            marker="^",
+            label="Samples",
+        )
+        ax.scatter(
+            ypredict[:, 0],
+            ypredict[:, 1],
+            color=(1, 0, 0, 0.1),
+            label="Pareto Optimal Samples",
+        )
+
+    ypredict_extend = np.zeros((ypredict.shape[0] + 1, ypredict.shape[1]))
+    ypredict_extend[1:, :] = ypredict[ypredict_order, :]
+    ypredict_extend[0, 1] = ypredict[ypredict_order[0], 1]
+
+    ax.plot(
+        ypredict_extend[:, 0],
+        ypredict_extend[:, 1],
+        c="red",
+        label="PR Curve",
+    )
+
+    if fill:
+        ax.fill_between(
+            ypredict_extend[:, 0],
+            ypredict_extend[:, 1],
+            where=ypredict_extend[:, 1] >= np.zeros(ypredict_extend.shape[0]),
+            interpolate=True,
+            color=(1, 0, 0, 0.45),
+        )
+
+    ax.set_title(video_name)
+    ax.set(xlabel="Recall", ylabel="Precision")
+    ax.set_xlim(current_outputs[:, 0].min(), current_outputs[:, 0].max())
+    ax.set_ylim(current_outputs[:, 1].min(), current_outputs[:, 1].max())
+
+    title = f"{dataset_name} "
+    if display_pareto_front:
+        title += "Pareto Front"
+    elif fill:
+        title += "Average Precision (AP)"
+    else:
+        title += "Precision-Recall (PR) Curve"
+
+    handles, labels = ax.get_legend_handles_labels()
+
+    if display_pareto_front:
+        fig.legend(handles, labels, loc="upper right", bbox_to_anchor=(0.71, 0.46))
+    else:
+        fig.legend(handles, labels, loc="upper right", bbox_to_anchor=(0.45, 0.32))
+
+    fig.suptitle(title)
+
+    return fig
+
+
 def plot_pareto_front_ref(
     dataset_name: str,
     max_cols=3,
@@ -682,7 +797,7 @@ def plot_sherlock_pareto_front(disable_network=False):
 
     handles, labels = ax.get_legend_handles_labels()
 
-    fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(0.8, 0.15))
+    fig.legend(handles, labels, loc="lower right", bbox_to_anchor=(1, 0.6))
     fig.suptitle(title)
 
     return fig
@@ -766,5 +881,58 @@ def get_all_data(enable_tracking=True, enable_persist=False, disable_network=Fal
         df = _add_pareto_front_to_dataframe(
             "VISO", video_file, "Objective function 3", y, current_idx, df
         )
+
+    return df
+
+
+def get_sample_count(
+    dataset_name,
+    max_width=None,
+    max_height=None,
+    allow_overlap=False,
+    disable_network=False,
+):
+    video_files = get_video_files_dict(dataset_name)
+    data = []
+
+    for video_name, dataset in video_files.items():
+        _, y, current_idx, _ = get_design_space(
+            dataset,
+            True,
+            False,
+            max_width=max_width,
+            max_height=max_height,
+            allow_overlap=allow_overlap,
+            disable_network=disable_network,
+        )
+
+        ypredict, _ = get_pareto_front(
+            dataset,
+            True,
+            False,
+            max_width=max_width,
+            max_height=max_height,
+            allow_overlap=allow_overlap,
+            disable_network=disable_network,
+        )
+
+        data.append(
+            [
+                video_name,
+                len(current_idx),
+                f"{round(len(current_idx) / float(y.shape[0]) * 10000) / 100}%",
+                ypredict.shape[0],
+            ]
+        )
+
+    df = pd.DataFrame(
+        data,
+        columns=[
+            "Video Name",
+            "Sampled Count",
+            "Sampled Percent",
+            "Pareto Optimal Count",
+        ],
+    )
 
     return df

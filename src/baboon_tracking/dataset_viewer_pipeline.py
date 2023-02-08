@@ -16,7 +16,7 @@ class DatasetViewerPipeline(Pipeline):
             "DatasetViewer",
             factory(GetVideoFrame, video_path),
             GetRegionFileRegion,
-            GetGroundTruthRegion,
+            # GetGroundTruthRegion,
             DisplayDebugRegions,
             TestExit,
             runtime_config=runtime_config,

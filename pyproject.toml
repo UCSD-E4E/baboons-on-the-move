@@ -26,10 +26,10 @@ numba = "^0.56.0"
 Pillow = "^8.4.0"
 PyYAML = "^6.0"
 scikit-learn = "^1.0.2"
-synology-api = "^0.4.3"
+synology-api = "^0.4.4"
 jupyter = "^1.0.0"
 GitPython = "^3.1.27"
-sherlock = { git = "https://github.com/KastnerRG/sherlock.git", branch = "feature/package", markers = "platform_machine == 'x86_64'" }
+sherlock = { git = "https://github.com/KastnerRG/sherlock.git", branch = "feature/poetry", markers = "platform_machine == 'x86_64'" }
 ipykernel = "^6.13.0"
 backoff = "^2.1.2"
 py7zr = "^0.18.9"

@@ -34,7 +34,7 @@ class Install(CliPlugin):
 
     def execute(self, args: Namespace):
         if not self._is_executable_in_path("poetry"):
-            self._install_global_package("poetry")
+            self._install_global_package("poetry", version="1.1.15")
 
         if not self._is_executable_in_path("black"):
             self._install_global_package("black")
@@ -53,8 +53,15 @@ class Install(CliPlugin):
         ) as archive:
             archive.extractall(target)
 
-    def _install_global_package(self, package_name: str):
-        subprocess.check_call([sys.executable, "-m", "pip", "install", package_name])
+    def _install_global_package(self, package_name: str, version: str = None):
+        if version is None:
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", package_name]
+            )
+        else:
+            subprocess.check_call(
+                [sys.executable, "-m", "pip", "install", f"{package_name}=={version}"]
+            )
 
     def _install_node_in_repo(self):
         platform_machine = platform.machine()
