@@ -27,7 +27,7 @@ class NAS:
             password,
             secure=True,
             cert_verify=False,
-            dsm_version=2,
+            dsm_version=7,
             debug=False,
             otp_code=None,
         )
