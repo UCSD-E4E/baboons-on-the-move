@@ -1,8 +1,9 @@
 [GENERAL OPTIONS]
 extension-pkg-whitelist=cv2
+generated-members=cv2.*
 
 [MESSAGES CONTROL]
-disable=bad-continuation,too-few-public-methods,no-self-use,too-many-locals,duplicate-code,line-too-long, too-many-arguments, too-many-instance-attributes
+disable=too-few-public-methods,too-many-locals,duplicate-code,line-too-long, too-many-arguments, too-many-instance-attributes, no-else-return
 
 [OPTIONS]
-good-names=f,id,i, x, y, x1, x2, y1, y2, X, T, f1
+good-names=f,id,i, x, y, x1, x2, y1, y2, X, T, f1, df, j, k, h, db, ax, g, gd, c, v, r, s, m

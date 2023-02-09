@@ -1,19 +1,28 @@
-from argparse import ArgumentParser, Namespace
-from os import makedirs, unlink, rename
+"""
+CLI Plugin for creating a dataset from a video and ground truth xml.
+"""
+
 import subprocess
+from argparse import ArgumentParser, Namespace
 from glob import glob
+from os import makedirs, unlink, rename
 from os.path import splitext, basename, dirname
 
-from cli_plugins.cli_plugin import CliPlugin
-from library.cli import str2bool
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
+
 from baboon_tracking.models.region import Region
+from cli_plugins.cli_plugin import CliPlugin
+from library.cli import str2bool
 from library.region_file import region_factory
 
 
 class Dataset(CliPlugin):
+    """
+    CLI Plugin for creating a dataset from a video and ground truth xml.
+    """
+
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 
@@ -93,7 +102,7 @@ class Dataset(CliPlugin):
         frame: int,
         identity: int,
         data: np.ndarray,
-        hysteresis=[5, 5],
+        hysteresis=(5, 5),
     ):
         data = data.astype(float)
 

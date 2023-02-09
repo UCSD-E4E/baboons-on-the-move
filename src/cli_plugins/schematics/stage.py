@@ -51,6 +51,6 @@ class Stage(Schematic):
         string_builder.append_line("")
 
         with open(path, "w", encoding="utf8") as f:
-            f.write(string_builder.__str__())
+            f.write(str(string_builder))
 
         os.popen(f"code {path}")

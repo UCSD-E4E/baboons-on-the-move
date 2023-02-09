@@ -1,12 +1,13 @@
 from typing import Any, Dict
+
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
+from baboon_tracking.decorators.debug import debug
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from library.region_file import RegionFile, region_factory
 from pipeline import Stage
-from pipeline.stage_result import StageResult
-from baboon_tracking.decorators.debug import debug
 from pipeline.decorators import stage
 from pipeline.decorators import runtime_config
+from pipeline.stage_result import StageResult
 
 
 # @debug(FrameMixin, (0, 255, 0))

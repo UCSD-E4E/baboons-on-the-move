@@ -13,14 +13,51 @@ from pipeline.stage_result import StageResult
 from pipeline.decorators import runtime_config, stage
 
 
+def _get_img_size(capture: CaptureMixin):
+    scale = 0.85
+
+    width = os.getenv("WIDTH")
+    height = os.getenv("HEIGHT")
+
+    if not width or not height:
+        if os.environ.get("DISPLAY", "") == "":
+            width = 0
+            height = 0
+        else:
+            root = tk.Tk()
+
+            width = root.winfo_screenwidth()
+            height = root.winfo_screenheight()
+
+    if not width or not height:
+        width = 1600
+        height = 900
+
+    width = int(width)
+    height = int(height)
+
+    width_scale = width / capture.frame_width
+    height_scale = height / capture.frame_height
+
+    if width_scale < height_scale:
+        height = capture.frame_height * width_scale
+    else:
+        width = capture.frame_width * height_scale
+
+    width = int(width * scale)
+    height = int(height * scale)
+
+    return width, height
+
+
 def show_result(function: Callable):
     """
     Provides a decorator for automatically showing the results of current stage to the screen.
     """
     prev_execute = function.execute
     display = True
-    im_size = None
-    capture = None
+    im_size: Tuple[int, int] = None
+    capture: CaptureMixin = None
     frame_attributes = None
 
     def set_runtime_config(_, rconfig: Dict[str, any]):
@@ -41,40 +78,7 @@ def show_result(function: Callable):
 
         if display:
             if im_size is None:
-                scale = 0.85
-
-                width = os.getenv("WIDTH")
-                height = os.getenv("HEIGHT")
-
-                if not width or not height:
-                    if os.environ.get("DISPLAY", "") == "":
-                        width = 0
-                        height = 0
-                    else:
-                        root = tk.Tk()
-
-                        width = root.winfo_screenwidth()
-                        height = root.winfo_screenheight()
-
-                if not width or not height:
-                    width = 1600
-                    height = 900
-
-                width = int(width)
-                height = int(height)
-
-                width_scale = width / capture.frame_width
-                height_scale = height / capture.frame_height
-
-                if width_scale < height_scale:
-                    height = capture.frame_height * width_scale
-                else:
-                    width = capture.frame_width * height_scale
-
-                width = int(width * scale)
-                height = int(height * scale)
-
-                im_size = (width, height)
+                im_size = _get_img_size(capture)
 
             if os.environ.get("DISPLAY", "") != "":
                 # This searches the current object for frame types.

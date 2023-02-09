@@ -1,9 +1,19 @@
+"""
+A CLI plugin for comparing two result files.
+Outputs the difference between the two sets.
+"""
+
 from argparse import ArgumentParser, Namespace
 from sqlite3 import connect
 from cli_plugins.cli_plugin import CliPlugin
 
 
 class Compare(CliPlugin):
+    """
+    A CLI plugin for comparing two result files.
+    Outputs the difference between the two sets.
+    """
+
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
 

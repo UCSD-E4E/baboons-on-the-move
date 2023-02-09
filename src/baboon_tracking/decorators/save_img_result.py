@@ -1,18 +1,17 @@
 import os
 import shutil
-import cv2
 from typing import Callable, Dict, List, Tuple
-from baboon_tracking.mixins.frame_mixin import FrameMixin
-from baboon_tracking.models.frame import Frame
-from pipeline.decorators import runtime_config, stage
 
+import cv2
+
+from baboon_tracking.models.frame import Frame
+from pipeline.decorators import runtime_config
 from pipeline.stage_result import StageResult
 
 
 def save_img_result(function: Callable):
     prev_execute = function.execute
     save = True
-    frame: FrameMixin = None
     frame_attributes = []
     created_folders = False
 

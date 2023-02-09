@@ -15,12 +15,10 @@ from baboon_tracking.mixins.transformation_matrices_mixin import (
 from baboon_tracking.models.region import Region
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.particle_filter import ParticleFilter
+from library.utils import flatten
 from pipeline import Stage
 from pipeline.stage_result import StageResult
 from pipeline.decorators import runtime_config, stage
-
-
-flatten = lambda t: [item for sublist in t for item in sublist]
 
 
 def process_pool(

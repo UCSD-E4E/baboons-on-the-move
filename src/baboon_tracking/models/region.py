@@ -3,11 +3,15 @@ Defines a region object.
 """
 from typing import Tuple
 from typing_extensions import Self
+
 from library.region import bb_intersection_over_union
-import numpy as np
 
 
 class Point:
+    """
+    Defines a single point object.
+    """
+
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y

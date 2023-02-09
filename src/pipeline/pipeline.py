@@ -123,7 +123,7 @@ class Pipeline(ABC):
                     caf.release(request_id)
 
                     return
-        except KeyboardInterrupt:
+        except KeyboardInterrupt as exc:
             if "timings" in self._runtime_config and self._runtime_config["timings"]:
                 print("Average Runtime per stage:")
                 self.stage.get_time().print_to_console()
@@ -131,7 +131,7 @@ class Pipeline(ABC):
             self.stage.on_destroy()
             caf.release(request_id)
 
-            raise KeyboardInterrupt()
+            raise exc
 
     def get(self, stage_type: Callable):
         """

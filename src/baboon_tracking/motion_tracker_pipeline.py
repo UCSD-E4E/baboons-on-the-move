@@ -1,7 +1,6 @@
 """
 Provides an algorithm for extracting motion regions from drone footage.
 """
-from baboon_tracking.stages.sqlite_base import SqliteBase
 from pipeline.pipeline import Pipeline
 from pipeline.factory import factory
 

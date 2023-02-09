@@ -1,4 +1,5 @@
 from typing import Dict, List, Tuple
+
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.bayesian_region import BayesianRegion

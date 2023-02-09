@@ -1,17 +1,21 @@
+"""
+A CLI plugin to render a generated region file and a ground truth file
+to a single video files based off of the supplied dataset.
+"""
+
 from argparse import ArgumentParser, Namespace
-from posixpath import splitext
 from baboon_tracking.dataset_viewer_pipeline import DatasetViewerPipeline
 
 from cli_plugins.cli_plugin import CliPlugin
-import cv2
-from os.path import dirname, basename
-from os import makedirs
-from glob import glob
 from library.args import ArgsParser, ArgumentParserBuilder
-from tqdm import tqdm
 
 
 class RenderDataset(CliPlugin):
+    """
+    A CLI plugin to render a generated region file and a ground truth file
+    to a single video files based off of the supplied dataset.
+    """
+
     def __init__(self, parser: ArgumentParser):
         CliPlugin.__init__(self, parser)
         ArgumentParserBuilder(

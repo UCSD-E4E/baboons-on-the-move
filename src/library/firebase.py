@@ -2,11 +2,12 @@
 The module is useful for interacting with Firebase.
 """
 
+import json
+from os.path import exists
 from typing import Any
+
 import firebase_admin
 from firebase_admin import credentials, db
-from os.path import exists
-import json
 
 
 DISABLE_NETWORK = False
@@ -32,7 +33,7 @@ class MockFirebaseReference:
 
 class MockFirebaseDB:
     def __init__(self, path: str):
-        with open(path, "r") as f:
+        with open(path, "r", "utf8") as f:
             self._data = json.loads(str.join("\n", f.readlines()))
 
     def reference(self, path: str):
@@ -40,12 +41,13 @@ class MockFirebaseDB:
 
 
 def initialize_app(disable_network=False):
-    global DISABLE_NETWORK
-    DISABLE_NETWORK = disable_network
-
     """
     Logic for initializing the firebase database app.
     """
+
+    global DISABLE_NETWORK
+    DISABLE_NETWORK = disable_network
+
     if not DISABLE_NETWORK:
         try:
             cred = credentials.Certificate("decrypted/firebase-key.json")

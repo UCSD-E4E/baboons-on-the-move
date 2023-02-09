@@ -11,14 +11,12 @@ import pickle
 
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
-from baboon_tracking.models.region import Baboon
+from baboon_tracking.models.region import Region
 from library.region import bb_intersection_over_union
+from library.utils import flatten
 from pipeline import Stage
 from pipeline.stage_result import StageResult
 from pipeline.decorators import config, stage
-
-
-flatten = lambda t: [item for sublist in t for item in sublist]
 
 
 @config("dist_threshold", "dead_reckoning/dist_threshold")
@@ -58,7 +56,7 @@ class DeadReckoning(Stage, BaboonsMixin):
         pathlib.Path("./temp").mkdir(exist_ok=True)
         pathlib.Path("./temp/dead_reckoning").mkdir(exist_ok=True)
 
-    def _centroid(self, baboon: Baboon):
+    def _centroid(self, baboon: Region):
         x1, y1, x2, y2 = baboon.rectangle
 
         width = float(x2 - x1)
@@ -66,7 +64,7 @@ class DeadReckoning(Stage, BaboonsMixin):
 
         return (width / 2 + x1, height / 2 + y1)
 
-    def _dist(self, first: Baboon, second: Baboon):
+    def _dist(self, first: Region, second: Region):
         first_center = self._centroid(first)
         second_center = self._centroid(second)
 
@@ -75,10 +73,10 @@ class DeadReckoning(Stage, BaboonsMixin):
             + (first_center[1] - second_center[1]) ** 2
         )
 
-    def _calc_region_overlap(self, first: Baboon, second: Baboon):
+    def _calc_region_overlap(self, first: Region, second: Region):
         return bb_intersection_over_union(first.rectangle, second.rectangle)
 
-    def _make_tuple(self, first: Baboon, second: Baboon, overlay: float):
+    def _make_tuple(self, first: Region, second: Region, overlay: float):
         if first.identity is not None and second.identity is None:
             return (first, second, overlay)
         if first.identity is None and second.identity is not None:
@@ -100,7 +98,7 @@ class DeadReckoning(Stage, BaboonsMixin):
             f"./temp/dead_reckoning/{frame_number}.pickle"
         )
 
-    def get(self, frame_number: int) -> List[Baboon]:
+    def get(self, frame_number: int) -> List[Region]:
         """
         Gets the list of baboons for the frame number.
         """
@@ -115,7 +113,7 @@ class DeadReckoning(Stage, BaboonsMixin):
 
         raise IOError("Cannot find the specified frame number")
 
-    def set(self, frame_number: int, baboons: List[Baboon]):
+    def set(self, frame_number: int, baboons: List[Region]):
         """
         Sets the list of baboons for the frame number.
         """

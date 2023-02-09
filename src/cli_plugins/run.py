@@ -2,8 +2,6 @@
 Starts the baboon tracker algorithm.
 """
 from argparse import ArgumentParser, Namespace
-import argparse
-from typing import Callable, List
 import numpy as np
 
 import yaml

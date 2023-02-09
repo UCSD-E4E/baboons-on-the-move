@@ -1,12 +1,14 @@
 from abc import ABC
+from math import ceil, floor
+from os.path import basename, splitext
 from sqlite3 import connect
 from typing import Iterator
-import pandas as pd
-from baboon_tracking.models.region import Region
-from os.path import basename, splitext
-import numpy as np
-from math import ceil, floor
 from xml.etree import ElementTree as ET
+
+import numpy as np
+import pandas as pd
+
+from baboon_tracking.models.region import Region
 
 
 class RegionFile(ABC):
@@ -139,7 +141,7 @@ class CvatXmlRegionFile(RegionFile):
     @property
     def frame_count(self) -> int:
         if self._max_frame == 0:
-            self._max_frame = max([f for f, _, _, _, _, _ in self._regions])
+            self._max_frame = max(f for f, _, _, _, _, _ in self._regions)
 
         return self._max_frame
 

@@ -66,7 +66,7 @@ class GetVideoFrame(Stage, FrameMixin, CaptureMixin):
             parts = video_path.split("/")
             idx = parts.index("Datasets")
 
-            self.name = "/".join(parts[(idx+1):-1])
+            self.name = "/".join(parts[(idx + 1) : -1])
 
     def execute(self) -> StageResult:
         """

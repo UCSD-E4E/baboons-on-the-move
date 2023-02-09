@@ -59,9 +59,9 @@ class Serial(ParentStage):
         subcharts: List[Tuple[Image.Image, Tuple[int, int], Tuple[int, int]]] = [
             s.flowchart_image() for s in self.stages
         ]
-        width = sum([img.size[0] for img, _, _ in subcharts]) + 20 * len(subcharts)
+        width = sum(img.size[0] for img, _, _ in subcharts) + 20 * len(subcharts)
 
-        max_img_height = max([img.size[1] for img, _, _ in subcharts])
+        max_img_height = max(img.size[1] for img, _, _ in subcharts)
         height = font.getsize(self.name)[1] + 20 + max_img_height
 
         img = Image.new("1", (width, height))

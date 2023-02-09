@@ -2,9 +2,9 @@
 Mixin for returning weights.
 """
 
+import numpy as np
 
 from baboon_tracking.models.frame import Frame
-import numpy as np
 
 
 class WeightsMixin:

@@ -1,29 +1,24 @@
 """
 CLI Plugin for performing optimization.
 """
-from datetime import datetime
-from genericpath import exists
 import hashlib
 from argparse import ArgumentParser, Namespace
-from sqlite3 import connect
-from typing import Dict, List, Tuple
-import cv2
-
-import numpy as np
-import pandas as pd
-import py7zr
-from pyrsistent import v
+from collections import OrderedDict
+from datetime import datetime
+from typing import List, Tuple
 import yaml
-from sherlock.utils import approximate_pareto
 
-from firebase_admin import db
+import cv2
+import numpy as np
 from sherlock import Sherlock
+from sherlock.utils import approximate_pareto
 from tqdm import tqdm
-from library.cli import str2bool
+
 
 from baboon_tracking.motion_tracker_pipeline import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
+from library.cli import str2bool
 from library.config import set_config_part, get_config_declaration, get_config_options
 from library.dataset import (
     dataset_motion_results_exists,
@@ -33,12 +28,9 @@ from library.dataset import (
     get_dataset_motion_results,
 )
 from library.design_space import get_design_space
-from library.firebase import initialize_app, get_dataset_ref
+from library.firebase import initialize_app, get_dataset_ref, MockFirebaseReference
 from library.region_file import region_factory
 from library.metrics import Metrics
-from library.cli import str2bool
-
-from collections import OrderedDict
 
 
 class Optimize(CliPlugin):
@@ -136,7 +128,7 @@ class Optimize(CliPlugin):
         known_idx: np.ndarray,
         dataset_path: str,
         config_options: List[Tuple[str, np.ndarray]],
-        storage_ref: db.Reference,
+        storage_ref: MockFirebaseReference,
         current_idx: List[int],
         video_file: str,
         enable_tracking: bool,

@@ -25,12 +25,12 @@ class Caffine:
         self._process = Popen(  # pylint: disable=consider-using-with
             [file_path], stdin=PIPE
         )
-        self._process.__enter__()
+        self._process.__enter__()  # pylint: disable=unnecessary-dunder-calls
 
     def _kill_process(self):
         self._process.communicate(" ")
         self._process.kill()
-        self._process.__exit__()
+        self._process.__exit__()  # pylint: disable=unnecessary-dunder-calls
 
     def request(self) -> int:
         """

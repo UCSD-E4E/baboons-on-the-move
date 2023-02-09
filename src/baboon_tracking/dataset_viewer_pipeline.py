@@ -1,12 +1,12 @@
 from baboon_tracking.decorators.debug import DisplayDebugRegions
-from pipeline.pipeline import Pipeline
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
 from baboon_tracking.stages.test_exit import TestExit
 from baboon_tracking.stages.get_region_file_region import (
-    GetGroundTruthRegion,
+    # GetGroundTruthRegion,
     GetRegionFileRegion,
 )
 from pipeline.factory import factory
+from pipeline.pipeline import Pipeline
 
 
 class DatasetViewerPipeline(Pipeline):

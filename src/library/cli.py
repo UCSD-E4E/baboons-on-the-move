@@ -1,3 +1,6 @@
+"""
+A set of CLI helper functions.
+"""
 import argparse
 from typing import Callable, List
 

@@ -50,12 +50,12 @@ class Parallel(ParentStage):
             s.flowchart_image() for s in self.stages
         ]
         height = (
-            sum([img.size[1] for img, _, _ in subcharts])
+            sum(img.size[1] for img, _, _ in subcharts)
             + 20 * len(subcharts)
             + font.getsize(self.name)[1]
         )
 
-        max_img_width = max([img.size[0] for img, _, _ in subcharts])
+        max_img_width = max(img.size[0] for img, _, _ in subcharts)
         width = 20 + max_img_width
 
         img = Image.new("1", (width, height))

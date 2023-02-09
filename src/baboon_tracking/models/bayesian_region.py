@@ -1,8 +1,16 @@
+"""
+An extension of a simple region that also stores an ID string and an ID.
+"""
 from typing import Tuple
+
 from baboon_tracking.models.region import Region
 
 
 class BayesianRegion(Region):
+    """
+    An extension of a simple region that also stores an ID string and an ID.
+    """
+
     def __init__(
         self,
         rectange: Tuple[int, int, int, int],
@@ -16,6 +24,9 @@ class BayesianRegion(Region):
 
     @staticmethod
     def from_region(region: Region, observed=False):
+        """
+        Generates a bayesian region from a region object.
+        """
         return BayesianRegion(
             region.rectangle,
             id_str=region.id_str,

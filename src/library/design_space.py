@@ -1,16 +1,16 @@
-from typing import Dict, List, Set, Tuple
-from genericpath import exists
-import pickle
-import yaml
-import numpy as np
 import hashlib
-from library.dataset import get_dataset_path
+import pickle
+from typing import Dict, List, Tuple
 
-import third_party.pareto as pareto
 import cv2
+import numpy as np
+import yaml
+from genericpath import exists
 
 from library.config import get_config_declaration, get_config_options
+from library.dataset import get_dataset_path
 from library.firebase import get_dataset_ref, initialize_app
+from third_party import pareto
 
 
 class DesignSpaceCache:
@@ -18,13 +18,13 @@ class DesignSpaceCache:
         self,
         value_cache: Dict[
             Tuple[str, str, bool, bool, int, int, bool, int], Tuple[float, float, float]
-        ] = {},
-        known_idx_cache: Dict[str, List[int]] = {},
-        current_idx_cache: Dict[str, List[int]] = {},
+        ] = None,
+        known_idx_cache: Dict[str, List[int]] = None,
+        current_idx_cache: Dict[str, List[int]] = None,
     ):
-        self._value_cache = value_cache
-        self._known_idx_cache = known_idx_cache
-        self._current_idx_cache = current_idx_cache
+        self._value_cache = value_cache or {}
+        self._known_idx_cache = known_idx_cache or {}
+        self._current_idx_cache = current_idx_cache or {}
         self._updated_cache = False
 
     def check_value(self, cache_key: Tuple[str, str, bool, bool, int, int, bool, int]):
@@ -34,7 +34,7 @@ class DesignSpaceCache:
         if cache_key in self._value_cache:
             return self._value_cache[cache_key]
         else:
-            raise f"{cache_key} not found in cache."
+            raise ValueError(f"{cache_key} not found in cache.")
 
     def set_value(
         self,
@@ -216,8 +216,10 @@ def get_pareto_front(
     return ypredict, ypredict_idx
 
 
-# From github.com/KastnerRG/sherlock/utils
 def compute_scores(y, rows, margin=0):
+    """
+    From github.com/KastnerRG/sherlock/utils
+    """
     ndrange = np.ptp(y, axis=0) * margin
     total_sum = np.sum(y, axis=0)
     nrows = y.shape[0]

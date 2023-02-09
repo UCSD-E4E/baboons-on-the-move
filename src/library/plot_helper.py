@@ -1,10 +1,16 @@
+"""
+Helpers for plotting results for Spot paper.
+"""
+
+import math
 from typing import Dict, List
+
 import numpy as np
 import pandas as pd
-from library.design_space import get_design_space, get_pareto_front
 import matplotlib.pyplot as plt
-import math
 from matplotlib.axes import Axes
+
+from library.design_space import get_design_space, get_pareto_front
 
 
 def get_video_files_dict(dataset_name: str) -> Dict[str, str]:
@@ -95,7 +101,7 @@ def get_dataset_results(
     max_height: int = None,
     allow_overlap=False,
     disable_network=False,
-    video_file_override: List[str] = [],
+    video_file_override: List[str] = None,
 ):
     df = pd.DataFrame(
         columns=[
@@ -308,7 +314,7 @@ def _get_citations():
         "FRMC": "\\cite{rezaei_background_2017}",
         "ClusterNet": "\\cite{lalonde_clusternet_2018}",
         "DTTP": "\\cite{ahmadi_moving_2019}",
-        "D\&T": "\\cite{ao_needles_2020}",
+        "D\\&T": "\\cite{ao_needles_2020}",
         "MMB": "\\cite{yin_detecting_2022}",
     }
 
@@ -345,7 +351,7 @@ def df2latex_table_v(df: pd.DataFrame, table_index: int):
 
             is_max = max_column == df.iloc[i, j]
             is_second = (
-                max([v for v in df.iloc[:, j] if v != max_column]) == df.iloc[i, j]
+                max(v for v in df.iloc[:, j] if v != max_column) == df.iloc[i, j]
             )
 
             color = ""
@@ -362,9 +368,9 @@ def df2latex_table_v(df: pd.DataFrame, table_index: int):
             if color:
                 table += "}"
 
-        table += f"\\\\\n"
+        table += "\\\\\n"
 
-    table += """    \hline\\\\
+    table += """    \\hline\\\\
 \\end{tabular}"""
 
     return table
@@ -391,7 +397,7 @@ def df2latex_table_vi(df: pd.DataFrame):
 
             is_max = max_column == df.iloc[i, j]
             is_second = (
-                max([v for v in df.iloc[:, j] if v != max_column]) == df.iloc[i, j]
+                max(v for v in df.iloc[:, j] if v != max_column) == df.iloc[i, j]
             )
 
             color = ""
@@ -408,9 +414,9 @@ def df2latex_table_vi(df: pd.DataFrame):
             if color:
                 table += "}"
 
-        table += f"\\\\\n"
+        table += "\\\\\n"
 
-    table += """    \hline\\\\
+    table += """    \\hline\\\\
 \\end{tabular}"""
 
     return table
@@ -423,9 +429,9 @@ def maximum_value_in_column(column):
     default = ""
 
     maximum_in_column = column.max()
-    second_in_column = max([v for v in column if v != maximum_in_column])
+    second_in_column = max(v for v in column if v != maximum_in_column)
     thrid_in_column = max(
-        [v for v in column if v != maximum_in_column and v != second_in_column]
+        v for v in column if v not in (maximum_in_column, second_in_column)
     )
 
     styles = []
@@ -472,7 +478,7 @@ def _plot_pareto_graph(
     hide_title=False,
     disable_network=False,
 ):
-    X, y, current_idx, known_idx = get_design_space(
+    _, y, current_idx, known_idx = get_design_space(
         video_file,
         enable_tracking,
         enable_persist,
@@ -521,7 +527,7 @@ def _plot_pareto_graph(
         ref_ypredict_idx_set = set(int(idx) for idx in ref_ypredict_idx)
         known_idx_set = set(int(idx) for idx in known_idx)
 
-        missing_idx = ref_ypredict_idx_set.difference(known_idx_set)
+        # missing_idx = ref_ypredict_idx_set.difference(known_idx_set)
         # if missing_idx:
         #     print(missing_idx)
 
@@ -644,7 +650,7 @@ def plot_precision_recall_curve(
     dataset_dict = get_video_files_dict(dataset_name)
     video_name = [k for k, v in dataset_dict.items() if v == video_file][0]
 
-    X, y, current_idx, known_idx = get_design_space(
+    _, y, current_idx, _ = get_design_space(
         video_file,
         enable_tracking,
         enable_persist,

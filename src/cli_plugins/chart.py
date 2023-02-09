@@ -2,7 +2,6 @@
 Generates a chart representing the baboon tracking algorithm.
 """
 from argparse import ArgumentParser, Namespace
-from baboon_tracking import MotionTrackerPipeline
 from baboon_tracking.sqlite_particle_filter_pipeline import SqliteParticleFilterPipeline
 from cli_plugins.cli_plugin import CliPlugin
 from pipeline_viewer.viewer import PipelineViewer

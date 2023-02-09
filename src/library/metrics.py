@@ -1,7 +1,7 @@
-from library.region_file import RegionFile
 from tqdm import tqdm
 import pandas as pd
-import numpy as np
+
+from library.region_file import RegionFile
 
 
 class Metrics:
@@ -28,7 +28,7 @@ class Metrics:
 
         for calc, gd in tqdm(zip(self._calculated, self._ground_truth)):
             if self._calculated.current_frame != self._ground_truth.current_frame:
-                raise "The frame numbers don't match"
+                raise ValueError("The frame numbers don't match")
 
             true_positive = 0
             false_negative = 0

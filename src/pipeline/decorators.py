@@ -45,8 +45,6 @@ def stage(parameter: str, is_property=False):
     """
 
     def inner_function(function: Callable):
-        global STAGE_MAP
-
         if not function in STAGE_MAP:
             STAGE_MAP[function] = []
 
