@@ -193,7 +193,7 @@ def get_sherlock_table(
     df.insert(
         1,
         "Objective Function",
-        ["Objective function 1", "Objective function 2", "Objective function 3"],
+        ["Problem Objective function 1", "Problem Objective function 2", "Final Objective Function"],
         True,
     )
     df.insert(2, "Max Width", [1024, 35, 35], True)
@@ -781,7 +781,10 @@ def plot_sherlock_pareto_front(disable_network=False):
     )
 
     for idx, (max_width, max_height, allow_overlap) in enumerate(settings):
-        video_name = f"Objective function {idx + 1}"
+        if idx != 2:
+            video_name = f"Problem Objective function {idx + 1}"
+        else:
+            video_name = "Final Objective Function"
 
         ax = axs[idx]
 
