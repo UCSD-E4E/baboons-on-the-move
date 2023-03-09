@@ -14,6 +14,9 @@ from library.design_space import get_design_space, get_pareto_front
 
 
 def get_video_files_dict(dataset_name: str) -> Dict[str, str]:
+    """
+    Gets the video files for the specified dataset.
+    """
     if dataset_name.lower() == "viso":
         return {
             "Video 1": "VISO/car/003",
@@ -31,6 +34,9 @@ def get_video_files_dict(dataset_name: str) -> Dict[str, str]:
 
 
 def get_video_files(dataset_name: str) -> List[str]:
+    """
+    Gets a list of video files for the specified dataset.
+    """
     if dataset_name.lower() == "viso":
         return [
             "VISO/car/003",
@@ -61,10 +67,16 @@ def _get_metric(table_v: pd.DataFrame, name: str) -> np.ndarray:
 
 
 def get_viso_table_v():
+    """
+    Gets the precision, recall, F1 table from Yin et al.
+    """
     return pd.read_csv("./plots/viso_table_v.csv", header=[0, 1], comment="#")
 
 
 def get_viso_table_vi():
+    """
+    Gets the AP, mAP table from Yin et al.
+    """
     return pd.read_csv("./plots/viso_table_vi.csv", comment="#")
 
 
@@ -103,6 +115,10 @@ def get_dataset_results(
     disable_network=False,
     video_file_override: List[str] = None,
 ):
+    """
+    Gets the dataset results for the specified dataset.
+    """
+
     df = pd.DataFrame(
         columns=[
             "Video Name",
@@ -154,6 +170,10 @@ def get_dataset_results(
 def get_sherlock_table(
     enable_tracking=True, enable_persist=False, disable_network=False
 ):
+    """
+    Gets the table of each of the Sherlock objective functions.
+    """
+
     df_video1_35_no = get_dataset_results(
         "VISO",
         enable_tracking=enable_tracking,
@@ -193,7 +213,11 @@ def get_sherlock_table(
     df.insert(
         1,
         "Objective Function",
-        ["Problem Objective function 1", "Problem Objective function 2", "Final Objective Function"],
+        [
+            "Problem Objective function 1",
+            "Problem Objective function 2",
+            "Final Objective Function",
+        ],
         True,
     )
     df.insert(2, "Max Width", [1024, 35, 35], True)
@@ -212,6 +236,10 @@ def add_spot_row_viso_table_v(
     allow_overlap=False,
     disable_network=False,
 ):
+    """
+    Adds the Spot row to the precision, recall, f1 table.
+    """
+
     spot = np.zeros((7, 3))
 
     for name, dataset in get_video_files_dict("VISO").items():
@@ -244,6 +272,10 @@ def add_spot_row_viso_table_vi(
     allow_overlap=False,
     disable_network=False,
 ):
+    """
+    Adds the Spot row to the AP, mAP table.
+    """
+
     spot = np.zeros(7)
 
     for name, dataset in get_video_files_dict("VISO").items():
@@ -274,6 +306,10 @@ def add_spot_row_viso_table_vi(
 
 
 def add_average_column_viso_table_v(table_v: pd.DataFrame):
+    """
+    Adds the average column to the precision, recall, f1 table.
+    """
+
     avg_recalls = np.average(_get_metric(table_v, "Recall"), axis=1)
     avg_precisions = np.average(_get_metric(table_v, "Precision"), axis=1)
     avg_f1s = np.average(_get_metric(table_v, "F1"), axis=1)
@@ -291,6 +327,10 @@ def add_average_column_viso_table_v(table_v: pd.DataFrame):
 
 
 def add_map_column_viso_table_vi(table_vi: pd.DataFrame):
+    """
+    Adds the mAP column to the VI table.
+    """
+
     map_df = pd.DataFrame(
         np.round(np.average(table_vi.iloc[:, 1:].to_numpy(), axis=1), decimals=2),
         columns=["mAP"],
@@ -320,6 +360,9 @@ def _get_citations():
 
 
 def df2latex_table_v(df: pd.DataFrame, table_index: int):
+    """
+    Converts the table V dataframe to a latex table.
+    """
     cite = _get_citations()
 
     table = """
@@ -377,6 +420,9 @@ def df2latex_table_v(df: pd.DataFrame, table_index: int):
 
 
 def df2latex_table_vi(df: pd.DataFrame):
+    """
+    Converts the table VI dataframe to latex.
+    """
     cite = _get_citations()
 
     table = """
@@ -423,6 +469,10 @@ def df2latex_table_vi(df: pd.DataFrame):
 
 
 def maximum_value_in_column(column):
+    """
+    Highlights the maximum and second largest value in each column in the dataframe.
+    """
+
     max_highlight = "background-color: red;"
     second_highlight = "background-color: blue;"
     third_highlight = ""  # "background-color: gray;"
@@ -457,7 +507,7 @@ def maximum_value_in_column(column):
     return styles
 
 
-def get_row_col(i: int):
+def _get_row_col(i: int):
     col = i % 3
     row = math.floor(i / 3)
 
@@ -559,6 +609,10 @@ def plot_pareto_front(
     ref_video_file=None,
     disable_network=False,
 ):
+    """
+    Plots the Pareto front for the specified dataset.
+    """
+
     video_files = get_video_files(dataset_name)
     cols = min(max_cols, len(video_files))
     rows_total = float(len(video_files)) / float(cols)
@@ -577,7 +631,7 @@ def plot_pareto_front(
     dataset_dict = get_video_files_dict(dataset_name)
     for idx, video_file in enumerate(video_files):
         video_name = [k for k, v in dataset_dict.items() if v == video_file][0]
-        r, c = get_row_col(idx)
+        r, c = _get_row_col(idx)
 
         if len(video_files) > 1:
             ax = axs[r, c]
@@ -633,6 +687,10 @@ def plot_precision_recall_curve(
     fill=False,
     disable_network=False,
 ):
+    """
+    Plots the PR curve for the given dataset.
+    """
+
     video_files = get_video_files(dataset_name)
     video_file = video_files[0]
     enable_tracking = True
@@ -741,6 +799,10 @@ def plot_pareto_front_ref(
     ref_video_files=None,
     disable_network=False,
 ):
+    """
+    Plots the Pareto front with reference to another Pareto front.
+    """
+
     video_files = get_video_files(dataset_name)
 
     if ref_video_files is None:
@@ -768,6 +830,10 @@ def plot_pareto_front_ref(
 
 
 def plot_sherlock_pareto_front(disable_network=False):
+    """
+    Plots the Pareto front for the VISO dataset, video 1 for each of Sherlock's objective functions.
+    """
+
     settings = [(1024, 1024, True), (35, 35, True), (35, 35, False)]
 
     cols = 3
@@ -835,6 +901,10 @@ def _add_pareto_front_to_dataframe(
 
 
 def get_all_data(enable_tracking=True, enable_persist=False, disable_network=False):
+    """
+    Gets a list of all of the Spot data for each objective function to output to a CSV.
+    """
+
     df = pd.DataFrame(
         [],
         columns=[
@@ -859,7 +929,7 @@ def get_all_data(enable_tracking=True, enable_persist=False, disable_network=Fal
     )
 
     df = _add_pareto_front_to_dataframe(
-        "VISO", "VISO/car/003", "Objective function 1", y, current_idx, df
+        "VISO", "VISO/car/003", "Problem Objective function 1", y, current_idx, df
     )
 
     _, y, current_idx, _ = get_design_space(
@@ -873,7 +943,7 @@ def get_all_data(enable_tracking=True, enable_persist=False, disable_network=Fal
     )
 
     df = _add_pareto_front_to_dataframe(
-        "VISO", "VISO/car/003", "Objective function 2", y, current_idx, df
+        "VISO", "VISO/car/003", "Problem Objective function 2", y, current_idx, df
     )
 
     for video_file in get_video_files("VISO"):
@@ -888,7 +958,7 @@ def get_all_data(enable_tracking=True, enable_persist=False, disable_network=Fal
         )
 
         df = _add_pareto_front_to_dataframe(
-            "VISO", video_file, "Objective function 3", y, current_idx, df
+            "VISO", video_file, "Final Objective function", y, current_idx, df
         )
 
     return df
@@ -901,6 +971,10 @@ def get_sample_count(
     allow_overlap=False,
     disable_network=False,
 ):
+    """
+    Produces a dataframe that represents the list of samples per video.
+    """
+
     video_files = get_video_files_dict(dataset_name)
     data = []
 
