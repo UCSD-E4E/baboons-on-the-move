@@ -6,6 +6,7 @@ from library.dataset import (
     get_dataset_filter_results,
     get_dataset_path,
 )
+from library.cli import str2bool
 from library.region_file import region_factory
 
 
@@ -39,6 +40,36 @@ class ArgumentParserBuilder:
             "--ground_truth",
             default=None,
             help="Provide the ground truth file to process",
+        )
+
+        return self
+
+    def add_max_size(self):
+        self.parser.add_argument(
+            "-l",
+            "--max_height",
+            default=None,
+            type=int,
+            help="The max height for the bounding region",
+        )
+
+        self.parser.add_argument(
+            "-w",
+            "--max_width",
+            default=None,
+            type=int,
+            help="The max width for the bounding region",
+        )
+
+        return self
+
+    def add_allow_overlap(self):
+        self.parser.add_argument(
+            "-a",
+            "--allow_overlap",
+            default=None,
+            type=str2bool,
+            help="Determines whether multiple regions can be allowed to overlap",
         )
 
         return self
@@ -113,3 +144,15 @@ class ArgsParser:
 
             if self.ground_truth:
                 self.ground_truth_regions = region_factory(self.ground_truth)
+
+        if hasattr(args, "max_height"):
+            if args.max_height is not None:
+                self.max_height = args.max_height
+
+        if hasattr(args, "max_width"):
+            if args.max_width is not None:
+                self.max_width = args.max_width
+
+        if hasattr(args, "allow_overlap"):
+            if args.allow_overlap is not None:
+                self.allow_overlap = args.allow_overlap

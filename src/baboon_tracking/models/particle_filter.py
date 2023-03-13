@@ -156,8 +156,14 @@ class ParticleFilter:
         bayesian_baboon.identity = self.instance_id
         bayesian_baboon.id_str = str(self.instance_id)
 
+    @property
+    def particle_history(self):
+        return self._particle_history
+
     def _add_particle_history(self, step_name: str, particles: List[Particle]):
-        self._particle_history.append((self._particle_history_idx, step_name, particles))
+        self._particle_history.append(
+            (self._particle_history_idx, step_name, particles)
+        )
         self._particle_history_idx += 1
 
     def transform(self, transformation: np.ndarray):
@@ -206,9 +212,7 @@ class ParticleFilter:
         self.particles = []
         count = 0
         for baboon, weight in baboons_weights:
-            particle_count = int(
-                np.round((weight / normalizer) / self._weight).item()
-            )
+            particle_count = int(np.round((weight / normalizer) / self._weight).item())
 
             if count + particle_count > self._particle_count:
                 particle_count = self._particle_count - count

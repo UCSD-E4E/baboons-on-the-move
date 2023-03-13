@@ -13,6 +13,9 @@ from baboon_tracking.mixins.transformation_matrices_mixin import (
     TransformationMatricesMixin,
 )
 from baboon_tracking.models.region import Region
+from baboon_tracking.mixins.particle_filter_history_mixin import (
+    ParticleFilterHistoryMixin,
+)
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.particle_filter import ParticleFilter
 from library.utils import flatten
@@ -45,7 +48,7 @@ def process_pool(
 @stage("baboons")
 @stage("transformation_matrices")
 @runtime_config("config")
-class ParticleFilterStage(Stage, BaboonsMixin):
+class ParticleFilterStage(Stage, ParticleFilterHistoryMixin, BaboonsMixin):
     """
     Defines a stage which uses a paticle filter to fill in missing regions.
     """
@@ -57,6 +60,7 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         config: Dict[str, Any],
     ) -> None:
         Stage.__init__(self)
+        ParticleFilterHistoryMixin.__init__(self)
         BaboonsMixin.__init__(self)
 
         self._executor = concurrent.futures.ProcessPoolExecutor()
@@ -66,6 +70,10 @@ class ParticleFilterStage(Stage, BaboonsMixin):
         self._particle_count = 5
         self._probability_thresh = 0
         self._runtime_config = config
+
+    @property
+    def particle_filter_history(self):
+        return [(p.instance_id, p.particle_history) for p in self._particle_filters]
 
     def on_destroy(self) -> None:
         self._executor.shutdown()

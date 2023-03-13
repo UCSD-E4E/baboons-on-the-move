@@ -16,7 +16,7 @@ class CalculateMetrics(CliPlugin):
         CliPlugin.__init__(self, parser)
         ArgumentParserBuilder(
             parser
-        ).add_dataset().add_region_file().add_ground_truth_file()
+        ).add_dataset().add_region_file().add_ground_truth_file().add_max_size().add_allow_overlap()
 
     def execute(self, args: Namespace):
         """
