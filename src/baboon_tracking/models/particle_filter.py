@@ -4,7 +4,7 @@ Implements a particle filter.
 
 from math import cos, pi, sin, sqrt
 from random import random
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import numpy as np
 
 from baboon_tracking.models.region import Region
@@ -59,8 +59,8 @@ class Particle:
         val = 1
         half_val = val / 2.0
 
-        delta_x = int(np.asscalar(np.round(sample * sin(degs))))
-        delta_y = int(np.asscalar(np.round(sample * cos(degs))))
+        delta_x = int(np.round(sample * sin(degs)).item())
+        delta_y = int(np.round(sample * cos(degs)).item())
 
         delta_x1 = int(round(random() * val - half_val))
         delta_y1 = int(round(random() * val - half_val))
@@ -136,22 +136,29 @@ class ParticleFilter:
     Implements a particle filter.
     """
 
-    instance_id = 0
+    _instance_id = 0
 
     def __init__(self, baboon: Region, particle_count: int):
         self._particle_count = particle_count
         self._weight = 1.0 / float(particle_count)
+        self._particle_history_idx = 0
+        self._particle_history: List[Tuple[int, str, List[Particle]]] = []
 
         bayesian_baboon = BayesianRegion.from_region(baboon, observed=True)
         self.particles: List[Particle] = [
             Particle(bayesian_baboon, self._weight) for _ in range(particle_count)
         ]
+        self._add_particle_history("initial", self.particles)
 
-        self._instance_id = ParticleFilter.instance_id
-        ParticleFilter.instance_id += 1
+        self.instance_id = ParticleFilter._instance_id
+        ParticleFilter._instance_id += 1
 
-        bayesian_baboon.identity = self._instance_id
-        bayesian_baboon.id_str = str(self._instance_id)
+        bayesian_baboon.identity = self.instance_id
+        bayesian_baboon.id_str = str(self.instance_id)
+
+    def _add_particle_history(self, step_name: str, particles: List[Particle]):
+        self._particle_history.append((self._particle_history_idx, step_name, particles))
+        self._particle_history_idx += 1
 
     def transform(self, transformation: np.ndarray):
         """
@@ -160,6 +167,8 @@ class ParticleFilter:
         for particle in self.particles:
             particle.transform(transformation)
 
+        self._add_particle_history("transform", self.particles)
+
     def predict(self):
         """
         Performs the predict step on each of the particles.
@@ -167,12 +176,16 @@ class ParticleFilter:
         for particle in self.particles:
             particle.predict()
 
+        self._add_particle_history("predict", self.particles)
+
     def update(self, baboons: List[Region]):
         """
         Performs the update step on each of the particles.
         """
         for particle in self.particles:
             particle.update(baboons)
+
+        self._add_particle_history("update", self.particles)
 
     def resample(self):
         """
@@ -194,7 +207,7 @@ class ParticleFilter:
         count = 0
         for baboon, weight in baboons_weights:
             particle_count = int(
-                np.asscalar(np.round((weight / normalizer) / self._weight))
+                np.round((weight / normalizer) / self._weight).item()
             )
 
             if count + particle_count > self._particle_count:
@@ -208,6 +221,8 @@ class ParticleFilter:
             )
 
             count = len(self.particles)
+
+        self._add_particle_history("resample", self.particles)
 
     def get_baboon(self) -> Region:
         """
