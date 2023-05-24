@@ -23,35 +23,7 @@ class Code(CliPlugin):
     def execute(self, args: Namespace):
         self._ensure_vscode_settings()
 
-        self._ensure_vscode_plugin("eamodio.gitlens")
-        self._ensure_vscode_plugin("ms-python.python")
-        self._ensure_vscode_plugin("ms-python.vscode-pylance")
-        self._ensure_vscode_plugin("VisualStudioExptTeam.vscodeintellicode")
-
         os.popen("code .")
-
-    def _check_vscode_plugin(self, plugin: str):
-        with os.popen("code --list-extensions") as f:
-            installed = any(l.strip() == plugin for l in f.readlines())
-
-        return installed
-
-    def _ensure_vscode_plugin(self, plugin: str):
-        if not self._check_vscode_plugin(plugin):
-            try:
-                subprocess.check_call(
-                    ["code", "--install-extension", plugin],
-                    shell=(sys.platform == "win32"),
-                )
-            except subprocess.CalledProcessError as exception:
-                print(
-                    Fore.RED,
-                    "WARNING: PLUGIN ",
-                    plugin,
-                    " NOT INSTALLED: ",
-                    str(exception),
-                    Style.RESET_ALL,
-                )
 
     def _ensure_vscode_settings(self):
         with open(

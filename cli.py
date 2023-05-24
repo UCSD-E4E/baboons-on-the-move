@@ -15,6 +15,8 @@ from src.cli_plugins.cli_plugin import CliPlugin
 
 
 def _short_circuit():
+    return False
+
     if len(sys.argv) > 1 and sys.argv[1].lower() != "shell":
         os.environ["CLI_ACTIVE"] = "1"
 

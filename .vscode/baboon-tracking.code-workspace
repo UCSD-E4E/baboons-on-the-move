@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		}
+	],
+	"settings": {
+		"python.languageServer": "Pylance"
+	},
+	"extensions": {
+		"recommendations": [
+			"ms-python.vscode-pylance",
+			"ms-python.pylint",
+			"ms-python.python",
+			"eamodio.gitlens",
+			"visualstudioexptteam.vscodeintellicode",
+			"visualstudioexptteam.intellicode-api-usage-examples"
+		]
+	}
+}
