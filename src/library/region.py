@@ -8,7 +8,7 @@ from numba import jit
 import numpy as np
 
 
-@jit
+@jit(nopython=True)
 def bb_intersection_over_union(
     box_a: Tuple[int, int, int, int], box_b: Tuple[int, int, int, int]
 ):
