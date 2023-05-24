@@ -103,7 +103,6 @@ class SqliteBase(Stage, ABC):
         self.before_database_create()
 
         if SqliteBase.connection is None:
-
             SqliteBase.connection = connect(self.file_name)
             SqliteBase.cursor = self.connection.cursor()
 

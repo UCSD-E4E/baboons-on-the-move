@@ -537,7 +537,10 @@ def _plot_pareto_graph(
         allow_overlap=allow_overlap,
         disable_network=disable_network,
     )
-    (ypredict, _,) = get_pareto_front(
+    (
+        ypredict,
+        _,
+    ) = get_pareto_front(
         video_file,
         enable_tracking,
         enable_persist,
@@ -564,7 +567,10 @@ def _plot_pareto_graph(
     )
 
     if ref_video_file is not None and video_file != ref_video_file:
-        (_, ref_ypredict_idx,) = get_pareto_front(
+        (
+            _,
+            ref_ypredict_idx,
+        ) = get_pareto_front(
             ref_video_file,
             enable_tracking,
             enable_persist,
@@ -717,7 +723,10 @@ def plot_precision_recall_curve(
         allow_overlap=allow_overlap,
         disable_network=disable_network,
     )
-    (ypredict, _,) = get_pareto_front(
+    (
+        ypredict,
+        _,
+    ) = get_pareto_front(
         video_file,
         enable_tracking,
         enable_persist,
