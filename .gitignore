@@ -230,3 +230,4 @@ env.yml
 !web/baboon-tracking-status/build
 temp
 *.bak
+poetry.lock

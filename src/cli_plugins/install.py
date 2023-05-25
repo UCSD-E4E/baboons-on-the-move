@@ -11,7 +11,7 @@ import urllib.request
 import zipfile
 import platform
 
-from shutil import which
+from shutil import which, copyfile
 from cli_plugins.cli_plugin import CliPlugin
 
 from cli_plugins.utils import execute_node_script
@@ -42,6 +42,8 @@ class Install(CliPlugin):
         if self._install_node_in_repo():
             execute_node_script("npm", ["install", "-g", "pyright"])
 
+        os.environ["SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL"] = True
+        copyfile(f"./poetry.lock.{platform.processor()}", "./poetry.lock")
         subprocess.check_call(["poetry", "install"], shell=(sys.platform == "win32"))
 
     def _extract(self, path: str, target: str):
