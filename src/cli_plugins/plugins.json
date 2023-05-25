@@ -114,7 +114,6 @@
             "subcommands": [
                 "optimize"
             ],
-            "support_arm": false,
             "description": "Optimize parameters."
         },
         {
