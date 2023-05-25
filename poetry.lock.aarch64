@@ -2055,6 +2055,21 @@ qa = ["flake8 (==3.8.3)", "mypy (==0.782)"]
 testing = ["Django (<3.1)", "attrs", "colorama", "docopt", "pytest (<7.0.0)"]
 
 [[package]]
+name = "jeepney"
+version = "0.8.0"
+description = "Low-level, pure Python DBus protocol wrapper."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "jeepney-0.8.0-py3-none-any.whl", hash = "sha256:c0a454ad016ca575060802ee4d590dd912e35c122fa04e70306de3d076cce755"},
+    {file = "jeepney-0.8.0.tar.gz", hash = "sha256:5efe48d255973902f6badc3ce55e2aa6c5c3b3bc642059ef3a91247bcfcc5806"},
+]
+
+[package.extras]
+test = ["async-timeout", "pytest", "pytest-asyncio (>=0.17)", "pytest-trio", "testpath", "trio"]
+trio = ["async_generator", "trio"]
+
+[[package]]
 name = "jinja2"
 version = "3.1.2"
 description = "A very fast and expressive template engine."
@@ -5508,6 +5523,19 @@ secure = ["certifi", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "ipaddress", "p
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
 [[package]]
+name = "wakepy"
+version = "0.6.0"
+description = "Simple wakelock / keep-awake / stay-awake"
+optional = false
+python-versions = "*"
+files = [
+    {file = "wakepy-0.6.0.tar.gz", hash = "sha256:29d8b3b5ff7e6ba088af0d3b6040f3363922899fa63615ac068307fc446b5160"},
+]
+
+[package.dependencies]
+jeepney = {version = ">=0.7.1", markers = "sys_platform == \"linux\""}
+
+[[package]]
 name = "wcwidth"
 version = "0.2.6"
 description = "Measures the displayed width of unicode strings in a terminal"
@@ -5724,4 +5752,4 @@ test = ["hypothesis", "packaging", "pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.10,<3.11"
-content-hash = "5e8d7e233b9ef0cc0779bd2a92077242e246637bb5e23b8b899f75a940f56fca"
+content-hash = "283e65f02254a9d4a3a25e03ac8cbdbceb0a9b4897b39b78aa0b41c949d5d481"
