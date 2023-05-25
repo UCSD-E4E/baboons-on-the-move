@@ -96,7 +96,10 @@ class Pipeline(ABC):
         if iterations:
             Pipeline.iterations = iterations
 
-        if platform.system() != "Linux" or os.environ["XDG_SESSION_TYPE"] != "tty":
+        keep_awake = (
+            platform.system() != "Linux" or os.environ["XDG_SESSION_TYPE"] != "tty"
+        )
+        if keep_awake:
             set_keepawake()
 
         curr = 1
@@ -121,7 +124,8 @@ class Pipeline(ABC):
                         self.stage.get_time().print_to_console()
 
                     self.stage.on_destroy()
-                    unset_keepawake()
+                    if keep_awake:
+                        unset_keepawake()
 
                     return
         except KeyboardInterrupt as exc:
@@ -130,7 +134,8 @@ class Pipeline(ABC):
                 self.stage.get_time().print_to_console()
 
             self.stage.on_destroy()
-            unset_keepawake()
+            if keep_awake:
+                unset_keepawake()
 
             raise exc
 
