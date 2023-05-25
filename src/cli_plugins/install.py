@@ -34,7 +34,7 @@ class Install(CliPlugin):
 
     def execute(self, args: Namespace):
         if not self._is_executable_in_path("poetry"):
-            self._install_global_package("poetry", version="1.1.15")
+            self._install_global_package("poetry", version="1.5.0")
 
         if not self._is_executable_in_path("black"):
             self._install_global_package("black")
@@ -44,7 +44,7 @@ class Install(CliPlugin):
 
         os.environ["SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL"] = "True"
         copyfile(f"./poetry.lock.{platform.processor()}", "./poetry.lock")
-        subprocess.check_call(["poetry", "install"], shell=(sys.platform == "win32"))
+        subprocess.check_call(["poetry", "install"])
 
     def _extract(self, path: str, target: str):
         extensions = pathlib.Path(path).suffixes
