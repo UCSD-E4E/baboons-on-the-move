@@ -4,9 +4,11 @@ Implements a base pipeline.
 
 from abc import ABC
 import inspect
+import os
+import platform
 from typing import Callable, List
 from tqdm import tqdm
-from wakepy import keepawake
+from wakepy import set_keepawake, unset_keepawake
 
 from pipeline.parent_stage import ParentStage
 
@@ -94,42 +96,43 @@ class Pipeline(ABC):
         if iterations:
             Pipeline.iterations = iterations
 
-        with keepawake(keep_screen_awake=False):
-            curr = 1
-            try:
-                while True:
-                    result = self.step()
-                    self.progress()
+        if platform.system() != "Linux" or os.environ["XDG_SESSION_TYPE"] != "tty":
+            set_keepawake()
 
-                    curr += 1
+        curr = 1
+        try:
+            while True:
+                result = self.step()
+                self.progress()
 
-                    if not result.continue_pipeline or (
-                        iterations and curr >= iterations + 1
-                    ):
-                        if self._progressbar:
-                            self._progressbar.close()
+                curr += 1
 
-                        if (
-                            "timings" in self._runtime_config
-                            and self._runtime_config["timings"]
-                        ):
-                            print("Average Runtime per stage:")
-                            self.stage.get_time().print_to_console()
-
-                        self.stage.on_destroy()
-
-                        return
-            except KeyboardInterrupt as exc:
-                if (
-                    "timings" in self._runtime_config
-                    and self._runtime_config["timings"]
+                if not result.continue_pipeline or (
+                    iterations and curr >= iterations + 1
                 ):
-                    print("Average Runtime per stage:")
-                    self.stage.get_time().print_to_console()
+                    if self._progressbar:
+                        self._progressbar.close()
 
-                self.stage.on_destroy()
+                    if (
+                        "timings" in self._runtime_config
+                        and self._runtime_config["timings"]
+                    ):
+                        print("Average Runtime per stage:")
+                        self.stage.get_time().print_to_console()
 
-                raise exc
+                    self.stage.on_destroy()
+                    unset_keepawake()
+
+                    return
+        except KeyboardInterrupt as exc:
+            if "timings" in self._runtime_config and self._runtime_config["timings"]:
+                print("Average Runtime per stage:")
+                self.stage.get_time().print_to_console()
+
+            self.stage.on_destroy()
+            unset_keepawake()
+
+            raise exc
 
     def get(self, stage_type: Callable):
         """
