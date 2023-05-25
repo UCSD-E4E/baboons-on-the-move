@@ -6,6 +6,7 @@ from abc import ABC
 import inspect
 from typing import Callable, List
 from tqdm import tqdm
+from wakepy import keepawake
 
 from pipeline.parent_stage import ParentStage
 
@@ -13,8 +14,6 @@ from pipeline.stage import Stage
 from pipeline.serial import Serial
 from pipeline.parallel import Parallel
 from pipeline.stage_result import StageResult
-
-from library.caf import Caffine
 
 
 class Pipeline(ABC):
@@ -95,43 +94,42 @@ class Pipeline(ABC):
         if iterations:
             Pipeline.iterations = iterations
 
-        caf = Caffine()
-        request_id = caf.request()
+        with keepawake(keep_screen_awake=False):
+            curr = 1
+            try:
+                while True:
+                    result = self.step()
+                    self.progress()
 
-        curr = 1
-        try:
-            while True:
-                result = self.step()
-                self.progress()
+                    curr += 1
 
-                curr += 1
-
-                if not result.continue_pipeline or (
-                    iterations and curr >= iterations + 1
-                ):
-                    if self._progressbar:
-                        self._progressbar.close()
-
-                    if (
-                        "timings" in self._runtime_config
-                        and self._runtime_config["timings"]
+                    if not result.continue_pipeline or (
+                        iterations and curr >= iterations + 1
                     ):
-                        print("Average Runtime per stage:")
-                        self.stage.get_time().print_to_console()
+                        if self._progressbar:
+                            self._progressbar.close()
 
-                    self.stage.on_destroy()
-                    caf.release(request_id)
+                        if (
+                            "timings" in self._runtime_config
+                            and self._runtime_config["timings"]
+                        ):
+                            print("Average Runtime per stage:")
+                            self.stage.get_time().print_to_console()
 
-                    return
-        except KeyboardInterrupt as exc:
-            if "timings" in self._runtime_config and self._runtime_config["timings"]:
-                print("Average Runtime per stage:")
-                self.stage.get_time().print_to_console()
+                        self.stage.on_destroy()
 
-            self.stage.on_destroy()
-            caf.release(request_id)
+                        return
+            except KeyboardInterrupt as exc:
+                if (
+                    "timings" in self._runtime_config
+                    and self._runtime_config["timings"]
+                ):
+                    print("Average Runtime per stage:")
+                    self.stage.get_time().print_to_console()
 
-            raise exc
+                self.stage.on_destroy()
+
+                raise exc
 
     def get(self, stage_type: Callable):
         """
