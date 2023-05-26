@@ -141,7 +141,6 @@ class Optimize(CliPlugin):
         cache_known_idx_ref = storage_ref.child("known_idx")
         cache_known_idx = cache_known_idx_ref.get() or []
         current_idx_ref = storage_ref.child("current_idx")
-        working_idx_ref = storage_ref.child("working_idx")
         last_update_ref = storage_ref.child("last_update")
 
         max_recall_ref = storage_ref.child("max_recall")
@@ -151,15 +150,9 @@ class Optimize(CliPlugin):
         path = f"{dataset_path}/img"
         ground_truth_path = f"{dataset_path}/gt/gt.txt"
 
-        working_idx = set(working_idx_ref.get() or [])
-
         known_idx = set(known_idx).difference(current_idx)
         self._print(str(known_idx))
         for idx in known_idx:
-            # Store the value we are working on so that we don't repeat work.
-            working_idx.add(int(idx))
-            working_idx_ref.set(list(working_idx))
-
             self._print(
                 "=" * 3
                 + f"{video_file}:{enable_tracking}:{enable_persist}:{max_width}:{max_height}:{allow_overlap}"
@@ -290,12 +283,7 @@ class Optimize(CliPlugin):
             max_f1_ref.set(self._max_f1)
             current_idx_ref.set(current_idx)
             last_update_ref.set(datetime.utcnow().isoformat())
-
-            working_idx = set(working_idx_ref.get() or [])
-            if int(idx) in working_idx:
-                working_idx.remove(int(idx))
-            working_idx_ref.set(list(working_idx))
-
+            
             current_outputs = np.array(y[current_idx, :])
             current_outputs_order = np.argsort(current_outputs[:, 0])
             current_outputs = current_outputs[current_outputs_order, :]
