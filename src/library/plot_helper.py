@@ -3,7 +3,7 @@ Helpers for plotting results for Spot paper.
 """
 
 import math
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -28,7 +28,10 @@ def get_video_files_dict(dataset_name: str) -> Dict[str, str]:
             "Video 7": "VISO/car/009",
         }
     elif dataset_name.lower() == "baboons":
-        return {"Video 1": "Baboons/NeilThomas/001"}
+        return {
+            "Video 1": "Baboons/NeilThomas/001",
+            "Video 2": "Baboons/NeilThomas/002",
+        }
 
     raise Exception(f"{dataset_name} does not exist.")
 
@@ -48,7 +51,7 @@ def get_video_files(dataset_name: str) -> List[str]:
             "VISO/car/009",
         ]
     elif dataset_name.lower() == "baboons":
-        return ["Baboons/NeilThomas/001"]
+        return ["Baboons/NeilThomas/001", "Baboons/NeilThomas/002"]
 
     raise Exception(f"{dataset_name} does not exist.")
 
@@ -109,8 +112,8 @@ def get_dataset_results(
     dataset_name: str,
     enable_tracking=True,
     enable_persist=False,
-    max_width: int = None,
-    max_height: int = None,
+    max_width: int or Tuple[int, int] = None,
+    max_height: int or Tuple[int, int] = None,
     allow_overlap=False,
     disable_network=False,
     video_file_override: List[str] = None,
@@ -129,7 +132,16 @@ def get_dataset_results(
         ]
     )
 
-    for name, dataset in get_video_files_dict(dataset_name).items():
+    count = len(get_video_files_dict(dataset_name).items())
+    if type(max_width) is not tuple:
+        max_width = (max_width,) * count
+
+    if type(max_height) is not tuple:
+        max_height = (max_height,) * count
+
+    for width, height, (name, dataset) in zip(
+        max_width, max_height, get_video_files_dict(dataset_name).items()
+    ):
         if video_file_override and name not in video_file_override:
             continue
 
@@ -137,8 +149,8 @@ def get_dataset_results(
             dataset,
             enable_tracking=enable_tracking,
             enable_persist=enable_persist,
-            max_width=max_width,
-            max_height=max_height,
+            max_width=width,
+            max_height=height,
             allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
@@ -147,8 +159,8 @@ def get_dataset_results(
             dataset,
             enable_tracking,
             enable_persist,
-            max_width=max_width,
-            max_height=max_height,
+            max_width=width,
+            max_height=height,
             allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
@@ -625,6 +637,13 @@ def plot_pareto_front(
     rows = math.ceil(rows_total)
     axs_to_delete = round((math.ceil(rows_total) - rows_total) * cols)
 
+    count = len(get_video_files_dict(dataset_name).items())
+    if type(max_width) is not tuple:
+        max_width = (max_width,) * count
+
+    if type(max_height) is not tuple:
+        max_height = (max_height,) * count
+
     fig, axs = plt.subplots(
         nrows=rows,
         ncols=cols,
@@ -635,12 +654,17 @@ def plot_pareto_front(
         fig.delaxes(axs[rows - 1][cols - 1 - i])
 
     dataset_dict = get_video_files_dict(dataset_name)
-    for idx, video_file in enumerate(video_files):
+    for width, height, (idx, video_file) in zip(
+        max_width, max_height, enumerate(video_files)
+    ):
         video_name = [k for k, v in dataset_dict.items() if v == video_file][0]
         r, c = _get_row_col(idx)
 
         if len(video_files) > 1:
-            ax = axs[r, c]
+            if rows > 1:
+                ax = axs[r, c]
+            else:
+                ax = axs[c]
         else:
             ax = axs
 
@@ -649,8 +673,8 @@ def plot_pareto_front(
             video_name,
             video_file,
             ax,
-            max_width=max_width,
-            max_height=max_height,
+            max_width=width,
+            max_height=height,
             allow_overlap=allow_overlap,
             ref_video_file=ref_video_file,
             hide_title=len(video_files) <= 1,
@@ -668,7 +692,10 @@ def plot_pareto_front(
             idx = 1
 
     if len(video_files) > 1:
-        ax = axs[idx, 0]
+        if rows > 1:
+            ax = axs[idx, 0]
+        else:
+            ax = axs[idx]
     else:
         ax = axs
 
@@ -987,13 +1014,22 @@ def get_sample_count(
     video_files = get_video_files_dict(dataset_name)
     data = []
 
-    for video_name, dataset in video_files.items():
+    count = len(video_files.items())
+    if type(max_width) is not tuple:
+        max_width = (max_width,) * count
+
+    if type(max_height) is not tuple:
+        max_height = (max_height,) * count
+
+    for width, height, (video_name, dataset) in zip(
+        max_width, max_height, video_files.items()
+    ):
         _, y, current_idx, _ = get_design_space(
             dataset,
             True,
             False,
-            max_width=max_width,
-            max_height=max_height,
+            max_width=width,
+            max_height=height,
             allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
@@ -1002,8 +1038,8 @@ def get_sample_count(
             dataset,
             True,
             False,
-            max_width=max_width,
-            max_height=max_height,
+            max_width=width,
+            max_height=height,
             allow_overlap=allow_overlap,
             disable_network=disable_network,
         )
