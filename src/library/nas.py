@@ -9,6 +9,7 @@ import getpass
 from os import getenv, makedirs
 from genericpath import exists
 from synology_api import filestation
+from synology_api.exceptions import FileStationError
 from tqdm import tqdm
 
 
@@ -135,13 +136,16 @@ class NAS:
         Checks to see if the given directory exists.
         """
 
-        parent = "/".join(path.split("/")[:-1])
-        result = self._file_station.get_file_list(parent)
+        try:
+            parent = "/".join(path.split("/")[:-1])
+            result = self._file_station.get_file_list(parent)
 
-        if "success" not in result or not result["success"]:
+            if "success" not in result or not result["success"]:
+                return False
+
+            return any(f for f in result["data"]["files"] if f["path"] == path)
+        except:
             return False
-
-        return any(f for f in result["data"]["files"] if f["path"] == path)
 
     def create_folder(self, path: str):
         """

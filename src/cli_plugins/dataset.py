@@ -51,11 +51,16 @@ class Dataset(CliPlugin):
             "-s",
             "--start",
             default=90,
+            type=int,
             help="Provides the start frame for the dataset.",
         )
 
         parser.add_argument(
-            "-e", "--end", default=419, help="Provides the end frame for the dataset."
+            "-e",
+            "--end",
+            default=419,
+            type=int,
+            help="Provides the end frame for the dataset.",
         )
 
         parser.add_argument(
@@ -262,7 +267,7 @@ class Dataset(CliPlugin):
     def execute(self, args: Namespace):
         dataset_path = f"./data/Datasets/{args.name}"
 
-        # self._generate_img(args.video, args.start, args.end, dataset_path)
+        self._generate_img(args.video, args.start, args.end, dataset_path)
         self._generate_gt(
             args.xml, args.start, args.end, args.enable_motion_only, dataset_path
         )
