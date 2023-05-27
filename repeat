@@ -4,6 +4,8 @@
 # cd $SCRIPT_RELATIVE_DIR
 # DIR=`pwd`
 
+. ~/.bashrc
+
 cd ~/Repos/school/baboon-tracking
 
 while true
