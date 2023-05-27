@@ -1,4 +1,4 @@
-#!/bin/bash -i
+#!/bin/bash
 
 # SCRIPT_RELATIVE_DIR=$(dirname "${BASH_SOURCE[0]}")
 # cd $SCRIPT_RELATIVE_DIR
@@ -6,7 +6,13 @@
 
 cd ~/Repos/school/baboon-tracking
 
-while true
-do
-    git pull && ./cli optimize -d $DATASET -t yes -p no -w $MAX_WIDTH -l $MAX_HEIGHT -o $ALLOW_OVERLAP
-done
+echo "#!/bin/bash" > do_repeat.sh
+cat ~/.bashrc >> do_repeat.sh
+
+echo while true >> do_repeat.sh
+echo do >> do_repeat.sh
+echo '  git pull && ./cli optimize -d $DATASET -t yes -p no -w $MAX_WIDTH -l $MAX_HEIGHT -o $ALLOW_OVERLAP' >> do_repeat.sh
+echo done >> do_repeat.sh
+
+chmod +x ./do_repeat.sh
+./do_repeat.sh
