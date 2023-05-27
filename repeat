@@ -1,10 +1,8 @@
-#!/bin/bash
+#!/bin/bash -i
 
 # SCRIPT_RELATIVE_DIR=$(dirname "${BASH_SOURCE[0]}")
 # cd $SCRIPT_RELATIVE_DIR
 # DIR=`pwd`
-
-. ~/.bashrc
 
 cd ~/Repos/school/baboon-tracking
 
