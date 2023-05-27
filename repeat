@@ -5,6 +5,7 @@
 # DIR=`pwd`
 
 cd ~/Repos/school/baboon-tracking
+git pull
 
 echo "#!/bin/bash" > do_repeat.sh
 cat ~/.bashrc >> do_repeat.sh

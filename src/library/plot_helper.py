@@ -487,7 +487,7 @@ def maximum_value_in_column(column):
 
     max_highlight = "background-color: red;"
     second_highlight = "background-color: blue;"
-    third_highlight = ""  # "background-color: gray;"
+    third_highlight = "background-color: gray;"
     default = ""
 
     maximum_in_column = column.max()
