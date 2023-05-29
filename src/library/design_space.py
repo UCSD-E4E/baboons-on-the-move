@@ -195,7 +195,7 @@ def get_pareto_front(
     allow_overlap=False,
     disable_network=False,
 ):
-    _, y, current_idx, known_idx = get_design_space(
+    _, y, current_idx, _ = get_design_space(
         video_file,
         enable_tracking,
         enable_persist,
@@ -208,10 +208,10 @@ def get_pareto_front(
     current_idx = np.array(current_idx)
     current_outputs = np.array(y[current_idx, :])
 
-    known_idx = np.array(known_idx)
+    current_idx = np.array(current_idx)
 
     ypredict, ypredict_idx, _ = approximate_pareto(current_outputs)
-    ypredict_idx = known_idx[ypredict_idx].flatten()
+    ypredict_idx = current_idx[ypredict_idx].flatten()
 
     return ypredict, ypredict_idx
 

@@ -3,6 +3,7 @@ Implements a particle filter.
 """
 
 from math import cos, pi, sin, sqrt
+from multiprocessing import Semaphore
 from random import random
 from typing import Dict, List, Tuple
 import numpy as np
@@ -137,6 +138,7 @@ class ParticleFilter:
     """
 
     _instance_id = 0
+    _lock = Semaphore()
 
     def __init__(self, baboon: Region, particle_count: int):
         self._particle_count = particle_count
@@ -150,8 +152,9 @@ class ParticleFilter:
         ]
         self._add_particle_history("initial", self.particles)
 
-        self.instance_id = ParticleFilter._instance_id
-        ParticleFilter._instance_id += 1
+        with ParticleFilter._lock:
+            self.instance_id = ParticleFilter._instance_id
+            ParticleFilter._instance_id += 1
 
         bayesian_baboon.identity = self.instance_id
         bayesian_baboon.id_str = str(self.instance_id)
