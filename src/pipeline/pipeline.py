@@ -40,6 +40,9 @@ class Pipeline(ABC):
             self_pdtTimeDelta
         )
 
+        with open("./output/update", "w", encoding="utf8") as f:
+            f.write(f"{self._last_print_time}\n")
+
         if parallel:
             self.stage = Parallel(name, runtime_config, *stage_types)
         else:
@@ -172,6 +175,10 @@ class Pipeline(ABC):
 
         if (now - self._last_print_time).seconds >= 5 * 60:
             tqdm.write(now)
+
+            with open("./output/update", "w", encoding="utf8") as f:
+                f.write(f"{now}\n")
+
             self._last_print_time = now
 
         self._progressbar.update(1)
