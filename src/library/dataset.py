@@ -71,6 +71,9 @@ def get_dataset_motion_results(
     Gets the motion results for a particular video file from the NAS.
     """
 
+    if not dataset_motion_results_exists(video_file, idx, config_hash):
+        return False
+
     if exists("./output/results.db"):
         unlink("./output/results.db")
 
@@ -82,8 +85,13 @@ def get_dataset_motion_results(
         f"/baboons/Results/{video_file}/{config_hash}/{idx}/results.db.7z", "./output"
     )
 
-    with py7zr.SevenZipFile("./output/results.db.7z", "r") as archive:
-        archive.extractall()
+    try:
+        with py7zr.SevenZipFile("./output/results.db.7z", "r") as archive:
+            archive.extractall()
+
+        return True
+    except py7zr.Bad7zFile:
+        return False
 
 
 def save_dataset_motion_results(

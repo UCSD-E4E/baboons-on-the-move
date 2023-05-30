@@ -170,14 +170,11 @@ class Optimize(CliPlugin):
 
                     set_config_part(key, config_value)
 
-                if not dataset_motion_results_exists(video_file, idx, config_hash):
+                if not get_dataset_motion_results(video_file, idx, config_hash):
                     MotionTrackerPipeline(
                         path, runtime_config=self._runtime_config
                     ).run()
                     save_dataset_motion_results(video_file, idx, config_hash)
-                else:
-                    self._print("Using previous motion results...")
-                    get_dataset_motion_results(video_file, idx, config_hash)
 
                 SqliteParticleFilterPipeline(
                     path, runtime_config=self._runtime_config
@@ -283,7 +280,7 @@ class Optimize(CliPlugin):
             max_f1_ref.set(self._max_f1)
             current_idx_ref.set(current_idx)
             last_update_ref.set(datetime.utcnow().isoformat())
-            
+
             current_outputs = np.array(y[current_idx, :])
             current_outputs_order = np.argsort(current_outputs[:, 0])
             current_outputs = current_outputs[current_outputs_order, :]

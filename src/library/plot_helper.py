@@ -1024,7 +1024,7 @@ def get_sample_count(
     for width, height, (video_name, dataset) in zip(
         max_width, max_height, video_files.items()
     ):
-        _, y, current_idx, _ = get_design_space(
+        _, y, _, known_idx = get_design_space(
             dataset,
             True,
             False,
@@ -1047,8 +1047,8 @@ def get_sample_count(
         data.append(
             [
                 video_name,
-                len(current_idx),
-                f"{round(len(current_idx) / float(y.shape[0]) * 10000) / 100}%",
+                len(known_idx),
+                f"{round(len(known_idx) / float(y.shape[0]) * 10000) / 100}%",
                 ypredict.shape[0],
             ]
         )
