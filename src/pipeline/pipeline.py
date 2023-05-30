@@ -6,6 +6,7 @@ from abc import ABC
 import inspect
 import os
 import platform
+import datetime
 from typing import Callable, List
 from tqdm import tqdm
 from wakepy import set_keepawake, unset_keepawake
@@ -34,6 +35,10 @@ class Pipeline(ABC):
         self.name = name
         self._runtime_config = runtime_config
         self._progressbar: tqdm = None
+        self_pdtTimeDelta = datetime.timedelta(hours=-7)
+        self._last_print_time: datetime = datetime.datetime.utcnow().astimezone(
+            self_pdtTimeDelta
+        )
 
         if parallel:
             self.stage = Parallel(name, runtime_config, *stage_types)
@@ -160,7 +165,13 @@ class Pipeline(ABC):
         ):
             return
 
+        now = datetime.datetime.utcnow().astimezone(self._pdtTimeDelta)
+
         if self._progressbar is None:
             self._progressbar = tqdm(total=int(Pipeline.iterations), position=0)
+
+        if (now - self._last_print_time).seconds >= 5 * 60:
+            tqdm.write(now)
+            self._last_print_time = now
 
         self._progressbar.update(1)
