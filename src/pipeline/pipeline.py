@@ -174,7 +174,7 @@ class Pipeline(ABC):
             self._progressbar = tqdm(total=int(Pipeline.iterations), position=0)
 
         if (now - self._last_print_time).seconds >= 5 * 60:
-            tqdm.write(now)
+            tqdm.write(str(now))
 
             with open("./output/update", "w", encoding="utf8") as f:
                 f.write(f"{now}\n")
