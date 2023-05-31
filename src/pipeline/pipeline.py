@@ -35,9 +35,9 @@ class Pipeline(ABC):
         self.name = name
         self._runtime_config = runtime_config
         self._progressbar: tqdm = None
-        self_pdtTimeDelta = datetime.timedelta(hours=-7)
+        self_pdtTimeZone = datetime.timezone(datetime.timedelta(hours=-7))
         self._last_print_time: datetime = datetime.datetime.utcnow().astimezone(
-            self_pdtTimeDelta
+            self_pdtTimeZone
         )
 
         with open("./output/update", "w", encoding="utf8") as f:
