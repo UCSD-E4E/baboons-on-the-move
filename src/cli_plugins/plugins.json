@@ -26,15 +26,6 @@
             "description": "Generates flowchart dynamically from code"
         },
         {
-            "module": "code",
-            "class": "Code",
-            "subcommands": [
-                "code",
-                "vscode"
-            ],
-            "description": "Opens VSCode with designated plugins"
-        },
-        {
             "module": "compare",
             "class": "Compare",
             "subcommands": [
