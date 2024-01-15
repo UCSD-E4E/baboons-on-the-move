@@ -11,6 +11,8 @@ from genericpath import exists
 from synology_api import filestation
 from synology_api.exceptions import FileStationError
 from tqdm import tqdm
+import shlex
+from subprocess import PIPE, CompletedProcess, run
 
 
 class NAS:
@@ -19,7 +21,7 @@ class NAS:
     """
 
     def __init__(self):
-        username, password, hostname, port = self._get_nas_parameters()
+        username, password, totp, hostname, port = self._get_nas_parameters()
 
         self._file_station = filestation.FileStation(
             hostname,
@@ -30,12 +32,13 @@ class NAS:
             cert_verify=False,
             dsm_version=7,
             debug=False,
-            otp_code=None,
+            otp_code=totp,
         )
 
     def _get_credentials(self):
         username = getenv("NAS_USER_NAME")
         password = getenv("NAS_PASSWORD")
+        totp_command = getenv("NAS_TOTP_COMMAND")
 
         username_token = None
         password_token = None
@@ -59,16 +62,21 @@ class NAS:
         with open("./nas_token.pickle", "wb") as f:
             pickle.dump((username, password), f)
 
-        return username, password
+        totp = None
+        if totp_command:
+            totp_result: CompletedProcess = run(shlex.split(totp_command), stdout=PIPE)
+            totp = totp_result.stdout.decode("utf8")
+
+        return username, password, totp
 
     def _get_nas_parameters(self):
-        username, password = self._get_credentials()
+        username, password, totp = self._get_credentials()
         with open("./decrypted/nas.json", "r", encoding="utf8") as f:
             nas_config = json.load(f)
             hostname = nas_config["hostname"]
             port = nas_config["port"]
 
-        return username, password, hostname, port
+        return username, password, totp, hostname, port
 
     def list_structure(self, path: str, recursive=False):
         """
