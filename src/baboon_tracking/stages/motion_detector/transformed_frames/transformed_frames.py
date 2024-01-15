@@ -9,8 +9,8 @@ from baboon_tracking.stages.motion_detector.transformed_frames.compute_shifted_m
 from baboon_tracking.stages.motion_detector.transformed_frames.shift_history_frames import (
     ShiftHistoryFrames,
 )
-from pipeline.parallel import Parallel
-from pipeline.decorators import runtime_config
+from bom_pipeline.parallel import Parallel
+from bom_pipeline.decorators import runtime_config
 
 
 @runtime_config("rconfig")

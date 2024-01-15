@@ -5,8 +5,8 @@ from typing import Callable, Dict, List, Tuple
 import cv2
 
 from baboon_tracking.models.frame import Frame
-from pipeline.decorators import runtime_config
-from pipeline.stage_result import StageResult
+from bom_pipeline.decorators import runtime_config
+from bom_pipeline.stage_result import StageResult
 
 
 def save_img_result(function: Callable):

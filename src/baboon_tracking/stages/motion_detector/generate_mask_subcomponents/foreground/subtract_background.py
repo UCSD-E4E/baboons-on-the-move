@@ -10,9 +10,9 @@ from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMix
 from baboon_tracking.mixins.unioned_frames_mixin import UnionedFramesMixin
 from baboon_tracking.mixins.weights_mixin import WeightsMixin
 from baboon_tracking.models.frame import Frame
-from pipeline import Stage
-from pipeline.decorators import config, stage
-from pipeline.stage_result import StageResult
+from bom_pipeline import Stage
+from bom_pipeline.decorators import config, stage
+from bom_pipeline.stage_result import StageResult
 
 
 @stage("preprocessed_frame")

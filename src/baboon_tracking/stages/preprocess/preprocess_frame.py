@@ -10,8 +10,8 @@ from baboon_tracking.stages.preprocess.convert_from_bgr2gray import ConvertFromB
 
 # from baboon_tracking.stages.preprocess.denoise import Denoise
 # from baboon_tracking.stages.preprocess.denoise_color import DenoiseColor
-from pipeline import Serial
-from pipeline.decorators import runtime_config
+from bom_pipeline import Serial
+from bom_pipeline.decorators import runtime_config
 
 
 @runtime_config("rconfig")

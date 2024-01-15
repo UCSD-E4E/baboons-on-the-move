@@ -5,9 +5,9 @@ Implements a storage of historical frame step for motion detection.
 from rx.subject import Subject
 from baboon_tracking.mixins.history_frames_mixin import HistoryFramesMixin
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
-from pipeline import Stage
-from pipeline.decorators import config, stage
-from pipeline.stage_result import StageResult
+from bom_pipeline import Stage
+from bom_pipeline.decorators import config, stage
+from bom_pipeline.stage_result import StageResult
 
 
 @config(

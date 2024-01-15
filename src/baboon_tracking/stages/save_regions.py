@@ -11,8 +11,8 @@ from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.region import Region
 from baboon_tracking.stages.sqlite_base import SqliteBase
 
-from pipeline.decorators import stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.decorators import stage
+from bom_pipeline.stage_result import StageResult
 
 
 @stage("baboons")

@@ -12,10 +12,10 @@ from baboon_tracking.decorators.save_img_result import save_img_result
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.models.region import Region
 from baboon_tracking.models.frame import Frame
-from pipeline.parent_stage import ParentStage
+from bom_pipeline.parent_stage import ParentStage
 
-from pipeline.stage import Stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.stage import Stage
+from bom_pipeline.stage_result import StageResult
 
 
 @show_result

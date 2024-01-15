@@ -8,8 +8,8 @@ from baboon_tracking.stages.particle_filter import ParticleFilterStage as Partic
 from baboon_tracking.stages.save_computed_regions import SaveComputedRegions
 from baboon_tracking.stages.save_hysteresis_regions import SaveHysteresisRegions
 from baboon_tracking.stages.test_exit import TestExit
-from pipeline.pipeline import Pipeline
-from pipeline.factory import factory
+from bom_pipeline.pipeline import Pipeline
+from bom_pipeline.factory import factory
 
 
 class SqliteParticleFilterPipeline(Pipeline):

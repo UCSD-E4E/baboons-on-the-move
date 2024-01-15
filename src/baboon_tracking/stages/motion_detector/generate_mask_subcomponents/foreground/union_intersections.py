@@ -5,9 +5,9 @@ import numpy as np
 
 from baboon_tracking.mixins.intersected_frames_mixin import IntersectedFramesMixin
 from baboon_tracking.mixins.unioned_frames_mixin import UnionedFramesMixin
-from pipeline import Stage
-from pipeline.decorators import stage
-from pipeline.stage_result import StageResult
+from bom_pipeline import Stage
+from bom_pipeline.decorators import stage
+from bom_pipeline.stage_result import StageResult
 
 
 @stage("intersected_frames")

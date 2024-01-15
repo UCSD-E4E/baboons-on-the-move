@@ -335,6 +335,24 @@ webencodings = "*"
 css = ["tinycss2 (>=1.1.0,<1.3)"]
 
 [[package]]
+name = "bom-pipeline"
+version = "0.1.0"
+description = ""
+optional = false
+python-versions = "^3.11"
+files = []
+develop = false
+
+[package.dependencies]
+wakepy = "^0.7.2"
+
+[package.source]
+type = "git"
+url = "git@github.com:UCSD-E4E/bom-pipeline.git"
+reference = "HEAD"
+resolved_reference = "8e6299db36d946f3d86b502c867f8d9cb1c8c309"
+
+[[package]]
 name = "brotli"
 version = "1.1.0"
 description = "Python bindings for the Brotli compression library"
@@ -5902,4 +5920,4 @@ test = ["hypothesis", "packaging", "pytest", "pytest-cov"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.11,<3.12"
-content-hash = "7f5a09b5a80c00e9a625165bf12699603026da630a5d324835ead3e0f05c4ee5"
+content-hash = "e4da33b52864df1cf8964d01638f6c1da7fb9c93981cace16b030ee175f5cd89"

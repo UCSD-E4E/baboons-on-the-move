@@ -4,8 +4,8 @@ Tests for the press of the "Q" key or the end of the video.
 
 import cv2
 
-from pipeline import Stage
-from pipeline.stage_result import StageResult
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
 
 
 class TestExit(Stage):

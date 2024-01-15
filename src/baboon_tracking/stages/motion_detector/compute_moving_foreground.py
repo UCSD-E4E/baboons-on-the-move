@@ -13,9 +13,9 @@ from baboon_tracking.mixins.history_of_dissimilarity_mixin import (
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.mixins.weights_mixin import WeightsMixin
 from baboon_tracking.models.frame import Frame
-from pipeline import Stage
-from pipeline.stage_result import StageResult
-from pipeline.decorators import config, stage
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
+from bom_pipeline.decorators import config, stage
 
 
 @stage("history_of_dissimilarity")

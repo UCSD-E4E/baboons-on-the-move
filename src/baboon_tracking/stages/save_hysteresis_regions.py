@@ -5,8 +5,8 @@ from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.bayesian_region import BayesianRegion
 from baboon_tracking.models.region import Region
 from baboon_tracking.stages.save_regions import SaveRegions
-from pipeline.decorators import stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.decorators import stage
+from bom_pipeline.stage_result import StageResult
 
 
 @stage("baboons")

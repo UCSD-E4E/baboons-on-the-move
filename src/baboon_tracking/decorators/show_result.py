@@ -9,8 +9,8 @@ import cv2
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.models.frame import Frame
 
-from pipeline.stage_result import StageResult
-from pipeline.decorators import runtime_config, stage
+from bom_pipeline.stage_result import StageResult
+from bom_pipeline.decorators import runtime_config, stage
 
 
 def _get_img_size(capture: CaptureMixin):

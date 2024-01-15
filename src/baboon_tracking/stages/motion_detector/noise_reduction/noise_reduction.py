@@ -11,8 +11,8 @@ from baboon_tracking.stages.motion_detector.noise_reduction.group_filter import 
 from baboon_tracking.stages.motion_detector.noise_reduction.hysteresis_filter import (
     HysteresisFilter,
 )
-from pipeline import ConfigSerial
-from pipeline.decorators import runtime_config
+from bom_pipeline import ConfigSerial
+from bom_pipeline.decorators import runtime_config
 
 
 @runtime_config("rconfig")

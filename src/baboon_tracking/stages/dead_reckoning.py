@@ -15,8 +15,8 @@ from baboon_tracking.models.region import Region
 from library.region import bb_intersection_over_union
 from library.utils import flatten
 from pipeline import Stage
-from pipeline.stage_result import StageResult
-from pipeline.decorators import config, stage
+from bom_pipeline.stage_result import StageResult
+from bom_pipeline.decorators import config, stage
 
 
 @config("dist_threshold", "dead_reckoning/dist_threshold")

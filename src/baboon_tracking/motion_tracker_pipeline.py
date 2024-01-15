@@ -1,8 +1,9 @@
 """
 Provides an algorithm for extracting motion regions from drone footage.
 """
-from pipeline.pipeline import Pipeline
-from pipeline.factory import factory
+from bom_pipeline.pipeline import Pipeline
+from bom_pipeline.factory import factory
+from bom_pipeline.initializer import Initializer
 
 from baboon_tracking.decorators.debug import DisplayDebugRegions
 from baboon_tracking.stages.get_video_frame import GetVideoFrame
@@ -22,6 +23,7 @@ class MotionTrackerPipeline(Pipeline):
         Pipeline.__init__(
             self,
             "MotionTrackerPipeline",
+            Initializer(),
             factory(GetVideoFrame, video_path),
             PreprocessFrame,
             MotionDetector,

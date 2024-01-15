@@ -8,9 +8,9 @@ from numba import jit, prange
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.moving_foreground_mixin import MovingForegroundMixin
 from baboon_tracking.models.frame import Frame
-from pipeline import Stage
-from pipeline.decorators import config, stage
-from pipeline.stage_result import StageResult
+from bom_pipeline import Stage
+from bom_pipeline.decorators import config, stage
+from bom_pipeline.stage_result import StageResult
 
 
 @jit(nopython=True)

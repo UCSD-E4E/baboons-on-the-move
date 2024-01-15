@@ -7,9 +7,9 @@ import numpy as np
 from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.preprocessed_frame_mixin import PreprocessedFrameMixin
 from baboon_tracking.models.frame import Frame
-from pipeline.decorators import stage, config
-from pipeline import Stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.decorators import stage, config
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
 
 
 @show_result

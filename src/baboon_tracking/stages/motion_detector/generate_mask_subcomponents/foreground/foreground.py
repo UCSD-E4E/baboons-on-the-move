@@ -15,8 +15,8 @@ from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foregrou
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foreground.union_intersections import (
     UnionIntersections,
 )
-from pipeline import Serial
-from pipeline.decorators import runtime_config
+from bom_pipeline import Serial
+from bom_pipeline.decorators import runtime_config
 
 
 @runtime_config("rconfig")

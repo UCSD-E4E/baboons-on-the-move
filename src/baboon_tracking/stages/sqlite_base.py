@@ -8,9 +8,9 @@ from typing import Dict
 import git
 import backoff
 from library.config import get_config
-from pipeline.parent_stage import ParentStage
-from pipeline.pipeline import Pipeline
-from pipeline.stage import Stage
+from bom_pipeline.parent_stage import ParentStage
+from bom_pipeline.pipeline import Pipeline
+from bom_pipeline.stage import Stage
 
 
 class SqliteBase(Stage, ABC):

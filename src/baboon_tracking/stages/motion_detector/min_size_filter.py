@@ -4,9 +4,9 @@ A filter that ensures blobs are of a minimum size.
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.region import Region
 
-from pipeline import Stage
-from pipeline.stage_result import StageResult
-from pipeline.decorators import stage, config
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
+from bom_pipeline.decorators import stage, config
 
 
 @config("min_size", "motion_detector/min_size_filter/min_size")

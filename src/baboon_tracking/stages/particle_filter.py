@@ -19,9 +19,9 @@ from baboon_tracking.mixins.particle_filter_history_mixin import (
 from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.models.particle_filter import ParticleFilter
 from library.utils import flatten
-from pipeline import Stage
-from pipeline.stage_result import StageResult
-from pipeline.decorators import runtime_config, stage
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
+from bom_pipeline.decorators import runtime_config, stage
 
 
 def process_pool(

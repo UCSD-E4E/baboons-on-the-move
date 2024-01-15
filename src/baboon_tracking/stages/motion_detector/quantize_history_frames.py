@@ -6,9 +6,9 @@ from baboon_tracking.mixins.shifted_history_frames_mixin import (
 )
 from baboon_tracking.models.frame import Frame
 from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
-from pipeline.decorators import config, stage
-from pipeline.stage import Stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.decorators import config, stage
+from bom_pipeline.stage import Stage
+from bom_pipeline.stage_result import StageResult
 
 
 @config(

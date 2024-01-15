@@ -9,9 +9,9 @@ from baboon_tracking.mixins.transformation_matrices_mixin import (
     TransformationMatricesMixin,
 )
 from baboon_tracking.models.frame import Frame
-from pipeline.decorators import config, stage
-from pipeline.stage import Stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.decorators import config, stage
+from bom_pipeline.stage import Stage
+from bom_pipeline.stage_result import StageResult
 from third_party.ssc import ssc
 
 

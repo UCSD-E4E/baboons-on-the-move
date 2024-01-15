@@ -8,9 +8,9 @@ from baboon_tracking.mixins.quantized_frames_mixin import QuantizedFramesMixin
 from baboon_tracking.mixins.weights_mixin import WeightsMixin
 from baboon_tracking.decorators.save_img_result import save_img_result
 from library.utils import scale_ndarray
-from pipeline import Stage
-from pipeline.stage_result import StageResult
-from pipeline.decorators import stage
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
+from bom_pipeline.decorators import stage
 
 
 @stage("quantized_frames")

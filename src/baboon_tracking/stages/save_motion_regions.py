@@ -15,8 +15,8 @@ from baboon_tracking.mixins.transformation_matrices_mixin import (
 )
 from baboon_tracking.stages.save_regions import SaveRegions
 from baboon_tracking.stages.sqlite_base import SqliteBase
-from pipeline.decorators import stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.decorators import stage
+from bom_pipeline.stage_result import StageResult
 
 
 @stage("baboons")

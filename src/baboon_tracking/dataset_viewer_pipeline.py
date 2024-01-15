@@ -5,8 +5,8 @@ from baboon_tracking.stages.get_region_file_region import (
     # GetGroundTruthRegion,
     GetRegionFileRegion,
 )
-from pipeline.factory import factory
-from pipeline.pipeline import Pipeline
+from bom_pipeline.factory import factory
+from bom_pipeline.pipeline import Pipeline
 
 
 class DatasetViewerPipeline(Pipeline):

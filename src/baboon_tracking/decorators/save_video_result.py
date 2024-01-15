@@ -8,9 +8,9 @@ import pathlib
 import cv2
 from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.models.frame import Frame
-from pipeline.decorators import runtime_config, stage
+from bom_pipeline.decorators import runtime_config, stage
 
-from pipeline.stage_result import StageResult
+from bom_pipeline.stage_result import StageResult
 
 
 def save_video_result(function: Callable):

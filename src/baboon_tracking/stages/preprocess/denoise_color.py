@@ -6,9 +6,9 @@ from baboon_tracking.decorators.show_result import show_result
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 
 from baboon_tracking.models.frame import Frame
-from pipeline import Stage
-from pipeline.stage_result import StageResult
-from pipeline.decorators import stage
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
+from bom_pipeline.decorators import stage
 
 
 @stage("frame")

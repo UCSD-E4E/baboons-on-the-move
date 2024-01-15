@@ -10,9 +10,9 @@ from baboon_tracking.mixins.capture_mixin import CaptureMixin
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from baboon_tracking.models.frame import Frame
 
-from pipeline.pipeline import Pipeline
-from pipeline import Stage
-from pipeline.stage_result import StageResult
+from bom_pipeline.pipeline import Pipeline
+from bom_pipeline import Stage
+from bom_pipeline.stage_result import StageResult
 
 
 class GetVideoFrame(Stage, FrameMixin, CaptureMixin):

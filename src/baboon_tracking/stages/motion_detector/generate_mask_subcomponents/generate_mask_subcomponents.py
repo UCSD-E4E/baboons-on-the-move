@@ -9,8 +9,8 @@ from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.foregrou
 from baboon_tracking.stages.motion_detector.generate_mask_subcomponents.generate_history_of_dissimilarity import (
     GenerateHistoryOfDissimilarity,
 )
-from pipeline import Parallel
-from pipeline.decorators import runtime_config
+from bom_pipeline import Parallel
+from bom_pipeline.decorators import runtime_config
 
 
 @runtime_config("rconfig")

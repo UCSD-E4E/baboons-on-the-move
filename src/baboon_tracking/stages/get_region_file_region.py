@@ -4,10 +4,10 @@ from baboon_tracking.mixins.baboons_mixin import BaboonsMixin
 from baboon_tracking.decorators.debug import debug
 from baboon_tracking.mixins.frame_mixin import FrameMixin
 from library.region_file import RegionFile, region_factory
-from pipeline import Stage
-from pipeline.decorators import stage
-from pipeline.decorators import runtime_config
-from pipeline.stage_result import StageResult
+from bom_pipeline import Stage
+from bom_pipeline.decorators import stage
+from bom_pipeline.decorators import runtime_config
+from bom_pipeline.stage_result import StageResult
 
 
 # @debug(FrameMixin, (0, 255, 0))
