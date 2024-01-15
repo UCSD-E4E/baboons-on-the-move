@@ -1,11 +1,12 @@
 {
     "recommendations": [
-        "eamodio.gitlens",
-        "ms-python.python",
         "ms-python.vscode-pylance",
+        "ms-python.python",
         "ms-toolsai.jupyter",
         "njpwerner.autodocstring",
         "ms-python.isort",
-        "VisualStudioExptTeam.vscodeintellicode"
+        "eamodio.gitlens",
+        "VisualStudioExptTeam.vscodeintellicode",
+        "ms-python.black-formatter"
     ]
 }

@@ -17,15 +17,6 @@
             "description": "Calculates metrics for the current algorithm"
         },
         {
-            "module": "chart",
-            "class": "Chart",
-            "subcommands": [
-                "chart",
-                "flowchart"
-            ],
-            "description": "Generates flowchart dynamically from code"
-        },
-        {
             "module": "compare",
             "class": "Compare",
             "subcommands": [
