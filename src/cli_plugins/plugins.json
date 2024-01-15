@@ -116,14 +116,6 @@
             "description": "Runs algorithm and display time of each step"
         },
         {
-            "module": "shell",
-            "class": "Shell",
-            "subcommands": [
-                "shell"
-            ],
-            "description": "Opens shell in virtual environment"
-        },
-        {
             "module": "docs",
             "class": "Docs",
             "subcommands": [
