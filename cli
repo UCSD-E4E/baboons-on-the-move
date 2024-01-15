@@ -1,0 +1,35 @@
+#!/bin/bash
+
+SHELL_NAME=$(basename $SHELL)
+echo Using $SHELL_NAME...
+
+# Check to see if pyenv is on the path.
+pyenv --version > /dev/null
+if [ $? -ne 0 ]
+then
+    # Update PATH
+    export PATH="$HOME/.pyenv/bin:$PATH"
+
+    pyenv --version > /dev/null
+    if [ $? -ne 0 ]
+    then
+        # Install pyenv if not found.
+        curl https://pyenv.run | $SHELL
+    fi
+    
+    eval "$(pyenv init --path)"
+    eval "$(pyenv virtualenv-init -)"
+fi
+
+# Check to see if pyenv has been added to the path.
+cat ~/.${SHELL_NAME}rc | grep 'export PATH="$HOME/.pyenv/bin:$PATH"' > /dev/null
+if [ $? -ne 0 ]
+then
+    # Add pyenv to your path.
+    echo '
+export PATH="$HOME/.pyenv/bin:$PATH"
+eval "$(pyenv init --path)"
+eval "$(pyenv virtualenv-init -)"' >> ~/.${SHELL_NAME}rc
+fi
+
+python ./cli.py $@
