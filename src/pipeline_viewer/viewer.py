@@ -2,14 +2,14 @@
 Implements a treeviewer based Pipeline Viewer
 """
 
-import tkinter as tk
-from tkinter import ttk
-from pipeline.parent_stage import ParentStage
+# import tkinter as tk
+# from tkinter import ttk
+# from pipeline.parent_stage import ParentStage
 
-from pipeline.pipeline import Pipeline
-from pipeline.serial import Serial
-from pipeline.parallel import Parallel
-from pipeline.stage import Stage
+# from pipeline.pipeline import Pipeline
+# from pipeline.serial import Serial
+# from pipeline.parallel import Parallel
+# from pipeline.stage import Stage
 
 
 class PipelineViewer:

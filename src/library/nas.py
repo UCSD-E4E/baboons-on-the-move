@@ -2,17 +2,18 @@
 A wrapper around the synology API for to help with NAS access.
 """
 
-import sys
+import getpass
 import json
 import pickle
-import getpass
+import shlex
+import sys
 from os import getenv, makedirs
+from subprocess import PIPE, CompletedProcess, run
+
 from genericpath import exists
 from synology_api import filestation
 from synology_api.exceptions import FileStationError
 from tqdm import tqdm
-import shlex
-from subprocess import PIPE, CompletedProcess, run
 
 
 class NAS:
@@ -44,7 +45,7 @@ class NAS:
         password_token = None
         if exists("./nas_token.pickle"):
             with open("./nas_token.pickle", "rb") as f:
-                username_token, password_token = pickle.load(f)
+                username_token, password_token, totp_command = pickle.load(f)
 
         if not username:
             if username_token:
@@ -60,7 +61,7 @@ class NAS:
                 password = getpass.getpass(prompt="NAS Password: ")
 
         with open("./nas_token.pickle", "wb") as f:
-            pickle.dump((username, password), f)
+            pickle.dump((username, password, totp_command), f)
 
         totp = None
         if totp_command:

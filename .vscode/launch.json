@@ -56,7 +56,8 @@
                 // "VISO/car/003",
                 // "-f",
                 // "f:yes:no:15164"
-            ]
+            ],
+            "justMyCode": false,
         },
         {
             "name": "Python: Current File",

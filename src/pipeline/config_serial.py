@@ -1,8 +1,10 @@
 """
 Implements a serial stage which allows the various sub stages to be reordered or turned off via config.
 """
-from typing import Dict, Callable, List
-from pipeline.serial import Serial
+from typing import Callable, Dict, List
+
+from bom_pipeline.serial import Serial
+
 from library.config import get_config_part
 
 

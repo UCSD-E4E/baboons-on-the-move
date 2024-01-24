@@ -7,13 +7,12 @@ from datetime import datetime
 from random import gauss
 from typing import Any, Dict, Tuple
 
+import numpy as np
+import yaml
 from firebase_admin import db
 from numpy.core.numeric import Inf
-import yaml
-import numpy as np
 
 from library.firebase import initialize_app
-
 
 CONFIG_STORE = None
 CONFIG_PATH = "./config.yml"

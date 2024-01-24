@@ -3,7 +3,6 @@
         "tests"
     ],
     "python.testing.unittestEnabled": false,
-    "python.linting.pylintEnabled": true,
     "editor.rulers": [
         100
     ],
@@ -11,7 +10,7 @@
         "editor.defaultFormatter": "ms-python.black-formatter",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true
+            "source.organizeImports": "explicit"
         },
     },
     "isort.args": [
