@@ -32,7 +32,6 @@ gitpython = "^3.1.40"
 backoff = "^2.2.1"
 py7zr = "^0.20.8"
 protobuf = "^4.25.1"
-wakepy = "^0.7.2"
 sherlock = { git = "https://github.com/KastnerRG/sherlock.git", branch = "feature/poetry" }
 bom-pipeline = {git = "git@github.com:UCSD-E4E/bom-pipeline.git"}
 
