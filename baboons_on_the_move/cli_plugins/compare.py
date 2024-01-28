@@ -6,17 +6,17 @@ Outputs the difference between the two sets.
 from argparse import ArgumentParser, Namespace
 from sqlite3 import connect
 
-from baboons_on_the_move.cli_plugins.cli_plugin import CliPlugin
+from bom_common.pluggable_cli import Plugin
 
 
-class Compare(CliPlugin):
+class Compare(Plugin):
     """
     A CLI plugin for comparing two result files.
     Outputs the difference between the two sets.
     """
 
     def __init__(self, parser: ArgumentParser):
-        CliPlugin.__init__(self, parser)
+        super().__init__(parser)
 
         parser.add_argument(
             "-1",

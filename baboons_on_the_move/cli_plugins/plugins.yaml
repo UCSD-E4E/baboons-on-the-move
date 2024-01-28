@@ -1,6 +1,7 @@
 # baseline:
 #     module: baseline
 #     class: Baseline
+#     package: baboons_on_the_move.cli_plugins
 #     subcommands:
 #         - baseline
 #     description: "Updates the baseline used by the test cases"
@@ -8,6 +9,7 @@
 # calculate_metrics:
 #     module: calculate_metrics
 #     class: CalculateMetrics
+#     package: baboons_on_the_move.cli_plugins
 #     subcommands:
 #         - calc-metrics
 #     description: "Calculates metrics for the current algorithm"
@@ -15,6 +17,7 @@
 compare:
     module: compare
     class: Compare
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - compare
     description: "Compares two results databases and produces the difference"
@@ -22,6 +25,7 @@ compare:
 data:
     module: data
     class: Data
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - data
     description: "Download data from team Google Drive"
@@ -29,6 +33,7 @@ data:
 # dataset:
 #     module: dataset
 #     class: Dataset
+#     package: baboons_on_the_move.cli_plugins
 #     subcommands:
 #         - dataset
 #     description: "Create dataset from xml file and video."
@@ -36,6 +41,7 @@ data:
 download_parameters:
     module: download_parameters
     class: DownloadParameters
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - download-params
     description: "Download latest parameters from the cloud."
@@ -43,6 +49,7 @@ download_parameters:
 decrypt:
     module: encrypt_decrypt
     class: Decrypt
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - decrypt
     description: "Decrypts data folder"
@@ -50,6 +57,7 @@ decrypt:
 encrypt:
     module: encrypt_decrypt
     class: Encrypt
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - encrypt
     description: "Encrypts data folder"
@@ -57,6 +65,7 @@ encrypt:
 format_files:
     module: format_files
     class: FormatFiles
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - format
     description: "Format all python files to follow standard"
@@ -64,6 +73,7 @@ format_files:
 generate:
     module: generate
     class: Generate
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - generate
         - gen
@@ -73,6 +83,7 @@ generate:
 lint:
     module: lint
     class: Lint
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - lint
     description: "Checks code for error using pylint, pyright, and black"
@@ -80,6 +91,7 @@ lint:
 # optimize:
 #     module: optimize
 #     class: Optimize
+#     package: baboons_on_the_move.cli_plugins
 #     subcommands:
 #         - optimize
 #     description: "Optimize parameters."
@@ -87,6 +99,7 @@ lint:
 # run:
 #     module: run
 #     class: Run
+#     package: baboons_on_the_move.cli_plugins
 #     subcommands:
 #         - run
 #     description: "Runs algorithm and display time of each step"
@@ -94,6 +107,7 @@ lint:
 docs:
     module: docs
     class: Docs
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - docs
     description: "Generates sphinx documentation"
@@ -101,13 +115,15 @@ docs:
 test:
     module: test
     class: Test
+    package: baboons_on_the_move.cli_plugins
     subcommands:
         - test
     description: "Runs pytest unit and integration tests"
     
-render_dataset:
-    module: render_dataset
-    class: RenderDataset
-    subcommands:
-        - render-dataset
-    description: "Renders the specified dataset"
+# render_dataset:
+#     module: render_dataset
+#     class: RenderDataset
+#     package: baboons_on_the_move.cli_plugins
+#     subcommands:
+#         - render-dataset
+#     description: "Renders the specified dataset"

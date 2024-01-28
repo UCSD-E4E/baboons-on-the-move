@@ -4,11 +4,11 @@ Gets the data necessary to test the algorithm from Google Drive.
 import pathlib
 from argparse import ArgumentParser, Namespace
 
+from bom_common.pluggable_cli import Plugin
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
 from tqdm import tqdm
 
-from baboons_on_the_move.cli_plugins.cli_plugin import CliPlugin
 from baboons_on_the_move.cli_plugins.utils_import import (
     get_ci_data_folder,
     get_team_drive,
@@ -16,13 +16,13 @@ from baboons_on_the_move.cli_plugins.utils_import import (
 )
 
 
-class Data(CliPlugin):
+class Data(Plugin):
     """
     Gets the data necessary to test the algorithm from Google Drive.
     """
 
     def __init__(self, parser: ArgumentParser):
-        CliPlugin.__init__(self, parser)
+        super().__init__(parser)
 
     def execute(self, args: Namespace):
         pathlib.Path("./data").mkdir(exist_ok=True)

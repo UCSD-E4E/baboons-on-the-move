@@ -1,20 +1,20 @@
 """
 Runs unit and integration tests
 """
-from argparse import ArgumentParser, Namespace
 import sys
+from argparse import ArgumentParser, Namespace
+
 import pytest
+from bom_common.pluggable_cli import Plugin
 
-from baboons_on_the_move.cli_plugins.cli_plugin import CliPlugin
 
-
-class Test(CliPlugin):
+class Test(Plugin):
     """
     Run unit and integration tests
     """
 
     def __init__(self, parser: ArgumentParser):
-        CliPlugin.__init__(self, parser)
+        super().__init__(parser)
 
     def execute(self, args: Namespace):
         exit_code = pytest.main(["-s"])

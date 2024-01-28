@@ -6,8 +6,7 @@ import os
 from argparse import ArgumentParser, Namespace
 
 import pyAesCrypt
-
-from baboons_on_the_move.cli_plugins.cli_plugin import CliPlugin
+from bom_common.pluggable_cli import Plugin
 
 BUFFER_SIZE = 64 * 1024
 
@@ -20,13 +19,13 @@ def _get_password():
     return password
 
 
-class Encrypt(CliPlugin):
+class Encrypt(Plugin):
     """
     Encrypts all files in the ./decrypted folder.
     """
 
     def __init__(self, parser: ArgumentParser):
-        CliPlugin.__init__(self, parser)
+        super().__init__(parser)
 
     def execute(self, args: Namespace):
         password = _get_password()
@@ -46,13 +45,13 @@ class Encrypt(CliPlugin):
             )
 
 
-class Decrypt(CliPlugin):
+class Decrypt(Plugin):
     """
     Decrypt all the files in the encrypted folder.
     """
 
     def __init__(self, parser: ArgumentParser):
-        CliPlugin.__init__(self, parser)
+        super().__init__(parser)
 
     def execute(self, args: Namespace):
         if not os.path.exists("./decrypted"):

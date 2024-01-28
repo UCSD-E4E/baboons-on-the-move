@@ -1,20 +1,20 @@
 """
 Generates sphinx documentation from source code
 """
-from argparse import ArgumentParser, Namespace
 import os
 import subprocess
+from argparse import ArgumentParser, Namespace
 
-from baboons_on_the_move.cli_plugins.cli_plugin import CliPlugin
+from bom_common.pluggable_cli import Plugin
 
 
-class Docs(CliPlugin):
+class Docs(Plugin):
     """
     Lints all the Python files.
     """
 
     def __init__(self, parser: ArgumentParser):
-        CliPlugin.__init__(self, parser)
+        super().__init__(parser)
 
     def execute(self, args: Namespace):
         """

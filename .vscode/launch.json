@@ -65,6 +65,9 @@
             "request": "launch",
             "module": "baboons_on_the_move",
             "console": "integratedTerminal",
+            "args": [
+                "decrypt"
+            ],
             "justMyCode": false,
         },
         {

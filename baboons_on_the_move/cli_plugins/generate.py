@@ -5,17 +5,18 @@ import importlib
 import json
 from argparse import ArgumentParser, Namespace
 
-from baboons_on_the_move.cli_plugins.cli_plugin import CliPlugin
+from bom_common.pluggable_cli import Plugin
+
 from baboons_on_the_move.cli_plugins.schematics.schematic import Schematic
 
 
-class Generate(CliPlugin):
+class Generate(Plugin):
     """
     A cli plugin that is used for creating Python files.
     """
 
     def __init__(self, parser: ArgumentParser):
-        CliPlugin.__init__(self, parser)
+        super().__init__(parser)
 
         subparsers = parser.add_subparsers(dest="schematic")
         subparsers.required = True
