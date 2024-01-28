@@ -60,6 +60,14 @@
             "justMyCode": false,
         },
         {
+            "name": "Python: Baboons on the Move Module",
+            "type": "python",
+            "request": "launch",
+            "module": "baboons_on_the_move",
+            "console": "integratedTerminal",
+            "justMyCode": false,
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",

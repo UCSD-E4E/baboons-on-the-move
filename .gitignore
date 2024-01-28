@@ -128,9 +128,6 @@ target/
 profile_default/
 ipython_config.py
 
-# pyenv
-.python-version
-
 # celery beat schedule file
 celerybeat-schedule
 
@@ -215,7 +212,6 @@ $RECYCLE.BIN/
 tools/
 data/
 
-google_drive_token.pickle
 nas_token.pickle
 dataset_cache.pickle
 score_cache.pickle
@@ -226,6 +222,5 @@ output
 # Vagrant Customfile
 env.yml
 
-!web/baboon-tracking-status/build
 temp
 *.bak

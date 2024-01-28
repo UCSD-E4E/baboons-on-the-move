@@ -1,0 +1,113 @@
+# baseline:
+#     module: baseline
+#     class: Baseline
+#     subcommands:
+#         - baseline
+#     description: "Updates the baseline used by the test cases"
+
+# calculate_metrics:
+#     module: calculate_metrics
+#     class: CalculateMetrics
+#     subcommands:
+#         - calc-metrics
+#     description: "Calculates metrics for the current algorithm"
+
+compare:
+    module: compare
+    class: Compare
+    subcommands:
+        - compare
+    description: "Compares two results databases and produces the difference"
+
+data:
+    module: data
+    class: Data
+    subcommands:
+        - data
+    description: "Download data from team Google Drive"
+
+# dataset:
+#     module: dataset
+#     class: Dataset
+#     subcommands:
+#         - dataset
+#     description: "Create dataset from xml file and video."
+
+download_parameters:
+    module: download_parameters
+    class: DownloadParameters
+    subcommands:
+        - download-params
+    description: "Download latest parameters from the cloud."
+
+decrypt:
+    module: encrypt_decrypt
+    class: Decrypt
+    subcommands:
+        - decrypt
+    description: "Decrypts data folder"
+
+encrypt:
+    module: encrypt_decrypt
+    class: Encrypt
+    subcommands:
+        - encrypt
+    description: "Encrypts data folder"
+
+format_files:
+    module: format_files
+    class: FormatFiles
+    subcommands:
+        - format
+    description: "Format all python files to follow standard"
+
+generate:
+    module: generate
+    class: Generate
+    subcommands:
+        - generate
+        - gen
+        - g
+    description: "Generate Python files"
+
+lint:
+    module: lint
+    class: Lint
+    subcommands:
+        - lint
+    description: "Checks code for error using pylint, pyright, and black"
+
+# optimize:
+#     module: optimize
+#     class: Optimize
+#     subcommands:
+#         - optimize
+#     description: "Optimize parameters."
+
+# run:
+#     module: run
+#     class: Run
+#     subcommands:
+#         - run
+#     description: "Runs algorithm and display time of each step"
+
+docs:
+    module: docs
+    class: Docs
+    subcommands:
+        - docs
+    description: "Generates sphinx documentation"
+
+test:
+    module: test
+    class: Test
+    subcommands:
+        - test
+    description: "Runs pytest unit and integration tests"
+    
+render_dataset:
+    module: render_dataset
+    class: RenderDataset
+    subcommands:
+        - render-dataset
+    description: "Renders the specified dataset"

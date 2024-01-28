@@ -96,7 +96,3 @@ def main():
 
     args = parser.parse_args()
     args.run_plugin(args)
-
-
-if __name__ == "__main__":
-    main()
